@@ -293,7 +293,7 @@ Feature: Machine group relationship
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin changes a machine's group relationship to another group
@@ -327,7 +327,7 @@ Feature: Machine group relationship
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin removes a machine's group relationship
@@ -356,7 +356,7 @@ Feature: Machine group relationship
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin changes a machine's policy relationship to a non-existent group
@@ -392,7 +392,7 @@ Feature: Machine group relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin changes a machine's group relationship to a group for another account
@@ -419,7 +419,7 @@ Feature: Machine group relationship
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product changes a machine's group relationship to another group
@@ -467,7 +467,7 @@ Feature: Machine group relationship
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product changes a machine's group relationship to a new group for a machine they don't own
@@ -506,7 +506,7 @@ Feature: Machine group relationship
       """
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to change a machine's group relationship (license owner)
@@ -529,7 +529,7 @@ Feature: Machine group relationship
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to change a machine's group relationship (license user)
@@ -553,7 +553,7 @@ Feature: Machine group relationship
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User changes a machine's group relationship to another group for a machine they don't own
@@ -575,7 +575,7 @@ Feature: Machine group relationship
       """
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License changes a machine's group relationship to another group
@@ -597,7 +597,7 @@ Feature: Machine group relationship
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous changes a machine's group relationship to a different group
@@ -616,5 +616,5 @@ Feature: Machine group relationship
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job

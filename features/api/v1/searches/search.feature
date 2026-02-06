@@ -46,7 +46,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 5 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search using the OR operator
@@ -78,7 +78,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 10 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by user type
@@ -108,7 +108,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 9 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by user type without user.read permissions
@@ -142,7 +142,7 @@ Feature: Search
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by user type using pagination
@@ -180,7 +180,7 @@ Feature: Search
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by user type on the role relationship
@@ -202,7 +202,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 1 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search with a query that is too small
@@ -233,7 +233,7 @@ Feature: Search
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search with a metadata query that is too small
@@ -266,7 +266,7 @@ Feature: Search
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by an unsearchable type "accounts"
@@ -297,7 +297,7 @@ Feature: Search
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by an unsearchable type "tokens"
@@ -328,7 +328,7 @@ Feature: Search
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by an unknown type
@@ -359,7 +359,7 @@ Feature: Search
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by an unknown attribute
@@ -390,7 +390,7 @@ Feature: Search
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by user type on the first and last name attributes
@@ -420,7 +420,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 1 "user"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by user type on the full name attribute
@@ -449,7 +449,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 1 "user"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by user type on the first name attribute that is misspelled
@@ -477,7 +477,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 0 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by user type on the last name attribute
@@ -520,7 +520,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 3 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by user type on the email attribute
@@ -542,7 +542,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 1 "user"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by user type on the email attribute using domain name
@@ -582,7 +582,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 1 "user"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by user type on the email attribute using domain name without TLD
@@ -622,7 +622,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 3 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by user type on the email attribute using local part
@@ -662,7 +662,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 3 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by user type on email attribute containing a dot
@@ -688,7 +688,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 1 "user"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by user type on the metadata attribute using an exact query
@@ -718,7 +718,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 1 "user"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by user type on the metadata attribute using an array of terms
@@ -757,7 +757,7 @@ Feature: Search
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by license type on the metadata attribute using a snakecased metadata key
@@ -787,7 +787,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 1 "license"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by user type on the metadata attribute using a nested query that doesn't match
@@ -817,7 +817,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 0 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by user type on the metadata attribute using a nested query that loosely matches
@@ -849,7 +849,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 0 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by license type on a metadata object attribute (full)
@@ -885,7 +885,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 1 "license"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by license type on a metadata object attribute (partial)
@@ -918,7 +918,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 1 "license"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by license type on a metadata array attribute (full)
@@ -948,7 +948,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 1 "license"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by license type on a metadata array attribute (partial)
@@ -978,7 +978,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 1 "license"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by license type on the key attribute
@@ -1006,7 +1006,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 1 "license"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by license type on a large key attribute
@@ -1034,7 +1034,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by license type using a partial ID
@@ -1062,7 +1062,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 1 "license"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by license type on the key attribute using a partial key
@@ -1090,7 +1090,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin attempts to perform a search by license type on the key attribute for another account
@@ -1118,7 +1118,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by license type on the name attribute
@@ -1146,7 +1146,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 1 "license"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by license type on the policy relationship by ID
@@ -1187,7 +1187,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 2 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by license type on the policy relationship by name
@@ -1234,7 +1234,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 2 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by license type on the user relationship by ID
@@ -1258,7 +1258,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 7 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by license type on the user relationship by email
@@ -1282,7 +1282,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 5 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by policy type on the product relationship by ID
@@ -1311,7 +1311,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 1 "policy"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by policy type on the product relationship by name
@@ -1358,7 +1358,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 2 "policies"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by release type on the product relationship by name
@@ -1405,7 +1405,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 2 "releases"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by machine type on the license relationship by ID
@@ -1434,7 +1434,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 5 "machines"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by machine type on the policy relationship by ID
@@ -1459,7 +1459,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 4 "machines"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by machine type on the fingerprint attribute
@@ -1481,7 +1481,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 1 "machine"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by machine type on the user relationship by email
@@ -1523,7 +1523,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 2 "machines"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by machine type on the name attribute using an exact match
@@ -1558,7 +1558,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 1 "machine"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by machine type on the name attribute using a suffix
@@ -1593,7 +1593,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 10 "machine"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by request log type on ID (full)
@@ -1628,7 +1628,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 1 "request-log"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by request log type on ID (partial)
@@ -1663,7 +1663,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 3 "request-logs"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by request log type on the url attribute (full)
@@ -1693,7 +1693,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 9 "request-logs"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by request log type on the url attribute (partial)
@@ -1723,7 +1723,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 3 "request-logs"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by request log type on the IP attribute (full, IPv4)
@@ -1758,7 +1758,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 4 "request-logs"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by request log type on the IP attribute (partial, IPv4)
@@ -1793,7 +1793,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 10 "request-logs"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by request log type on the IP attribute (full, IPv6)
@@ -1828,7 +1828,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 2 "request-logs"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by request log type on the IP attribute (partial, IPv6)
@@ -1863,7 +1863,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 10 "request-logs"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by request log type on resource (full)
@@ -1893,7 +1893,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 8 "request-logs"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by request log type on resource (partial)
@@ -1923,7 +1923,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 8 "request-logs"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by request log type on resource ID (full)
@@ -1953,7 +1953,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 8 "request-logs"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by request log type on resource ID (partial)
@@ -1983,7 +1983,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 8 "request-logs"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by request log type on requestor (full)
@@ -2013,7 +2013,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 1 "request-log"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by request log type on requestor (partial)
@@ -2057,7 +2057,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 3 "request-logs"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by request log type on requestor ID (full)
@@ -2087,7 +2087,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 1 "request-log"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by request log type on requestor ID (partial)
@@ -2117,7 +2117,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 1 "request-log"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by request log type on requestor ID and type
@@ -2162,7 +2162,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 1 "request-log"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by request log type on multiple attributes
@@ -2216,7 +2216,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 2 "request-logs"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by group type on name
@@ -2258,7 +2258,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 3 "groups"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search with an empty query
@@ -2287,7 +2287,7 @@ Feature: Search
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search with a empty value
@@ -2323,7 +2323,7 @@ Feature: Search
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search with a nil value
@@ -2349,7 +2349,7 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 0 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   @ee
@@ -2371,7 +2371,7 @@ Feature: Search
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Product performs a search
@@ -2392,7 +2392,7 @@ Feature: Search
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: User performs a search
@@ -2413,7 +2413,7 @@ Feature: Search
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: License performs a search
@@ -2434,7 +2434,7 @@ Feature: Search
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Anonymous performs a search
@@ -2452,7 +2452,7 @@ Feature: Search
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin attempts to perform an SQL injection
@@ -2475,5 +2475,5 @@ Feature: Search
     Then the response status should be "200"
     And the response body should be an array with 0 "request-logs"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs

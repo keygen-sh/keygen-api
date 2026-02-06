@@ -33,7 +33,7 @@ Feature: Machine checkout actions
     When I send a POST request to "/accounts/test1/machines/$0/actions/check-out"
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous performs a machine checkout (GET)
@@ -43,7 +43,7 @@ Feature: Machine checkout actions
     When I send a GET request to "/accounts/test1/machines/$0/actions/check-out"
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with defaults (POST)
@@ -96,7 +96,7 @@ Feature: Machine checkout actions
       { "lastCheckOutAt": "2022-10-16T14:52:48.000Z" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -133,7 +133,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -165,7 +165,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -194,7 +194,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -226,7 +226,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -255,7 +255,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -275,7 +275,7 @@ Feature: Machine checkout actions
     Then the response status should be "200"
     And the response body should be a "machine-file" with a certificate signed using "ed25519"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout using Ed25519 (GET)
@@ -294,7 +294,7 @@ Feature: Machine checkout actions
     Then the response status should be "200"
     And the response should be a "MACHINE" certificate signed using "ed25519"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout using RSA-PSS (POST)
@@ -313,7 +313,7 @@ Feature: Machine checkout actions
     Then the response status should be "200"
     And the response body should be a "machine-file" with a certificate signed using "rsa-pss-sha256"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout using RSA-PSS (GET)
@@ -332,7 +332,7 @@ Feature: Machine checkout actions
     Then the response status should be "200"
     And the response should be a "MACHINE" certificate signed using "rsa-pss-sha256"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout using RSA (POST)
@@ -351,7 +351,7 @@ Feature: Machine checkout actions
     Then the response status should be "200"
     And the response body should be a "machine-file" with a certificate signed using "rsa-sha256"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout using RSA (GET)
@@ -370,7 +370,7 @@ Feature: Machine checkout actions
     Then the response status should be "200"
     And the response should be a "MACHINE" certificate signed using "rsa-sha256"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout using ECDSA (POST)
@@ -389,7 +389,7 @@ Feature: Machine checkout actions
     Then the response status should be "200"
     And the response body should be a "machine-file" with a certificate signed using "ecdsa-p256"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout using ECDSA (GET)
@@ -408,7 +408,7 @@ Feature: Machine checkout actions
     Then the response status should be "200"
     And the response should be a "MACHINE" certificate signed using "ecdsa-p256"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with a custom algorithm (POST)
@@ -434,7 +434,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -463,7 +463,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -490,7 +490,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machines checkout with an invalid signing algorithm (POST)
@@ -516,7 +516,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with a nil algorithm (POST)
@@ -541,7 +541,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with an empty algorithm (GET)
@@ -563,7 +563,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with a custom TTL (POST)
@@ -589,7 +589,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -613,7 +613,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -638,7 +638,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with an empty TTL (GET)
@@ -659,7 +659,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with a TTL that is too short (POST)
@@ -685,7 +685,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with a TTL that is too short (GET)
@@ -708,7 +708,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with a TTL that is very long (POST)
@@ -734,7 +734,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -758,7 +758,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -781,7 +781,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with a license include (GET)
@@ -803,7 +803,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with an owner include (POST)
@@ -832,7 +832,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with an owner include (GET)
@@ -862,7 +862,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with a license owner include (POST)
@@ -893,7 +893,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with a license user include (POST, v1.5)
@@ -926,7 +926,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with a license users include (POST)
@@ -962,7 +962,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with a policy include (POST)
@@ -985,7 +985,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with a policy include (POST, v1.4)
@@ -1017,7 +1017,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with a policy include (POST, v1.3)
@@ -1049,7 +1049,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with a policy include (POST, v1.1)
@@ -1080,7 +1080,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with a policy include (GET)
@@ -1103,7 +1103,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout a product include (POST)
@@ -1130,7 +1130,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout a product include (GET)
@@ -1154,7 +1154,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with entitlement includes (POST)
@@ -1184,7 +1184,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with entitlement includes (GET)
@@ -1211,7 +1211,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with component includes (POST)
@@ -1237,7 +1237,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with component includes (GET)
@@ -1260,7 +1260,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with a group include (POST)
@@ -1288,7 +1288,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with a group include (GET)
@@ -1313,7 +1313,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with encrypted includes (POST)
@@ -1347,7 +1347,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -1383,7 +1383,7 @@ Feature: Machine checkout actions
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1414,7 +1414,7 @@ Feature: Machine checkout actions
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1444,7 +1444,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1471,7 +1471,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with encrypted includes (GET)
@@ -1501,7 +1501,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with invalid includes (POST)
@@ -1531,7 +1531,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with invalid includes (GET)
@@ -1558,7 +1558,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with empty includes (POST)
@@ -1577,7 +1577,7 @@ Feature: Machine checkout actions
       { "included": [] }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with empty includes (GET)
@@ -1593,7 +1593,7 @@ Feature: Machine checkout actions
       { "included": [] }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout by fingerprint (POST)
@@ -1610,7 +1610,7 @@ Feature: Machine checkout actions
     Then the response status should be "200"
     And the response body should be a "machine-file"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout by fingerprint (GET)
@@ -1627,7 +1627,7 @@ Feature: Machine checkout actions
     Then the response status should be "200"
     And the response should be a "MACHINE" certificate
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with a bad content-type header (POST)
@@ -1662,7 +1662,7 @@ Feature: Machine checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -1700,7 +1700,7 @@ Feature: Machine checkout actions
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1737,7 +1737,7 @@ Feature: Machine checkout actions
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1779,7 +1779,7 @@ Feature: Machine checkout actions
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1824,7 +1824,7 @@ Feature: Machine checkout actions
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1850,7 +1850,7 @@ Feature: Machine checkout actions
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product performs a machine checkout (POST)
@@ -1866,7 +1866,7 @@ Feature: Machine checkout actions
     Then the response status should be "200"
     And the response body should be a "machine-file"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product performs a machine checkout (GET)
@@ -1882,7 +1882,7 @@ Feature: Machine checkout actions
     Then the response status should be "200"
     And the response should be a "MACHINE" certificate
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product performs a checkout for a machine of another product (POST)
@@ -1895,7 +1895,7 @@ Feature: Machine checkout actions
     When I send a POST request to "/accounts/test1/machines/$0/actions/check-out"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product performs a checkout for a machine of another product (GET)
@@ -1908,7 +1908,7 @@ Feature: Machine checkout actions
     When I send a GET request to "/accounts/test1/machines/$0/actions/check-out"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License performs a machine checkout (POST)
@@ -1922,7 +1922,7 @@ Feature: Machine checkout actions
     Then the response status should be "200"
     And the response body should be a "machine-file"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License performs a machine checkout (GET)
@@ -1936,7 +1936,7 @@ Feature: Machine checkout actions
     Then the response status should be "200"
     And the response should be a "MACHINE" certificate
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License performs a machine checkout without checkout permissions (POST)
@@ -1952,7 +1952,7 @@ Feature: Machine checkout actions
     When I send a POST request to "/accounts/test1/machines/$0/actions/check-out?include=license.policy"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License performs a machine checkout without checkout permissions (GET)
@@ -1968,7 +1968,7 @@ Feature: Machine checkout actions
     When I send a GET request to "/accounts/test1/machines/$0/actions/check-out?include=license.product"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License performs a machine checkout without include permissions (POST)
@@ -1984,7 +1984,7 @@ Feature: Machine checkout actions
     When I send a POST request to "/accounts/test1/machines/$0/actions/check-out?include=license.policy"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License performs a machine checkout without include permissions (GET)
@@ -2000,7 +2000,7 @@ Feature: Machine checkout actions
     When I send a GET request to "/accounts/test1/machines/$0/actions/check-out?include=license.product"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License performs a machine checkout with permissions (POST)
@@ -2017,7 +2017,7 @@ Feature: Machine checkout actions
     Then the response status should be "200"
     And the response body should be a "machine-file"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License performs a machine checkout with permissions (GET)
@@ -2034,7 +2034,7 @@ Feature: Machine checkout actions
     Then the response status should be "200"
     And the response should be a "MACHINE" certificate
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License performs a machine checkout for another machine (POST)
@@ -2047,7 +2047,7 @@ Feature: Machine checkout actions
     When I send a POST request to "/accounts/test1/machines/$1/actions/check-out"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License performs a machine checkout for another machine (GET)
@@ -2060,7 +2060,7 @@ Feature: Machine checkout actions
     When I send a GET request to "/accounts/test1/machines/$1/actions/check-out"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User performs a machine checkout for their machine (POST, license owner)
@@ -2075,7 +2075,7 @@ Feature: Machine checkout actions
     Then the response status should be "200"
     And the response body should be a "machine-file"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User performs a machine checkout for their machine (GET, license owner)
@@ -2090,7 +2090,7 @@ Feature: Machine checkout actions
     Then the response status should be "200"
     And the response should be a "MACHINE" certificate
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User performs a machine checkout for their machine (POST, licensee)
@@ -2106,7 +2106,7 @@ Feature: Machine checkout actions
     Then the response status should be "200"
     And the response body should be a "machine-file"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User performs a machine checkout for their machine (GET, licensee)
@@ -2122,7 +2122,7 @@ Feature: Machine checkout actions
     Then the response status should be "200"
     And the response should be a "MACHINE" certificate
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User performs a machine checkout for a machine they don't own (POST)
@@ -2135,7 +2135,7 @@ Feature: Machine checkout actions
     When I send a POST request to "/accounts/test1/machines/$0/actions/check-out"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User performs a machine checkout for a machine they don't own (GET)
@@ -2148,5 +2148,5 @@ Feature: Machine checkout actions
     When I send a GET request to "/accounts/test1/machines/$0/actions/check-out"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job

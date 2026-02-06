@@ -66,7 +66,7 @@ Feature: Create package
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 4 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a package with the PyPI engine
@@ -116,7 +116,7 @@ Feature: Create package
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 4 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a package with the Tauri engine
@@ -166,7 +166,7 @@ Feature: Create package
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a package with the raw engine
@@ -216,7 +216,7 @@ Feature: Create package
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a package with a nil engine
@@ -266,7 +266,7 @@ Feature: Create package
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 4 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a package with an invalid engine
@@ -327,7 +327,7 @@ Feature: Create package
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to create a package for another account
@@ -358,7 +358,7 @@ Feature: Create package
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Developer creates a package for their account
@@ -390,7 +390,7 @@ Feature: Create package
       """
     Then the response status should be "201"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Sales attempts to create a package for their account
@@ -422,7 +422,7 @@ Feature: Create package
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Support attempts to create a package for their account
@@ -454,7 +454,7 @@ Feature: Create package
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Read-only attempts to create a package for their account
@@ -486,7 +486,7 @@ Feature: Create package
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -537,7 +537,7 @@ Feature: Create package
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -588,7 +588,7 @@ Feature: Create package
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to create a package for their account
@@ -629,7 +629,7 @@ Feature: Create package
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to create a package for their account
@@ -661,7 +661,7 @@ Feature: Create package
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to create a package for their account
@@ -693,7 +693,7 @@ Feature: Create package
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous attempts to create a package for their account
@@ -722,5 +722,5 @@ Feature: Create package
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job

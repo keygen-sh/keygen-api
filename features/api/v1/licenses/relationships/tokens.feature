@@ -41,7 +41,7 @@ Feature: Generate authentication token for license
       }
       """
     And sidekiq should have 3 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates a named license token
@@ -67,7 +67,7 @@ Feature: Generate authentication token for license
       { "name": "Client Token" }
       """
     And sidekiq should have 3 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates a license token with a max activation count
@@ -290,7 +290,7 @@ Feature: Generate authentication token for license
       { "Keygen-Environment": null }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ce
@@ -340,7 +340,7 @@ Feature: Generate authentication token for license
       { "Keygen-Environment": null }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -382,7 +382,7 @@ Feature: Generate authentication token for license
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -420,7 +420,7 @@ Feature: Generate authentication token for license
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -453,7 +453,7 @@ Feature: Generate authentication token for license
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -495,7 +495,7 @@ Feature: Generate authentication token for license
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -529,7 +529,7 @@ Feature: Generate authentication token for license
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -571,7 +571,7 @@ Feature: Generate authentication token for license
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -608,7 +608,7 @@ Feature: Generate authentication token for license
       { "Keygen-Environment": null }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -637,7 +637,7 @@ Feature: Generate authentication token for license
       { "Keygen-Environment": null }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -666,7 +666,7 @@ Feature: Generate authentication token for license
       { "Keygen-Environment": null }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -711,7 +711,7 @@ Feature: Generate authentication token for license
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -756,7 +756,7 @@ Feature: Generate authentication token for license
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -801,7 +801,7 @@ Feature: Generate authentication token for license
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -842,7 +842,7 @@ Feature: Generate authentication token for license
       { "Keygen-Environment": null }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1221,7 +1221,7 @@ Feature: Generate authentication token for license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1270,7 +1270,7 @@ Feature: Generate authentication token for license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1309,7 +1309,7 @@ Feature: Generate authentication token for license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1348,7 +1348,7 @@ Feature: Generate authentication token for license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1387,7 +1387,7 @@ Feature: Generate authentication token for license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1426,7 +1426,7 @@ Feature: Generate authentication token for license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1472,7 +1472,7 @@ Feature: Generate authentication token for license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1518,7 +1518,7 @@ Feature: Generate authentication token for license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to generate a token for a license it doesn't own

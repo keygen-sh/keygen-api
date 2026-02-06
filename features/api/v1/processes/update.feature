@@ -48,7 +48,7 @@ Feature: Update machine process
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Developer updates a process
@@ -75,7 +75,7 @@ Feature: Update machine process
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Sales updates a process
@@ -102,7 +102,7 @@ Feature: Update machine process
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Support updates a process
@@ -129,7 +129,7 @@ Feature: Update machine process
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Read only updates a process
@@ -156,7 +156,7 @@ Feature: Update machine process
     Then the response status should be "403"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -193,7 +193,7 @@ Feature: Update machine process
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -230,7 +230,7 @@ Feature: Update machine process
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -263,7 +263,7 @@ Feature: Update machine process
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product updates a process
@@ -293,7 +293,7 @@ Feature: Update machine process
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product updates a process for a different product
@@ -320,7 +320,7 @@ Feature: Update machine process
     Then the response status should be "404"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License updates a process's metadata
@@ -348,7 +348,7 @@ Feature: Update machine process
     Then the response status should be "400"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License updates a process for a different license
@@ -375,7 +375,7 @@ Feature: Update machine process
     Then the response status should be "404"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User updates a process (license owner)
@@ -400,7 +400,7 @@ Feature: Update machine process
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User updates a process (license user, machine owner)
@@ -426,7 +426,7 @@ Feature: Update machine process
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User updates a process (license user, not owner)
@@ -452,7 +452,7 @@ Feature: Update machine process
     Then the response status should be "403"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User updates a process's metadata
@@ -481,7 +481,7 @@ Feature: Update machine process
     Then the response status should be "400"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User updates a process for a different user
@@ -508,7 +508,7 @@ Feature: Update machine process
     Then the response status should be "404"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous updates a process
@@ -532,5 +532,5 @@ Feature: Update machine process
     Then the response status should be "401"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job

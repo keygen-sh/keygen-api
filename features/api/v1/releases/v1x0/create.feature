@@ -86,7 +86,7 @@ Feature: Create release
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin upserts a new release for their account
@@ -158,7 +158,7 @@ Feature: Create release
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a new release for their account (free tier, limit not reached)
@@ -224,7 +224,7 @@ Feature: Create release
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a new release for their account (free tier, limit reached)
@@ -279,7 +279,7 @@ Feature: Create release
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a new release for their account (non-lowercase filetype)
@@ -343,7 +343,7 @@ Feature: Create release
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a duplicate release (by version)
@@ -397,7 +397,7 @@ Feature: Create release
       }
       """
     And sidekiq should have 3 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a duplicate release (by filename)
@@ -446,7 +446,7 @@ Feature: Create release
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates an rc release
@@ -506,7 +506,7 @@ Feature: Create release
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates an alpha release
@@ -567,7 +567,7 @@ Feature: Create release
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a beta release
@@ -622,7 +622,7 @@ Feature: Create release
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a dev release
@@ -683,7 +683,7 @@ Feature: Create release
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates an alpha release on the stable channel
@@ -731,7 +731,7 @@ Feature: Create release
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates an alpha release on the beta channel
@@ -779,7 +779,7 @@ Feature: Create release
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a release with a mismatched filetype
@@ -828,7 +828,7 @@ Feature: Create release
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a release without an extension in the filename
@@ -864,7 +864,7 @@ Feature: Create release
       """
     Then the response status should be "201"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a release with an invalid version (not a semver)
@@ -912,7 +912,7 @@ Feature: Create release
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a release with an invalid version (v prefix)
@@ -960,7 +960,7 @@ Feature: Create release
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a release with entitlement constraints
@@ -1020,7 +1020,7 @@ Feature: Create release
     And the current account should have 2 "release-entitlement-constraints"
     And the current account should have 3 "entitlements"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a release with an invalid channel
@@ -1067,7 +1067,7 @@ Feature: Create release
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a release with entitlement constraints that belong to another account
@@ -1155,7 +1155,7 @@ Feature: Create release
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a release with a null filetype
@@ -1204,7 +1204,7 @@ Feature: Create release
     And the current account should have 0 "platforms"
     And the current account should have 0 "filetypes"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a release with a null platform
@@ -1252,7 +1252,7 @@ Feature: Create release
       """
     And the current account should have 0 "platforms"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a duplicate release with a null platform
@@ -1304,7 +1304,7 @@ Feature: Create release
       }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" jobs
+    And sidekiq should have 1 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a duplicate release with a null filetype
@@ -1357,5 +1357,5 @@ Feature: Create release
       }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" jobs
+    And sidekiq should have 1 "event-log" jobs
     And sidekiq should have 1 "request-log" job

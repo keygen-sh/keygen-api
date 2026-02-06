@@ -39,7 +39,7 @@ Feature: Update machine
     And the response body should be a "machine" with the name "Home iMac"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Developer updates a machine
@@ -156,7 +156,7 @@ Feature: Update machine
       { "name": "Isolated Machine" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -189,7 +189,7 @@ Feature: Update machine
       { "name": "Shared Machine" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -244,7 +244,7 @@ Feature: Update machine
     Then the response status should be "200"
     And the response body should be a "machine" with a nil ip
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin updates a machine's core count to an amount that is permissible
@@ -294,7 +294,7 @@ Feature: Update machine
     And the response body should be a "machine" with the cores "12"
     And the first "license" should have a correct machine core count
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin updates a machine's core count to an amount that exceeds their maximum core limit (no overages)
@@ -353,7 +353,7 @@ Feature: Update machine
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin updates a machine's core count to an amount that exceeds their maximum core limit (allows overages)
@@ -403,7 +403,7 @@ Feature: Update machine
     And the response body should be a "machine" with the cores "32"
     And the first "license" should have a correct machine core count
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin updates a machine's memory to an amount that is permissible
@@ -443,7 +443,7 @@ Feature: Update machine
     And the response body should be a "machine" with the memory "67108864"
     And the first "license" should have a correct machine memory count
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin updates a machine's memory to an amount that exceeds their maximum memory limit (no overages)
@@ -493,7 +493,7 @@ Feature: Update machine
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin updates a machine's memory to an amount that exceeds their maximum memory limit (allows overages)
@@ -534,7 +534,7 @@ Feature: Update machine
     And the response body should be a "machine" with the memory "536870912"
     And the first "license" should have a correct machine memory count
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin updates a machine's disk to an amount that is permissible
@@ -574,7 +574,7 @@ Feature: Update machine
     And the response body should be a "machine" with the disk "68719476736"
     And the first "license" should have a correct machine disk count
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin updates a machine's disk to an amount that exceeds their maximum disk limit (no overages)
@@ -624,7 +624,7 @@ Feature: Update machine
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin updates a machine's disk to an amount that exceeds their maximum disk limit (allows overages)
@@ -665,7 +665,7 @@ Feature: Update machine
     And the response body should be a "machine" with the disk "549755813888"
     And the first "license" should have a correct machine disk count
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to update a machine's fingerprint
@@ -687,7 +687,7 @@ Feature: Update machine
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product updates a machine for their product
@@ -713,7 +713,7 @@ Feature: Update machine
     Then the response status should be "200"
     And the response body should be a "machine" with the name "Work MacBook Pro"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to update a machine for another product
@@ -736,7 +736,7 @@ Feature: Update machine
       """
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License updates a machine's name that belongs to a unprotected license
@@ -760,7 +760,7 @@ Feature: Update machine
     Then the response status should be "200"
     And the response body should be a "machine" with the name "Office Mac"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License updates a machine's name that belongs to a protected license
@@ -783,7 +783,7 @@ Feature: Update machine
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License updates a machine's cores that belongs to a unprotected license
@@ -806,7 +806,7 @@ Feature: Update machine
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User updates a machine's name that belongs to a unprotected license (license owner)
@@ -839,7 +839,7 @@ Feature: Update machine
     Then the response status should be "200"
     And the response body should be a "machine" with the name "Office Mac"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User updates a machine's name that belongs to a unprotected license (license user, as owner)
@@ -869,7 +869,7 @@ Feature: Update machine
     Then the response status should be "200"
     And the response body should be a "machine" with the name "Office Mac"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User updates a machine's name that belongs to a unprotected license (license user, no owner)
@@ -898,7 +898,7 @@ Feature: Update machine
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User updates a machine's name that belongs to a protected license
@@ -930,7 +930,7 @@ Feature: Update machine
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User updates a machine's fingerprint for their license
@@ -961,7 +961,7 @@ Feature: Update machine
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to update a machine for another user
@@ -986,7 +986,7 @@ Feature: Update machine
       """
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous user attempts to update a machine for their account
@@ -1006,7 +1006,7 @@ Feature: Update machine
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to update a machine for another account
@@ -1028,5 +1028,5 @@ Feature: Update machine
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job

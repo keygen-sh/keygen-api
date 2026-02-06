@@ -255,7 +255,7 @@ Feature: License entitlements relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -291,7 +291,7 @@ Feature: License entitlements relationship
     And the current account should have 0 "policy-entitlements"
     And the current account should have 3 "entitlements"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -326,7 +326,7 @@ Feature: License entitlements relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attaches empty entitlements to a license
@@ -350,7 +350,7 @@ Feature: License entitlements relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attaches an entitlement to a license that already exists as a policy entitlement
@@ -382,7 +382,7 @@ Feature: License entitlements relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to attach an entitlement to a license that already exists as a license entitlement
@@ -413,7 +413,7 @@ Feature: License entitlements relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to attach entitlements to a license with an invalid entitlement ID
@@ -446,7 +446,7 @@ Feature: License entitlements relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to attach an entitlement to a license for another account
@@ -466,7 +466,7 @@ Feature: License entitlements relationship
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -502,7 +502,7 @@ Feature: License entitlements relationship
     And the current account should have 0 "policy-entitlements"
     And the current account should have 3 "entitlements"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -536,7 +536,7 @@ Feature: License entitlements relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -572,7 +572,7 @@ Feature: License entitlements relationship
     And the current account should have 0 "policy-entitlements"
     And the current account should have 3 "entitlements"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -609,7 +609,7 @@ Feature: License entitlements relationship
     And the current account should have 0 "policy-entitlements"
     And the current account should have 3 "entitlements"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -645,7 +645,7 @@ Feature: License entitlements relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attaches entitlements to a license
@@ -669,7 +669,7 @@ Feature: License entitlements relationship
     Then the response status should be "200"
     And the response body should be an array with 2 "license-entitlements"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to attach entitlements to a license it doesn't own
@@ -700,7 +700,7 @@ Feature: License entitlements relationship
       """
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to attach entitlements to themselves
@@ -721,7 +721,7 @@ Feature: License entitlements relationship
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to attach entitlements to their license (license owner)
@@ -743,7 +743,7 @@ Feature: License entitlements relationship
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to attach entitlements to their license (license user)
@@ -766,7 +766,7 @@ Feature: License entitlements relationship
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to attach entitlements to a license
@@ -788,7 +788,7 @@ Feature: License entitlements relationship
       """
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   # Detachment
@@ -814,7 +814,7 @@ Feature: License entitlements relationship
     And the current account should have 0 "policy-entitlements"
     And the current account should have 3 "entitlements"
     And sidekiq should have 3 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin detaches empty entitlements from a license
@@ -840,7 +840,7 @@ Feature: License entitlements relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to detach entitlements from a license with an invalid entitlement ID
@@ -874,7 +874,7 @@ Feature: License entitlements relationship
     And the current account should have 0 "policy-entitlement"
     And the current account should have 3 "entitlements"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to detach entitlements from a license that is inherited from the policy
@@ -949,7 +949,7 @@ Feature: License entitlements relationship
     And the current account should have 0 "policy-entitlements"
     And the current account should have 2 "entitlements"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -980,7 +980,7 @@ Feature: License entitlements relationship
     And the current account should have 0 "policy-entitlements"
     And the current account should have 4 "entitlements"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1011,7 +1011,7 @@ Feature: License entitlements relationship
     And the current account should have 0 "policy-entitlements"
     And the current account should have 4 "entitlements"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee

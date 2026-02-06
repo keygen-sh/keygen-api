@@ -14,7 +14,6 @@ PLACEHOLDERS = %w[
   component
   machine_process
   process
-  metric
   plan
   policy
   product

@@ -27,7 +27,7 @@ Feature: Manage second factors for user
     Then the response status should be "200"
     And the response body should be an array with 1 "second-factor"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin lists second factors while having 2FA enabled
@@ -40,7 +40,7 @@ Feature: Manage second factors for user
     Then the response status should be "200"
     And the response body should be an array with 1 "second-factor"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin lists second factors while having no second factor
@@ -53,7 +53,7 @@ Feature: Manage second factors for user
     Then the response status should be "200"
     And the response body should be an array with 0 "second-factors"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin lists a user's second factors and the user has 2FA disabled
@@ -67,7 +67,7 @@ Feature: Manage second factors for user
     Then the response status should be "200"
     And the response body should be an array with 1 "second-factor"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin lists a user's second factors and the user has 2FA enabled
@@ -81,7 +81,7 @@ Feature: Manage second factors for user
     Then the response status should be "200"
     And the response body should be an array with 1 "second-factor"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin lists a user's second factors and the user has no second factors
@@ -95,7 +95,7 @@ Feature: Manage second factors for user
     Then the response status should be "200"
     And the response body should be an array with 0 "second-factors"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User lists second factors while having 2FA disabled
@@ -109,7 +109,7 @@ Feature: Manage second factors for user
     Then the response status should be "200"
     And the response body should be an array with 1 "second-factors"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User lists second factors while having 2FA enabled
@@ -123,7 +123,7 @@ Feature: Manage second factors for user
     Then the response status should be "200"
     And the response body should be an array with 1 "second-factors"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User lists second factors while having no second factor
@@ -137,7 +137,7 @@ Feature: Manage second factors for user
     Then the response status should be "200"
     And the response body should be an array with 0 "second-factors"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User lists an admin's second factors
@@ -150,7 +150,7 @@ Feature: Manage second factors for user
     When I send a GET request to "/accounts/test1/users/$0/second-factors"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -169,7 +169,7 @@ Feature: Manage second factors for user
     When I send a GET request to "/accounts/test1/users/$1/second-factors"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -188,7 +188,7 @@ Feature: Manage second factors for user
     When I send a GET request to "/accounts/test1/users/$1/second-factors"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product lists an admin's second factors
@@ -212,7 +212,7 @@ Feature: Manage second factors for user
     When I send a GET request to "/accounts/test1/users/$1/second-factors"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   # Second factor show
@@ -231,7 +231,7 @@ Feature: Manage second factors for user
     And the response body should be a "second-factor" with a "secret" attribute
     And the response body should be a "second-factor" with a "uri" attribute
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin retrieves a second factor while having 2FA enabled
@@ -249,7 +249,7 @@ Feature: Manage second factors for user
     And the response body should be a "second-factor" without a "secret" attribute
     And the response body should be a "second-factor" without a "uri" attribute
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User retrieves a second factor while having 2FA disabled
@@ -267,7 +267,7 @@ Feature: Manage second factors for user
       """
     And the response body should be a "second-factor" with a uri
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User retrieves a second factor while having 2FA enabled
@@ -285,7 +285,7 @@ Feature: Manage second factors for user
       """
     And the response body should be a "second-factor" without a "uri" attribute
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -300,7 +300,7 @@ Feature: Manage second factors for user
     When I send a GET request to "/accounts/test1/users/$1/second-factors/$0?environment=shared"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product retrieve a user's second factor
@@ -314,7 +314,7 @@ Feature: Manage second factors for user
     When I send a GET request to "/accounts/test1/users/$1/second-factors/$0"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   # Second factor creation
@@ -334,7 +334,7 @@ Feature: Manage second factors for user
       """
     Then the response status should be "201"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User creates a second factor while having no other second factor and providing a correct password
@@ -354,7 +354,7 @@ Feature: Manage second factors for user
       """
     Then the response status should be "201"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -380,7 +380,7 @@ Feature: Manage second factors for user
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product creates a second factor for a user with no other second factor and provides a correct password
@@ -401,7 +401,7 @@ Feature: Manage second factors for user
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a second factor while having no other second factor and providing an incorrect password
@@ -431,7 +431,7 @@ Feature: Manage second factors for user
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a second factor while having 2FA disabled and providing a correct password
@@ -450,7 +450,7 @@ Feature: Manage second factors for user
       """
     Then the response status should be "409"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a second factor while having 2FA disabled and providing a correct OTP
@@ -480,7 +480,7 @@ Feature: Manage second factors for user
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a second factor while having 2FA enabled and providing a correct OTP
@@ -499,7 +499,7 @@ Feature: Manage second factors for user
       """
     Then the response status should be "409"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a second factor while having 2FA enabled and providing a correct password
@@ -529,7 +529,7 @@ Feature: Manage second factors for user
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a second factor while having 2FA enabled and providing an incorrect password
@@ -559,7 +559,7 @@ Feature: Manage second factors for user
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a second factor while having 2FA enabled and providing an incorrect OTP
@@ -589,7 +589,7 @@ Feature: Manage second factors for user
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   # Second factor enable
@@ -615,7 +615,7 @@ Feature: Manage second factors for user
       """
     Then the response status should be "200"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin enables a second factor while having 2FA enabled and providing a correct OTP
@@ -640,7 +640,7 @@ Feature: Manage second factors for user
       """
     Then the response status should be "200"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin enables a second factor while having 2FA disabled and providing an incorrect OTP
@@ -676,7 +676,7 @@ Feature: Manage second factors for user
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin enables a second factor while having 2FA disabled and without an OTP
@@ -708,7 +708,7 @@ Feature: Manage second factors for user
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
    Scenario: User enables a second factor while having 2FA disabled and providing a correct OTP
@@ -734,7 +734,7 @@ Feature: Manage second factors for user
       """
     Then the response status should be "200"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -766,7 +766,7 @@ Feature: Manage second factors for user
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to enable a user's second factor
@@ -793,7 +793,7 @@ Feature: Manage second factors for user
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   # Second factor disable
@@ -819,7 +819,7 @@ Feature: Manage second factors for user
       """
     Then the response status should be "200"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin disables a second factor while having 2FA enabled and providing a correct OTP
@@ -844,7 +844,7 @@ Feature: Manage second factors for user
       """
     Then the response status should be "200"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin disables a second factor while having 2FA enabled and providing an incorrect OTP
@@ -880,7 +880,7 @@ Feature: Manage second factors for user
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin disables a second factor while having 2FA enabled and without an OTP
@@ -912,7 +912,7 @@ Feature: Manage second factors for user
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User disables a second factor while having 2FA enabled and providing a correct OTP
@@ -938,7 +938,7 @@ Feature: Manage second factors for user
       """
     Then the response status should be "200"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -970,7 +970,7 @@ Feature: Manage second factors for user
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to disable a user's second factor
@@ -997,7 +997,7 @@ Feature: Manage second factors for user
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   # Second factor deletion
@@ -1017,7 +1017,7 @@ Feature: Manage second factors for user
       """
     Then the response status should be "204"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin deletes a second factor while having 2FA disabled
@@ -1029,7 +1029,7 @@ Feature: Manage second factors for user
     When I send a DELETE request to "/accounts/test1/users/$0/second-factors/$0"
     Then the response status should be "204"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin deletes a second factor while having 2FA enabled and providing an incorrect OTP
@@ -1059,7 +1059,7 @@ Feature: Manage second factors for user
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User deletes a second factor while having 2FA enabled and providing a correct OTP
@@ -1079,7 +1079,7 @@ Feature: Manage second factors for user
       """
     Then the response status should be "204"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1101,7 +1101,7 @@ Feature: Manage second factors for user
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to delete a user's second factor
@@ -1122,5 +1122,5 @@ Feature: Manage second factors for user
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job

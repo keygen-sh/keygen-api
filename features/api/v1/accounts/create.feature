@@ -1612,7 +1612,7 @@ Feature: Create account
   #     }
   #     """
   #   And sidekiq should have 0 "webhook" jobs
-  #   And sidekiq should have 0 "metric" jobs
+  #   And sidekiq should have 0 "event-log" jobs
   #   And sidekiq should have 0 "request-log" jobs
 
   # Scenario: Anonymous attempts to perform an account takeover using unicode truncation (ID collision)
@@ -1661,5 +1661,5 @@ Feature: Create account
   #     }
   #     """
   #   And sidekiq should have 0 "webhook" jobs
-  #   And sidekiq should have 0 "metric" jobs
+  #   And sidekiq should have 0 "event-log" jobs
   #   And sidekiq should have 0 "request-log" jobs

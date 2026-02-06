@@ -134,7 +134,7 @@ Feature: Tauri v2 upgrade application
     When I send a GET request to "/accounts/test1/engines/tauri/app1?platform=linux&arch=x86_64&version=1.1.0"
     Then the response status should be "204"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Endpoint should not return an upgrade when a version does not exist
@@ -144,7 +144,7 @@ Feature: Tauri v2 upgrade application
     When I send a GET request to "/accounts/test1/engines/tauri/app1?platform=linux&arch=x86_64&version=3.0.0"
     Then the response status should be "204"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Endpoint should return an upgrade when an upgrade is available
@@ -162,7 +162,7 @@ Feature: Tauri v2 upgrade application
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Endpoint should prefer NSIS over MSI for windows
