@@ -230,7 +230,7 @@ Feature: Policy pool relationship
     Then the response status should be "200"
     And the response body should be a "key"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to pop a key from an empty pool
@@ -245,7 +245,7 @@ Feature: Policy pool relationship
     When I send a DELETE request to "/accounts/test1/policies/$0/pool"
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to pop a key from a policy that doesn't use a pool
@@ -267,7 +267,7 @@ Feature: Policy pool relationship
     When I send a DELETE request to "/accounts/test1/policies/$0/pool"
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -332,7 +332,7 @@ Feature: Policy pool relationship
     When I send a DELETE request to "/accounts/test1/policies/$0/pool"
     Then the response status should be "200"
     And the response body should be a "key"
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to pop a key from a pool for a policy of another product

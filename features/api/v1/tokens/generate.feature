@@ -48,7 +48,7 @@ Feature: Generate authentication token
       }
       """
     And sidekiq should have 4 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates a new token via token authentication
@@ -76,7 +76,7 @@ Feature: Generate authentication token
       }
       """
     And sidekiq should have 4 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates a named token
@@ -105,7 +105,7 @@ Feature: Generate authentication token
       { "name": "Client Token" }
       """
     And sidekiq should have 4 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -137,7 +137,7 @@ Feature: Generate authentication token
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -169,7 +169,7 @@ Feature: Generate authentication token
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -201,7 +201,7 @@ Feature: Generate authentication token
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -251,7 +251,7 @@ Feature: Generate authentication token
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -301,7 +301,7 @@ Feature: Generate authentication token
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates a token without a bearer
@@ -339,7 +339,7 @@ Feature: Generate authentication token
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ce
@@ -385,7 +385,7 @@ Feature: Generate authentication token
       { "Keygen-Environment": null }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -428,7 +428,7 @@ Feature: Generate authentication token
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -466,7 +466,7 @@ Feature: Generate authentication token
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -599,7 +599,7 @@ Feature: Generate authentication token
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -632,7 +632,7 @@ Feature: Generate authentication token
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -674,7 +674,7 @@ Feature: Generate authentication token
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -713,7 +713,7 @@ Feature: Generate authentication token
       { "Keygen-Environment": null }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -742,7 +742,7 @@ Feature: Generate authentication token
       { "Keygen-Environment": null }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -771,7 +771,7 @@ Feature: Generate authentication token
       { "Keygen-Environment": null }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -816,7 +816,7 @@ Feature: Generate authentication token
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -862,7 +862,7 @@ Feature: Generate authentication token
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -907,7 +907,7 @@ Feature: Generate authentication token
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -951,7 +951,7 @@ Feature: Generate authentication token
       { "Keygen-Environment": null }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -996,7 +996,7 @@ Feature: Generate authentication token
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1041,7 +1041,7 @@ Feature: Generate authentication token
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ce
@@ -1077,7 +1077,7 @@ Feature: Generate authentication token
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ce
@@ -1113,7 +1113,7 @@ Feature: Generate authentication token
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1142,7 +1142,7 @@ Feature: Generate authentication token
       { "permissions": ["license.validate"] }
       """
     And sidekiq should have 4 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1171,7 +1171,7 @@ Feature: Generate authentication token
       { "permissions": ["license.validate"] }
       """
     And sidekiq should have 4 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin with 2FA enabled generates a new token via basic authentication without an OTP code
@@ -1271,7 +1271,7 @@ Feature: Generate authentication token
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Sales generates a new token via basic authentication
@@ -1293,7 +1293,7 @@ Feature: Generate authentication token
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Support generates a new token via basic authentication
@@ -1315,7 +1315,7 @@ Feature: Generate authentication token
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Read-only generates a new token via basic authentication
@@ -1336,7 +1336,7 @@ Feature: Generate authentication token
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates a new token with a custom expiry via basic authentication
@@ -1366,7 +1366,7 @@ Feature: Generate authentication token
       { "kind": "admin-token" }
       """
     And sidekiq should have 3 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates a new token for an invalid product
@@ -1637,7 +1637,7 @@ Feature: Generate authentication token
       { "kind": "user-token" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User generates a new token via token authentication
@@ -1659,7 +1659,7 @@ Feature: Generate authentication token
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -1704,7 +1704,7 @@ Feature: Generate authentication token
       { "kind": "developer-token" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Developer generates a token for an admin
@@ -1741,7 +1741,7 @@ Feature: Generate authentication token
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User generates a token for another user
@@ -1770,7 +1770,7 @@ Feature: Generate authentication token
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User generates a token for an admin
@@ -1799,7 +1799,7 @@ Feature: Generate authentication token
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ce
@@ -1818,7 +1818,7 @@ Feature: Generate authentication token
     Then the response status should be "201"
     And the response body should be a "token" without a "permissions" attribute
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1840,7 +1840,7 @@ Feature: Generate authentication token
       { "permissions": ["license.read", "license.validate", "token.generate"] }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ce
@@ -1859,7 +1859,7 @@ Feature: Generate authentication token
     Then the response status should be "201"
     And the response body should be a "token" without a "permissions" attribute
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1881,7 +1881,7 @@ Feature: Generate authentication token
       { "permissions": ["license.read", "license.validate", "token.generate"] }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1899,7 +1899,7 @@ Feature: Generate authentication token
     When I send a POST request to "/accounts/test1/tokens"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1917,7 +1917,7 @@ Feature: Generate authentication token
     When I send a POST request to "/accounts/test1/tokens"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ce
@@ -1935,7 +1935,7 @@ Feature: Generate authentication token
     When I send a POST request to "/accounts/ent1/tokens"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1953,7 +1953,7 @@ Feature: Generate authentication token
     When I send a POST request to "/accounts/ent1/tokens"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ce
@@ -1989,7 +1989,7 @@ Feature: Generate authentication token
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ce
@@ -2025,7 +2025,7 @@ Feature: Generate authentication token
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -2057,7 +2057,7 @@ Feature: Generate authentication token
       }
       """
     And sidekiq should have 4 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -2089,7 +2089,7 @@ Feature: Generate authentication token
       }
       """
     And sidekiq should have 4 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -2127,7 +2127,7 @@ Feature: Generate authentication token
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -2165,7 +2165,7 @@ Feature: Generate authentication token
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User generates a new token with a custom expiry via basic authentication
@@ -2195,7 +2195,7 @@ Feature: Generate authentication token
       { "kind": "user-token" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User generates a new token without an expiry via basic authentication
@@ -2227,7 +2227,7 @@ Feature: Generate authentication token
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to generate a new token with an invalid email
@@ -2427,7 +2427,7 @@ Feature: Generate authentication token
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to generate a new token without a password
@@ -2452,7 +2452,7 @@ Feature: Generate authentication token
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to generate a new token without a password (v1.8)
@@ -2538,7 +2538,7 @@ Feature: Generate authentication token
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to generate a new token without a password (configured SSO, matched email, existing user)
@@ -2567,7 +2567,7 @@ Feature: Generate authentication token
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to generate a new token without a password (configured SSO, matched email, new user)
@@ -2591,7 +2591,7 @@ Feature: Generate authentication token
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to generate a new token without a password (configured SSO, mismatched email, existing admin)
@@ -2620,7 +2620,7 @@ Feature: Generate authentication token
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to generate a new token without a password (configured SSO, mismatched email, existing user)
@@ -2649,7 +2649,7 @@ Feature: Generate authentication token
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to generate a new token without a password (configured SSO, mismatched email, new user)
@@ -2673,7 +2673,7 @@ Feature: Generate authentication token
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to generate a new token for a passwordless user
@@ -2698,7 +2698,7 @@ Feature: Generate authentication token
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to generate a new token for a passwordless user (v1.8)

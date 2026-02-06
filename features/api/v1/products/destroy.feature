@@ -27,7 +27,7 @@ Feature: Delete product
     Then the response status should be "204"
     And the current account should have 2 "products"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to delete a product for another account
@@ -41,7 +41,7 @@ Feature: Delete product
     And the response body should be an array of 1 error
     And the current account should have 3 "products"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Developer deletes one of their products
@@ -55,7 +55,7 @@ Feature: Delete product
     Then the response status should be "204"
     And the current account should have 2 "products"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Sales attempts to delete one of their products
@@ -69,7 +69,7 @@ Feature: Delete product
     Then the response status should be "403"
     And the current account should have 3 "products"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Support attempts to delete one of their products
@@ -83,7 +83,7 @@ Feature: Delete product
     Then the response status should be "403"
     And the current account should have 3 "products"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Read-only attempts to delete one of their products
@@ -97,7 +97,7 @@ Feature: Delete product
     Then the response status should be "403"
     And the current account should have 3 "products"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -111,7 +111,7 @@ Feature: Delete product
     When I send a DELETE request to "/accounts/test1/products/$0?environment=isolated"
     Then the response status should be "204"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product deletes itself
@@ -124,7 +124,7 @@ Feature: Delete product
     Then the response status should be "403"
     And the current account should have 2 "products"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to delete another product for their account
@@ -137,7 +137,7 @@ Feature: Delete product
     Then the response status should be "404"
     And the current account should have 3 "products"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to delete their product

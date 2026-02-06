@@ -223,7 +223,7 @@ Feature: Machine owner relationship
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin changes a machine's owner relationship to a user they're not associated to
@@ -257,7 +257,7 @@ Feature: Machine owner relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin removes a machine's owner relationship
@@ -281,7 +281,7 @@ Feature: Machine owner relationship
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin changes a machine's owner relationship to a non-existent user
@@ -312,7 +312,7 @@ Feature: Machine owner relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin changes a machine's owner relationship to a user for another account
@@ -346,7 +346,7 @@ Feature: Machine owner relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product changes a machine's owner relationship to another user
@@ -379,7 +379,7 @@ Feature: Machine owner relationship
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product changes a machine's owner relationship to another user
@@ -403,7 +403,7 @@ Feature: Machine owner relationship
       """
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product changes a machine's owner relationship that would exceed group limits
@@ -448,7 +448,7 @@ Feature: Machine owner relationship
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Owner attempts to change their machine's owner relationship
@@ -470,7 +470,7 @@ Feature: Machine owner relationship
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to change their machine's owner relationship
@@ -493,7 +493,7 @@ Feature: Machine owner relationship
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to change a license's owner relationship
@@ -518,7 +518,7 @@ Feature: Machine owner relationship
       """
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to change their machine's owner relationship
@@ -543,7 +543,7 @@ Feature: Machine owner relationship
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to change a machine's owner relationship
@@ -568,7 +568,7 @@ Feature: Machine owner relationship
       """
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous attempts to change a machine's owner relationship
@@ -587,5 +587,5 @@ Feature: Machine owner relationship
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job

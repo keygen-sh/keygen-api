@@ -43,10 +43,6 @@ prune_event_logs:
   cron: "0 4 * * *" # Every day at 5am (10pm CST)
   class: "PruneEventLogsWorker"
 
-prune_metrics:
-  cron: "0 5 * * *" # Every day at 4am (11pm CST)
-  class: "PruneMetricsWorker"
-
 prune_webhook_events:
   cron: "0 6 * * *" # Every day at 6am (12am CST)
   class: "PruneWebhookEventsWorker"
@@ -54,10 +50,6 @@ prune_webhook_events:
 vacuum_analyze_webhook_events:
   cron: "0 7 * * *" # Every day at 7am (1am CST)
   class: "VacuumAnalyzeWebhookEventsWorker"
-
-vacuum_analyze_metrics:
-  cron: "0 8 * * *" # Every day at 8am (2am CST)
-  class: "VacuumAnalyzeMetricsWorker"
 
 vacuum_analyze_request_logs:
   cron: "0 9 * * *" # Every day at 9am (3am CST)

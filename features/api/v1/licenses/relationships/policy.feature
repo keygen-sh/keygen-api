@@ -131,7 +131,7 @@ Feature: License policy relationship
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin changes a license's policy relationship to a non-existent policy
@@ -153,7 +153,7 @@ Feature: License policy relationship
       """
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin changes a license's policy relationship to a new policy that belongs to another product
@@ -185,7 +185,7 @@ Feature: License policy relationship
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin changes a encrypted license's policy relationship to a new unencrypted policy
@@ -226,7 +226,7 @@ Feature: License policy relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin changes an unencrypted license's policy relationship to a new encrypted policy
@@ -267,7 +267,7 @@ Feature: License policy relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin changes a license's policy relationship to a new policy with a different scheme
@@ -308,7 +308,7 @@ Feature: License policy relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin changes a pooled license's policy relationship to a new unpooled policy
@@ -350,7 +350,7 @@ Feature: License policy relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin changes an unpooled license's policy relationship to a new pooled policy
@@ -391,7 +391,7 @@ Feature: License policy relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin changes a license's policy relationship to a new policy for another account
@@ -413,7 +413,7 @@ Feature: License policy relationship
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin changes a license's policy relationship to a policy with a more strict machine uniqueness strategy
@@ -469,7 +469,7 @@ Feature: License policy relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin changes a license's policy relationship to a policy with a less strict machine uniqueness strategy
@@ -523,7 +523,7 @@ Feature: License policy relationship
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin changes a license's policy relationship to a policy with a more strict component uniqueness strategy
@@ -579,7 +579,7 @@ Feature: License policy relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin changes a license's policy relationship to a policy with a less strict component uniqueness strategy
@@ -633,7 +633,7 @@ Feature: License policy relationship
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin transfers a license to a new policy with a default transfer strategy
@@ -673,7 +673,7 @@ Feature: License policy relationship
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin transfers a license to a new policy with a KEEP_EXPIRY transfer strategy (has duration)
@@ -716,7 +716,7 @@ Feature: License policy relationship
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin transfers a license to a new policy with a KEEP_EXPIRY transfer strategy (no duration)
@@ -759,7 +759,7 @@ Feature: License policy relationship
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin transfers a license to a new policy with a RESET_EXPIRY transfer strategy (has duration)
@@ -802,7 +802,7 @@ Feature: License policy relationship
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin transfers a license to a new policy with a RESET_EXPIRY transfer strategy (no duration)
@@ -845,7 +845,7 @@ Feature: License policy relationship
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product changes a license's policy relationship to a new policy
@@ -876,7 +876,7 @@ Feature: License policy relationship
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product changes a license's policy relationship to a new policy they don't own
@@ -899,7 +899,7 @@ Feature: License policy relationship
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product changes a license's policy relationship to a new policy for a license they don't own
@@ -922,7 +922,7 @@ Feature: License policy relationship
       """
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User changes a license's policy relationship from an unprotected policy to an unprotected policy (license owner)
@@ -965,7 +965,7 @@ Feature: License policy relationship
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User changes a license's policy relationship from an unprotected policy to an unprotected policy (license user)
@@ -997,7 +997,7 @@ Feature: License policy relationship
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User changes a license's policy relationship from a protected policy to a protected policy
@@ -1031,7 +1031,7 @@ Feature: License policy relationship
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User changes an unprotected license's policy relationship from an unprotected policy to a protected policy
@@ -1070,7 +1070,7 @@ Feature: License policy relationship
       { "policyId": "$policies[0]" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User changes a protected license's policy relationship from a protected policy to an unprotected policy
@@ -1109,7 +1109,7 @@ Feature: License policy relationship
       { "policyId": "$policies[0]" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User changes an unprotected license's policy relationship to a non-existent policy
@@ -1140,7 +1140,7 @@ Feature: License policy relationship
       """
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User changes a license's policy relationship to a new policy for a license they don't own
@@ -1167,7 +1167,7 @@ Feature: License policy relationship
       """
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User transfers a license to a protected policy with a RESET_EXPIRY transfer strategy
@@ -1216,7 +1216,7 @@ Feature: License policy relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous changes a license's policy relationship to a new policy
@@ -1236,5 +1236,5 @@ Feature: License policy relationship
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job

@@ -42,7 +42,7 @@ Feature: Update account
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 0 "request-log" jobs
 
   @ee
@@ -68,7 +68,7 @@ Feature: Update account
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   @ee
@@ -94,7 +94,7 @@ Feature: Update account
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin updates the name for their account
@@ -115,7 +115,7 @@ Feature: Update account
     Then the response status should be "200"
     And the response body should be an "account" with the slug "new-name"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin updates their account's API version to v1.0
@@ -139,7 +139,7 @@ Feature: Update account
       { "apiVersion": "1.0" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin updates their account's API version to v1.1
@@ -163,7 +163,7 @@ Feature: Update account
       { "apiVersion": "1.1" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin updates their account's API version to v1.2
@@ -187,7 +187,7 @@ Feature: Update account
       { "apiVersion": "1.2" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin updates their account's API version an an invalid version
@@ -218,7 +218,7 @@ Feature: Update account
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin attempts to update another account
@@ -238,7 +238,7 @@ Feature: Update account
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   @ce
@@ -264,7 +264,7 @@ Feature: Update account
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   @ee
@@ -290,7 +290,7 @@ Feature: Update account
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   @ee
@@ -316,7 +316,7 @@ Feature: Update account
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   @ee
@@ -338,7 +338,7 @@ Feature: Update account
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Product attempts to update an account
@@ -359,7 +359,7 @@ Feature: Update account
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: User attempts to update an account
@@ -380,5 +380,5 @@ Feature: Update account
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs

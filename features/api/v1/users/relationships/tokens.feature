@@ -32,7 +32,7 @@ Feature: User tokens relationship
     And the response body should be a "token" with a token
     And the response body should be a "token" with a token
     And sidekiq should have 3 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates an admin token (another)
@@ -55,7 +55,7 @@ Feature: User tokens relationship
     And the response body should be a "token" with the kind "user-token"
     And the response body should be a "token" with a token
     And sidekiq should have 3 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates a user token (no password)
@@ -74,7 +74,7 @@ Feature: User tokens relationship
     And the response body should be a "token" with the kind "user-token"
     And the response body should be a "token" with a token
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates a named user token
@@ -101,7 +101,7 @@ Feature: User tokens relationship
       { "name": "Client Token" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates a user token with a custom expiry (present)
@@ -131,7 +131,7 @@ Feature: User tokens relationship
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates a user token with a custom expiry (null)
@@ -161,7 +161,7 @@ Feature: User tokens relationship
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -181,7 +181,7 @@ Feature: User tokens relationship
     And the response body should be a "token" with the kind "user-token"
     And the response body should be a "token" with a token
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product generates a user token
@@ -196,7 +196,7 @@ Feature: User tokens relationship
     And the response body should be a "token" with the kind "user-token"
     And the response body should be a "token" with a token
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ce
@@ -241,7 +241,7 @@ Feature: User tokens relationship
       { "Keygen-Environment": null }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ce
@@ -291,7 +291,7 @@ Feature: User tokens relationship
       { "Keygen-Environment": null }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -333,7 +333,7 @@ Feature: User tokens relationship
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -371,7 +371,7 @@ Feature: User tokens relationship
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -404,7 +404,7 @@ Feature: User tokens relationship
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -446,7 +446,7 @@ Feature: User tokens relationship
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -480,7 +480,7 @@ Feature: User tokens relationship
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -522,7 +522,7 @@ Feature: User tokens relationship
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -559,7 +559,7 @@ Feature: User tokens relationship
       { "Keygen-Environment": null }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -588,7 +588,7 @@ Feature: User tokens relationship
       { "Keygen-Environment": null }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -617,7 +617,7 @@ Feature: User tokens relationship
       { "Keygen-Environment": null }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -662,7 +662,7 @@ Feature: User tokens relationship
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -707,7 +707,7 @@ Feature: User tokens relationship
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -752,7 +752,7 @@ Feature: User tokens relationship
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -795,7 +795,7 @@ Feature: User tokens relationship
       { "Keygen-Environment": null }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -837,7 +837,7 @@ Feature: User tokens relationship
       { "Keygen-Environment": null }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -882,7 +882,7 @@ Feature: User tokens relationship
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -927,7 +927,7 @@ Feature: User tokens relationship
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ce
@@ -1019,7 +1019,7 @@ Feature: User tokens relationship
       { "permissions": ["license.validate"] }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1047,7 +1047,7 @@ Feature: User tokens relationship
       { "permissions": ["license.validate"] }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1095,7 +1095,7 @@ Feature: User tokens relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1143,7 +1143,7 @@ Feature: User tokens relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1182,7 +1182,7 @@ Feature: User tokens relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1221,7 +1221,7 @@ Feature: User tokens relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1260,7 +1260,7 @@ Feature: User tokens relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1299,7 +1299,7 @@ Feature: User tokens relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1343,7 +1343,7 @@ Feature: User tokens relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1387,7 +1387,7 @@ Feature: User tokens relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License generates a user token
