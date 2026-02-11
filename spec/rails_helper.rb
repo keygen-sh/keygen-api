@@ -41,7 +41,7 @@ DatabaseCleaner[:active_record].strategy                  = :transaction # cover
 DatabaseCleaner[:active_record, db: :clickhouse].strategy = :truncation
 
 RSpec.configure do |config|
-  econfig = RSpec::Expectations.configuration
+  expectations_config = RSpec::Expectations.configuration
 
   config.include ActiveSupport::Testing::TimeHelpers
   config.include ActiveJob::TestHelper
@@ -181,6 +181,23 @@ RSpec.configure do |config|
     end
   end
 
+  # skip tests if the given database requirements are not met (e.g. clickhouse is unavailable)
+  config.around :each, :only_read_replica do |example|
+    if Keygen.database.read_replica_available? && Keygen.database.read_replica_available?
+      example.run
+    else
+      skip 'skipped without read replica'
+    end
+  end
+
+  config.around :each, :only_clickhouse do |example|
+    if Keygen.database.clickhouse_available? && Keygen.database.clickhouse_enabled?
+      example.run
+    else
+      skip 'skipped without Clickhouse'
+    end
+  end
+
   # disable implicit transaction for cleaning up after tests (mainly to facilitate threading)
   config.around :each, :skip_transaction_cleaner do |example|
     DatabaseCleaner[:active_record].strategy = [:truncation, except: %w[event_types permissions]]
@@ -192,11 +209,11 @@ RSpec.configure do |config|
 
   # ignore false positives e.g. to_not raise_error SomeError
   config.around :each, :ignore_potential_false_positives do |example|
-    on_potential_false_positives_was, econfig.on_potential_false_positives = econfig.on_potential_false_positives, :nothing
+    on_potential_false_positives_was, expectations_config.on_potential_false_positives = expectations_config.on_potential_false_positives, :nothing
 
     example.run
   ensure
-    econfig.on_potential_false_positives = on_potential_false_positives_was
+    expectations_config.on_potential_false_positives = on_potential_false_positives_was
   end
 
   # Reset license file and license before each EE test.

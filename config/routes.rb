@@ -425,17 +425,6 @@ Rails.application.routes.draw do
         end
       end
 
-      resources :analytics, only: [] do
-        collection do
-          scope :actions, module: 'analytics/actions' do
-            get :top_licenses_by_volume, path: 'top-licenses-by-volume', to: 'counts#top_licenses_by_volume'
-            get :top_urls_by_volume,     path: 'top-urls-by-volume',     to: 'counts#top_urls_by_volume'
-            get :top_ips_by_volume,      path: 'top-ips-by-volume',      to: 'counts#top_ips_by_volume'
-            get :count,                                                  to: 'counts#count'
-          end
-        end
-      end
-
       post :search, to: 'searches#search'
     end
 
@@ -492,6 +481,17 @@ Rails.application.routes.draw do
       end
       scope :oci do
         concerns :oci
+      end
+    end
+  end
+
+  concern :priv do
+    scope constraints: MimeTypeConstraint.new(:jsonapi, :json, :binary, raise_on_no_match: true), defaults: { format: :json } do
+      namespace :analytics do
+        get 'stats/:stat_id', to: 'stats#show', as: :stat
+        get 'events/:event_id', to: 'events#show', as: :event, constraints: { event_id: /.*/ }
+        get 'leaderboards/:leaderboard_id', to: 'leaderboards#show', as: :leaderboard
+        get 'heatmaps/:heatmap_id', to: 'heatmaps#show', as: :heatmap
       end
     end
   end
@@ -670,6 +670,15 @@ Rails.application.routes.draw do
     scope module: :auth do
       concerns :sso
     end
+  end
+
+  # internal endpoints e.g. analytics
+  namespace :priv, path: '-' do
+    scope 'accounts/:account_id', as: :account do
+      concerns :priv
+    end
+
+    concerns :priv
   end
 
   # route helpers for redirecting to Portal

@@ -837,6 +837,21 @@ Then /^the response body should (?:contain|be) an array of errors?$/ do
   expect(json["errors"].size).to be >= 1
 end
 
+Then /^the response body should (?:contain|be) a "([^\"]*)" array$/ do |key|
+  json = JSON.parse last_response.body
+
+  expect(json).to have_key key
+  expect(json[key]).to be_an Array
+end
+
+Then /^the response body should (?:contain|be) a "([^\"]*)" array with (\d+) items$/ do |key, item_count|
+  json = JSON.parse last_response.body
+
+  expect(json).to have_key key
+  expect(json[key]).to be_an Array
+  expect(json[key].size).to eq item_count.to_i
+end
+
 Given /^the (\w+) error should have the following properties:$/ do |named_idx, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
   json = JSON.parse(last_response.body)

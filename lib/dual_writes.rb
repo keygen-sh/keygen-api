@@ -198,22 +198,18 @@ module DualWrites
 
     private
 
-    def insert_record(attributes, is_deleted:, ver:)
-      replica_class.insert!(with_metadata(attributes, is_deleted:, ver:))
-    end
-
-    def insert_records(records, is_deleted:, ver:)
-      records = records.map { with_metadata(it, is_deleted:, ver:) }
+    def insert_record(attributes, **) = insert_records([attributes], **)
+    def insert_records(attributes, is_deleted:, ver:)
+      records = attributes.map { with_metadata(it, is_deleted:, ver:) }
 
       replica_class.insert_all!(records)
     end
 
-    def with_metadata(attributes, is_deleted:, ver:, ttl: config[:ttl])
+    def with_metadata(attributes, is_deleted:, ver:)
       attrs = attributes.dup
 
       attrs['is_deleted'] ||= is_deleted if replica_class.column_names.include?('is_deleted')
       attrs['ver']        ||= ver        if replica_class.column_names.include?('ver')
-      attrs['ttl']        ||= ttl        if replica_class.column_names.include?('ttl')
 
       attrs
     end
@@ -237,7 +233,7 @@ module DualWrites
     end
 
     class_methods do
-      def dual_writes(to:, strategy:, ignored_columns: nil, sync: false, if: nil, **strategy_config)
+      def dual_writes(to:, strategy:, ignored_columns: nil, sync: false, if: nil, extending: nil, **strategy_config, &extension)
         databases = Array(to)
 
         raise ConfigurationError, 'to must be a symbol or array of symbols' unless
@@ -269,7 +265,10 @@ module DualWrites
           table      = table_name
 
           database_class = Class.new(base_class) do
-            self.table_name = table
+            self.primary_key = false
+            self.table_name  = table
+
+            # TODO(ezekg) add :extending/&extension functionality
           end
 
           const_set(database_class_name, database_class)
@@ -423,8 +422,12 @@ module DualWrites
       # merge virtual attributes (primary-ignored columns) into the attributes hash
       # so they're available for replication to databases that need them
       all_attributes = attributes.with_indifferent_access.merge(
-        self.class.ignored_columns_for_primary.each_with_object({}) do |column, hash|
-          hash[column] = public_send(column)
+        self.class.ignored_columns_for_primary.each_with_object({}) do |attribute, hash|
+          value = public_send(attribute)
+          next if
+            value.nil?
+
+          hash[attribute] = value
         end
       )
 
