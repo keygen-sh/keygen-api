@@ -279,6 +279,31 @@ class ApplicationController < ActionController::API
     end
   end
 
+  def render_not_supported(**kwargs)
+    skip_verify_authorized!
+
+    response.headers['Allow'] = '' # we support nothing
+
+    respond_to do |format|
+      format.any {
+        render status: :method_not_allowed, json: {
+          meta: { id: request.request_id },
+          errors: [{
+            title: 'Not supported',
+            detail: 'The request could not be completed',
+            **kwargs,
+          }],
+        }
+      }
+      format.html {
+        render html: 'Not Supported', status: :method_not_allowed
+      }
+      format.text {
+        head :method_not_allowed
+      }
+    end
+  end
+
   def render_internal_server_error(**kwargs)
     skip_verify_authorized!
 
@@ -504,6 +529,19 @@ class ApplicationController < ActionController::API
     end
 
     render_forbidden(**kwargs)
+  rescue Keygen::Error::NotSupportedError => e
+    kwargs = { code: e.code }
+
+    kwargs[:detail] = e.detail if
+      e.detail.present?
+
+    kwargs[:source] = e.source if
+      e.source.present?
+
+    kwargs[:links] = e.links if
+      e.links.present?
+
+    render_not_supported(**kwargs)
   rescue Keygen::Error::NotFoundError,
          ActiveRecord::RecordNotFound => e
     if e.model.present?

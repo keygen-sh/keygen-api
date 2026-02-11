@@ -254,6 +254,9 @@ Given /^the current account has the following "([^\"]*)" rows:$/ do |resource, r
       )
     end
   end
+
+  # HACK(ezekg) force drain dual_writes replication jobs
+  drain_replication_jobs
 end
 
 Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:with|for|in)(?: an)? existing "([^\"]*)"(?: through "([^\"]*)")?$/ do |count, traits, model_name, assoc_name, through_name|
