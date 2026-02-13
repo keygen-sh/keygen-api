@@ -13,8 +13,7 @@ describe Analytics::Stat do
 
         result = described_class.call(:machines, account:)
 
-        expect(result).to be_a(Analytics::Stat::Count)
-        expect(result.value).to eq(3)
+        expect(result).to satisfy { it in Analytics::Stat::Count(count: 3) }
       end
 
       it 'returns results for users stat' do
@@ -22,8 +21,7 @@ describe Analytics::Stat do
 
         result = described_class.call(:users, account:)
 
-        expect(result).to be_a(Analytics::Stat::Count)
-        expect(result.value).to eq(2)
+        expect(result).to satisfy { it in Analytics::Stat::Count(count: 2) }
       end
 
       it 'returns results for licenses stat' do
@@ -31,14 +29,13 @@ describe Analytics::Stat do
 
         result = described_class.call(:licenses, account:)
 
-        expect(result).to be_a(Analytics::Stat::Count)
-        expect(result.value).to eq(4)
+        expect(result).to satisfy { it in Analytics::Stat::Count(count: 4) }
       end
 
       it 'accepts string type names' do
         result = described_class.call('machines', account:)
 
-        expect(result).to be_a(Analytics::Stat::Count)
+        expect(result).to satisfy { it in Analytics::Stat::Count(count: Integer) }
       end
     end
 
@@ -61,13 +58,13 @@ describe Analytics::Stat do
       it 'scopes to environment' do
         result = described_class.call(:machines, account:, environment:)
 
-        expect(result.value).to eq(2)
+        expect(result).to satisfy { it in Analytics::Stat::Count(count: 2) }
       end
 
       it 'returns global count when no environment' do
         result = described_class.call(:machines, account:)
 
-        expect(result.value).to eq(3)
+        expect(result).to satisfy { it in Analytics::Stat::Count(count: 3) }
       end
     end
   end
