@@ -14,6 +14,10 @@ RequestMigrations.supported_versions.each do |version|
   end
 end
 
+Before '@api/priv' do
+  @api_version = '-' # private api prefix
+end
+
 # FIXME(ezekg) This is super hacky but there's no easy way to disable
 #              bullet outside of adding controller filters
 Before("@skip/bullet") { Bullet.instance_variable_set :@enable, false }

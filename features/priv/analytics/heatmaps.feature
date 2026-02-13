@@ -12,7 +12,7 @@ Feature: Heatmaps analytics
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
-    When I send a GET request to "/-/accounts/test1/analytics/heatmaps/expirations"
+    When I send a GET request to "/accounts/test1/analytics/heatmaps/expirations"
     Then the response status should be "200"
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
@@ -27,7 +27,7 @@ Feature: Heatmaps analytics
       | 96faacd6-16e6-4661-8e16-9e8064fbeb0a | 2024-03-05T00:00:00.000Z |
       | 31e30cc1-d454-40dc-b4ae-93ad683ddf33 | 2024-03-10T00:00:00.000Z |
     And I use an authentication token
-    When I send a GET request to "/-/accounts/test1/analytics/heatmaps/expirations?start_date=2024-03-01&end_date=2024-03-14"
+    When I send a GET request to "/accounts/test1/analytics/heatmaps/expirations?start_date=2024-03-01&end_date=2024-03-14"
     Then the response status should be "200"
     And the response body should be a "data" array with 14 items
     And the response body should be a JSON document with the following content:
@@ -59,7 +59,7 @@ Feature: Heatmaps analytics
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
-    When I send a GET request to "/-/accounts/test1/analytics/heatmaps/expirations"
+    When I send a GET request to "/accounts/test1/analytics/heatmaps/expirations"
     Then the response status should be "200"
     And the response body should be a "data" array with 365 items
     And sidekiq should have 0 "request-log" jobs
@@ -69,7 +69,7 @@ Feature: Heatmaps analytics
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
-    When I send a GET request to "/-/accounts/test1/analytics/heatmaps/invalid"
+    When I send a GET request to "/accounts/test1/analytics/heatmaps/invalid"
     Then the response status should be "404"
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
@@ -106,7 +106,7 @@ Feature: Heatmaps analytics
       """
       { "Keygen-Environment": "isolated" }
       """
-    When I send a GET request to "/-/accounts/test1/analytics/heatmaps/expirations?start_date=2026-03-05&end_date=2026-03-10"
+    When I send a GET request to "/accounts/test1/analytics/heatmaps/expirations?start_date=2026-03-05&end_date=2026-03-10"
     Then the response status should be "200"
     And the response body should be a "data" array with 6 items
     And the response body should be a JSON document with the following content:
@@ -156,7 +156,7 @@ Feature: Heatmaps analytics
       """
       { "Keygen-Environment": "shared" }
       """
-    When I send a GET request to "/-/accounts/test1/analytics/heatmaps/expirations?start_date=2026-03-05&end_date=2026-03-10"
+    When I send a GET request to "/accounts/test1/analytics/heatmaps/expirations?start_date=2026-03-05&end_date=2026-03-10"
     Then the response status should be "200"
     And the response body should be a "data" array with 6 items
     And the response body should be a JSON document with the following content:
@@ -180,7 +180,7 @@ Feature: Heatmaps analytics
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a GET request to "/-/accounts/test1/analytics/heatmaps/expirations"
+    When I send a GET request to "/accounts/test1/analytics/heatmaps/expirations"
     Then the response status should be "403"
     And the response body should be an array of 1 error
     And sidekiq should have 0 "request-log" jobs
@@ -191,7 +191,7 @@ Feature: Heatmaps analytics
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a GET request to "/-/accounts/test1/analytics/heatmaps/expirations"
+    When I send a GET request to "/accounts/test1/analytics/heatmaps/expirations"
     Then the response status should be "403"
     And the response body should be an array of 1 error
     And sidekiq should have 0 "request-log" jobs
@@ -202,7 +202,7 @@ Feature: Heatmaps analytics
     And the current account has 1 "license"
     And I am a license of account "test1"
     And I authenticate with my key
-    When I send a GET request to "/-/accounts/test1/analytics/heatmaps/expirations"
+    When I send a GET request to "/accounts/test1/analytics/heatmaps/expirations"
     Then the response status should be "403"
     And the response body should be an array of 1 error
     And sidekiq should have 0 "request-log" jobs
