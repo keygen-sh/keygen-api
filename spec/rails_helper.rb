@@ -108,7 +108,7 @@ RSpec.configure do |config|
     RequestMigrations::Testing.teardown!
     Faker::UniqueGenerator.clear
     StripeHelper.stop
-    DatabaseCleaner.clean
+    DatabaseCleaner.clean rescue nil
   end
 
   # Make sure we're working with a pristine ENV in EE tests.
