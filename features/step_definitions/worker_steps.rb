@@ -2,44 +2,6 @@
 
 World Rack::Test::Methods
 
-def drain_async_jobs
-  require 'sidekiq/testing'
-
-  # FIXME(ezekg) there doesn't seem to be an easier way to drain a subset of wrapped jobs
-  active_job = ActiveJob::QueueAdapters::SidekiqAdapter::JobWrapper
-  active_job.jobs.each do |job|
-    case job['wrapped']
-    when AsyncCreatable::CreateAsyncJob.name, AsyncUpdatable::UpdateAsyncJob.name,
-         AsyncTouchable::TouchAsyncJob.name, AsyncDestroyable::DestroyAsyncJob.name,
-         ActiveRecord::DestroyAssociationAsyncJob.name
-      active_job.process_job(job)
-    end
-  end
-
-  YankArtifactWorker.drain
-end
-
-def drain_replication_jobs
-  require 'sidekiq/testing'
-
-  active_job = ActiveJob::QueueAdapters::SidekiqAdapter::JobWrapper
-  active_job.jobs.each do |job|
-    case job['wrapped']
-    when DualWrites::BulkReplicationJob.name,
-         DualWrites::ReplicationJob.name
-      active_job.process_job(job)
-    end
-  end
-
-  # HACK(ezekg) force Clickhouse to merge data parts so they're visible to queries.
-  #             ReplacingMergeTree is eventually consistent, so without this,
-  #             tests may see stale or incomplete data.
-  if Keygen.database.clickhouse_enabled?
-    RequestLog::Clickhouse.connection.execute('OPTIMIZE TABLE request_logs FINAL')
-    EventLog::Clickhouse.connection.execute('OPTIMIZE TABLE event_logs FINAL')
-  end
-end
-
 Then /^sidekiq should (?:have|process) (\d+) "([^\"]*)" jobs?(?: queued in ([.\d]+ \w+))?$/ do |expected_count, worker_name, queued_at|
   worker_name =
     case worker_name

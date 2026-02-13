@@ -25,6 +25,29 @@ BeforeAll do
   Rails.cache.clear
 end
 
+# run subset of jobs inline so data is immediately available
+Around do |_scenario, block|
+  queue_adapter_was = ActiveJob::Base.queue_adapter
+
+  DualWrites::ReplicationJob.queue_adapter               =
+  DualWrites::BulkReplicationJob.queue_adapter           =
+  AsyncCreatable::CreateAsyncJob.queue_adapter           =
+  AsyncUpdatable::UpdateAsyncJob.queue_adapter           =
+  AsyncTouchable::TouchAsyncJob.queue_adapter            =
+  AsyncDestroyable::DestroyAsyncJob.queue_adapter        =
+  ActiveRecord::DestroyAssociationAsyncJob.queue_adapter = :inline
+
+  block.call
+ensure
+  DualWrites::ReplicationJob.queue_adapter               =
+  DualWrites::BulkReplicationJob.queue_adapter           =
+  AsyncCreatable::CreateAsyncJob.queue_adapter           =
+  AsyncUpdatable::UpdateAsyncJob.queue_adapter           =
+  AsyncTouchable::TouchAsyncJob.queue_adapter            =
+  AsyncDestroyable::DestroyAsyncJob.queue_adapter        =
+  ActiveRecord::DestroyAssociationAsyncJob.queue_adapter = queue_adapter_was
+end
+
 Before do |scenario|
   # Skip CE tests if we're running in an EE env, and vice-versa
   # for EE tests in a CE env.

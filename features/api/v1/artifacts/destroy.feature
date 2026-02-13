@@ -1,6 +1,5 @@
 @api/v1
 Feature: Delete artifact
-
   Background:
     Given the following "accounts" exist:
       | name    | slug  |
