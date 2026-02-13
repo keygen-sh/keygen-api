@@ -71,15 +71,15 @@ Then /^sidekiq should (?:have|process) (\d+) "([^\"]*)" jobs?(?: queued in ([.\d
 end
 
 Then /^the (?:account|user) should receive an? "([^\"]*)" email$/ do |mailer|
-  received_any = Sidekiq::Queues["mailers"].any? do |job|
-    job["args"].first["arguments"].include? mailer.underscore.parameterize(separator: "_")
+  received_any = enqueued_jobs_with(queue: 'mailers').any? do |job|
+    job['arguments'].include? mailer.underscore.parameterize(separator: '_')
   end
   expect(received_any).to be true
 end
 
 Then /^the (?:account|user) should not receive an? "([^\"]*)" email$/ do |mailer|
-  received_any = Sidekiq::Queues["mailers"].any? do |job|
-    job["args"].first["arguments"].include? mailer.underscore.parameterize(separator: "_")
+  received_any = enqueued_jobs_with(queue: 'mailers').any? do |job|
+    job['arguments'].include? mailer.underscore.parameterize(separator: '_')
   end
   expect(received_any).to be false
 end
