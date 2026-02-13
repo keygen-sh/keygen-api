@@ -10,6 +10,11 @@ FactoryBot.define do
     whodunnit   { build(:user, account:, environment:) }
     event_type
 
+    # HACK(ezekg) sometimes we create logs in the past but that causes clickhouse
+    #             to immediately throw out the records during merge because our
+    #             table by default only keeps records for 30 days
+    ttl { 100.years }
+
     trait :license_validation_succeeded do
       event_type { build(:event_type, event: 'license.validation.succeeded') }
     end
