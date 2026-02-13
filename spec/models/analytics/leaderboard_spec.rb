@@ -16,35 +16,41 @@ describe Analytics::Leaderboard do
         it 'returns results for ips leaderboard' do
           results = described_class.call(:ips, account:)
 
-          expect(results).to be_an(Array)
-          expect(results).to all be_a(Analytics::Leaderboard::Entry)
+          expect(results).to satisfy do |entries|
+            entries.all? { it in Analytics::Leaderboard::Entry(identifier: String, count: Integer) }
+          end
         end
 
         it 'returns results for urls leaderboard' do
           results = described_class.call(:urls, account:)
 
-          expect(results).to be_an(Array)
-          expect(results).to all be_a(Analytics::Leaderboard::Entry)
+          expect(results).to satisfy do |entries|
+            entries.all? { it in Analytics::Leaderboard::Entry(identifier: String, count: Integer) }
+          end
         end
 
         it 'returns results for licenses leaderboard' do
           results = described_class.call(:licenses, account:)
 
-          expect(results).to be_an(Array)
-          expect(results).to all be_a(Analytics::Leaderboard::Entry)
+          expect(results).to satisfy do |entries|
+            entries.all? { it in Analytics::Leaderboard::Entry(identifier: String, count: Integer) }
+          end
         end
 
         it 'returns results for user_agents leaderboard' do
           results = described_class.call(:user_agents, account:)
 
-          expect(results).to be_an(Array)
-          expect(results).to all be_a(Analytics::Leaderboard::Entry)
+          expect(results).to satisfy do |entries|
+            entries.all? { it in Analytics::Leaderboard::Entry(identifier: String, count: Integer) }
+          end
         end
 
         it 'accepts string type names' do
           results = described_class.call('ips', account:)
 
-          expect(results).to be_an(Array)
+          expect(results).to satisfy do |entries|
+            entries.all? { it in Analytics::Leaderboard::Entry(identifier: String, count: Integer) }
+          end
         end
       end
 

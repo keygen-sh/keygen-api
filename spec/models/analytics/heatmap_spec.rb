@@ -8,24 +8,20 @@ describe Analytics::Heatmap do
 
   describe '.call' do
     context 'with valid type' do
-      it 'returns results for expirations heatmap' do
+      it 'returns heatmap for license expirations' do
         results = described_class.call(:expirations, account:)
 
-        expect(results).to be_an(Array)
-        expect(results.first).to be_a(Analytics::Heatmap::Cell)
-        expect(results.first).to have_attributes(
-          date: be_a(Date),
-          x: be_a(Integer),
-          y: be_a(Integer),
-          temperature: be_a(Float),
-          value: be_a(Integer),
-        )
+        expect(results).to satisfy do |cells|
+          cells.all? { it in Analytics::Heatmap::Cell(date: Date, x: Integer, y: Integer, temperature: Float, count: Integer) }
+        end
       end
 
-      it 'accepts string type names' do
+      it 'accepts string types' do
         results = described_class.call('expirations', account:)
 
-        expect(results).to be_an(Array)
+        expect(results).to satisfy do |cells|
+          cells.all? { it in Analytics::Heatmap::Cell(date: Date, x: Integer, y: Integer, temperature: Float, count: Integer) }
+        end
       end
     end
 
@@ -39,16 +35,25 @@ describe Analytics::Heatmap do
 
     context 'with date range' do
       it 'respects custom date range' do
+        start_date = Date.current
+        end_date   = 30.days.from_now.to_date
+        date_range = (start_date..end_date).to_a
+
         results = described_class.call(
           :expirations,
           account:,
-          start_date: Date.current,
-          end_date: 30.days.from_now.to_date,
+          start_date:,
+          end_date:,
         )
 
-        expect(results.length).to eq(31)
-        expect(results.first.date).to eq(Date.current)
-        expect(results.last.date).to eq(30.days.from_now.to_date)
+        expect(results.length).to eq(date_range.length)
+        expect(results).to satisfy do
+          it in [
+            Analytics::Heatmap::Cell(date: ^start_date, x: Integer, y: Integer, temperature: Float, count: Integer),
+            *,
+            Analytics::Heatmap::Cell(date: ^end_date, x: Integer, y: Integer, temperature: Float, count: Integer)
+          ]
+        end
       end
     end
   end
