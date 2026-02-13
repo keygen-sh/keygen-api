@@ -255,6 +255,7 @@ When /^I send a DELETE request to "([^\"]*)"$/ do |path|
   end
 
   YankArtifactWorker.drain
+rescue Timeout::Error # FIXME(ezekg) for simulating S3 timeouts
 end
 
 Then /^the response status should (?:contain|be) "([^\"]*)"$/ do |status|
