@@ -234,6 +234,8 @@ When /^I send a DELETE request to "([^\"]*)" with the following:$/ do |path, bod
     delete path, body
   end
 
+  # FIXME(ezekg) sidekiq doesn't have a way to run a subset of jobs
+  #              inline like active job does
   YankArtifactWorker.drain
 end
 
