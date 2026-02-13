@@ -66,8 +66,6 @@ When /^I send a HEAD request to "([^\"]*)"$/ do |path|
   else
     head path
   end
-
-  drain_async_jobs
 end
 
 When /^I send a GET request to "([^\"]*)"$/ do |path|
@@ -86,8 +84,6 @@ When /^I send a GET request to "([^\"]*)"$/ do |path|
   else
     get path
   end
-
-  drain_async_jobs
 end
 
 When /^I send a POST request to "([^\"]*)"$/ do |path|
@@ -106,8 +102,6 @@ When /^I send a POST request to "([^\"]*)"$/ do |path|
   else
     post path
   end
-
-  drain_async_jobs
 end
 
 When /^I send a PUT request to "([^\"]*)"$/ do |path|
@@ -126,8 +120,6 @@ When /^I send a PUT request to "([^\"]*)"$/ do |path|
   else
     put path
   end
-
-  drain_async_jobs
 end
 
 When /^I send a PATCH request to "([^\"]*)"$/ do |path|
@@ -146,8 +138,6 @@ When /^I send a PATCH request to "([^\"]*)"$/ do |path|
   else
     patch path
   end
-
-  drain_async_jobs
 end
 
 When /^I send a POST request to "([^\"]*)" with the following:$/ do |path, body|
@@ -167,8 +157,6 @@ When /^I send a POST request to "([^\"]*)" with the following:$/ do |path, body|
   else
     post path, body
   end
-
-  drain_async_jobs
 end
 
 When /^I send a POST request to "([^\"]*)" with the following badly encoded data:$/ do |path, body|
@@ -188,8 +176,6 @@ When /^I send a POST request to "([^\"]*)" with the following badly encoded data
   else
     post path, body.encode!('CP1252')
   end
-
-  drain_async_jobs
 end
 
 When /^I send a PATCH request to "([^\"]*)" with the following:$/ do |path, body|
@@ -209,8 +195,6 @@ When /^I send a PATCH request to "([^\"]*)" with the following:$/ do |path, body
   else
     patch path, body
   end
-
-  drain_async_jobs
 end
 
 When /^I send a PUT request to "([^\"]*)" with the following:$/ do |path, body|
@@ -230,8 +214,6 @@ When /^I send a PUT request to "([^\"]*)" with the following:$/ do |path, body|
   else
     put path, body
   end
-
-  drain_async_jobs
 end
 
 When /^I send a DELETE request to "([^\"]*)" with the following:$/ do |path, body|
@@ -252,7 +234,7 @@ When /^I send a DELETE request to "([^\"]*)" with the following:$/ do |path, bod
     delete path, body
   end
 
-  drain_async_jobs
+  YankArtifactWorker.drain
 end
 
 When /^I send a DELETE request to "([^\"]*)"$/ do |path|
@@ -272,8 +254,7 @@ When /^I send a DELETE request to "([^\"]*)"$/ do |path|
     delete path
   end
 
-  drain_async_jobs
-rescue Timeout::Error
+  YankArtifactWorker.drain
 end
 
 Then /^the response status should (?:contain|be) "([^\"]*)"$/ do |status|
