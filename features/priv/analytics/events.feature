@@ -13,7 +13,7 @@ Feature: Event analytics
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
-    When I send a GET request to "/-/accounts/test1/analytics/events/license.validation.succeeded"
+    When I send a GET request to "/accounts/test1/analytics/events/license.validation.succeeded"
     Then the response status should be "200"
     And sidekiq should have 0 "request-log" jobs
 
@@ -32,7 +32,7 @@ Feature: Event analytics
       | 99e87418-ade4-460f-a5aa-a856a0059397 | license.validation.failed    | 2100-08-24T00:00:00.000Z |
       | d1e6f594-7bcb-455f-971b-1e8b3ea63fd7 | license.validation.succeeded | 2099-08-20T00:00:00.000Z |
     And I use an authentication token
-    When I send a GET request to "/-/accounts/test1/analytics/events/license.validation.succeeded?start_date=2100-08-20&end_date=2100-08-27"
+    When I send a GET request to "/accounts/test1/analytics/events/license.validation.succeeded?start_date=2100-08-20&end_date=2100-08-27"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
@@ -60,7 +60,7 @@ Feature: Event analytics
       | 99e87418-ade4-460f-a5aa-a856a0059397 | license.validation.failed    | 2100-08-24T00:00:00.000Z |
       | d1e6f594-7bcb-455f-971b-1e8b3ea63fd7 | license.validation.succeeded | 2099-08-20T00:00:00.000Z |
     And I use an authentication token
-    When I send a GET request to "/-/accounts/test1/analytics/events/license.validation.*?start_date=2100-08-20&end_date=2100-08-27"
+    When I send a GET request to "/accounts/test1/analytics/events/license.validation.*?start_date=2100-08-20&end_date=2100-08-27"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
@@ -90,7 +90,7 @@ Feature: Event analytics
       | 96faacd6-16e6-4661-8e16-9e8064fbeb0a | license.created | 2100-08-24T00:00:00.000Z |
       | d1e6f594-7bcb-455f-971b-1e8b3ea63fd7 | license.created | 2099-08-20T00:00:00.000Z |
     And I use an authentication token
-    When I send a GET request to "/-/accounts/test1/analytics/events/license.created?start_date=2100-08-20&end_date=2100-08-27"
+    When I send a GET request to "/accounts/test1/analytics/events/license.created?start_date=2100-08-20&end_date=2100-08-27"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
@@ -111,7 +111,7 @@ Feature: Event analytics
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a GET request to "/-/accounts/test1/analytics/events/license.validation.succeeded"
+    When I send a GET request to "/accounts/test1/analytics/events/license.validation.succeeded"
     Then the response status should be "403"
     And the response body should be an array of 1 error
     And sidekiq should have 0 "request-log" jobs
@@ -121,7 +121,7 @@ Feature: Event analytics
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a GET request to "/-/accounts/test1/analytics/events/license.validation.succeeded"
+    When I send a GET request to "/accounts/test1/analytics/events/license.validation.succeeded"
     Then the response status should be "403"
     And the response body should be an array of 1 error
     And sidekiq should have 0 "request-log" jobs

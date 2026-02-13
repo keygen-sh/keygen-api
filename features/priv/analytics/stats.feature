@@ -13,7 +13,7 @@ Feature: Stat analytics
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
-    When I send a GET request to "/-/accounts/test1/analytics/stats/machines"
+    When I send a GET request to "/accounts/test1/analytics/stats/machines"
     Then the response status should be "200"
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
@@ -23,7 +23,7 @@ Feature: Stat analytics
     And the current account is "test1"
     And the current account has 5 "machines"
     And I use an authentication token
-    When I send a GET request to "/-/accounts/test1/analytics/stats/machines"
+    When I send a GET request to "/accounts/test1/analytics/stats/machines"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
@@ -41,7 +41,7 @@ Feature: Stat analytics
     And the current account is "test1"
     And the current account has 3 "users"
     And I use an authentication token
-    When I send a GET request to "/-/accounts/test1/analytics/stats/users"
+    When I send a GET request to "/accounts/test1/analytics/stats/users"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
@@ -59,7 +59,7 @@ Feature: Stat analytics
     And the current account is "test1"
     And the current account has 4 "licenses"
     And I use an authentication token
-    When I send a GET request to "/-/accounts/test1/analytics/stats/licenses"
+    When I send a GET request to "/accounts/test1/analytics/stats/licenses"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
@@ -135,7 +135,7 @@ Feature: Stat analytics
       | 25515b44-6921-4b14-9f89-7e1510beb5bd | 5796eb0e-cae8-43b7-9fdc-d5a6bf6597de | d2f63b6f664a45339d484b2f2b30f5b0 |
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/-/accounts/test1/analytics/stats/alus"
+    When I send a GET request to "/accounts/test1/analytics/stats/alus"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
@@ -153,7 +153,7 @@ Feature: Stat analytics
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
-    When I send a GET request to "/-/accounts/test1/analytics/stats/invalid"
+    When I send a GET request to "/accounts/test1/analytics/stats/invalid"
     Then the response status should be "404"
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
@@ -170,7 +170,7 @@ Feature: Stat analytics
       """
       { "Keygen-Environment": "isolated" }
       """
-    When I send a GET request to "/-/accounts/test1/analytics/stats/machines"
+    When I send a GET request to "/accounts/test1/analytics/stats/machines"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
@@ -195,7 +195,7 @@ Feature: Stat analytics
       """
       { "Keygen-Environment": "shared" }
       """
-    When I send a GET request to "/-/accounts/test1/analytics/stats/machines"
+    When I send a GET request to "/accounts/test1/analytics/stats/machines"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
@@ -215,7 +215,7 @@ Feature: Stat analytics
     And the current account has 2 global "machines"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/-/accounts/test1/analytics/stats/machines"
+    When I send a GET request to "/accounts/test1/analytics/stats/machines"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
@@ -233,7 +233,7 @@ Feature: Stat analytics
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a GET request to "/-/accounts/test1/analytics/stats/machines"
+    When I send a GET request to "/accounts/test1/analytics/stats/machines"
     Then the response status should be "403"
     And the response body should be an array of 1 error
     And sidekiq should have 0 "request-log" jobs
@@ -244,7 +244,7 @@ Feature: Stat analytics
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a GET request to "/-/accounts/test1/analytics/stats/machines"
+    When I send a GET request to "/accounts/test1/analytics/stats/machines"
     Then the response status should be "403"
     And the response body should be an array of 1 error
     And sidekiq should have 0 "request-log" jobs
@@ -255,7 +255,7 @@ Feature: Stat analytics
     And the current account has 1 "license"
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a GET request to "/-/accounts/test1/analytics/stats/machines"
+    When I send a GET request to "/accounts/test1/analytics/stats/machines"
     Then the response status should be "403"
     And the response body should be an array of 1 error
     And sidekiq should have 0 "request-log" jobs
