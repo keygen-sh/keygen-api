@@ -175,10 +175,6 @@ class ApplicationPolicy
         end
     end
 
-    # bail early if there is no record to avoid environment mismatch false-positives
-    return if
-      record.nil?
-
     # ^^^ ditto for the record, except we're potentially allowed to access records
     # from other environments if strict-mode is disabled.
     case record
