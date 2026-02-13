@@ -30,6 +30,14 @@ def drain_replication_jobs
       active_job.process_job(job)
     end
   end
+
+  # HACK(ezekg) force Clickhouse to merge data parts so they're visible to queries.
+  #             ReplacingMergeTree is eventually consistent, so without this,
+  #             tests may see stale or incomplete data.
+  if Keygen.database.clickhouse_enabled?
+    RequestLog::Clickhouse.connection.execute('OPTIMIZE TABLE request_logs FINAL')
+    EventLog::Clickhouse.connection.execute('OPTIMIZE TABLE event_logs FINAL')
+  end
 end
 
 Then /^sidekiq should (?:have|process) (\d+) "([^\"]*)" jobs?(?: queued in ([.\d]+ \w+))?$/ do |expected_count, worker_name, queued_at|
