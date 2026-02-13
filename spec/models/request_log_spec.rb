@@ -28,9 +28,7 @@ describe RequestLog, type: :model do
           to: %i[clickhouse],
           strategy: :clickhouse,
           sync: false,
-          strategy_config: hash_including(
-            ttl: an_instance_of(Proc),
-          ),
+          strategy_config: {},
         )
       end
     end
@@ -55,9 +53,7 @@ describe RequestLog, type: :model do
             performed_at: a_kind_of(ActiveSupport::TimeWithZone),
             operation: :create,
             database: :clickhouse,
-            strategy_config: hash_including(
-              ttl: account.request_log_retention_duration,
-            ),
+            strategy_config: {},
           )
         end
 
@@ -92,9 +88,7 @@ describe RequestLog, type: :model do
             performed_at: a_kind_of(ActiveSupport::TimeWithZone),
             operation: :update,
             database: :clickhouse,
-            strategy_config: hash_including(
-              ttl: account.request_log_retention_duration,
-            ),
+            strategy_config: {},
           )
         end
       end
@@ -109,9 +103,7 @@ describe RequestLog, type: :model do
             performed_at: a_kind_of(ActiveSupport::TimeWithZone),
             operation: :destroy,
             database: :clickhouse,
-            strategy_config: hash_including(
-              ttl: account.request_log_retention_duration,
-            ),
+            strategy_config: {},
           )
         end
       end
@@ -176,9 +168,7 @@ describe RequestLog, type: :model do
               performed_at: a_kind_of(ActiveSupport::TimeWithZone),
               operation: :insert_all,
               database: :clickhouse,
-              strategy_config: hash_including(
-                ttl: account.request_log_retention_duration,
-              ),
+              strategy_config: {},
             )
           end
 
