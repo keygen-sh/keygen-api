@@ -34,11 +34,10 @@ ACTIVE_JOBS_TO_RUN_INLINE = [
   ActiveRecord::DestroyAssociationAsyncJob,
   DualWrites::BulkReplicationJob,
   DualWrites::ReplicationJob,
-  # FIXME(ezekg) these are failing because readonly connections block any inline writes
-  # AsyncDestroyable::DestroyAsyncJob,
-  # AsyncCreatable::CreateAsyncJob,
-  # AsyncUpdatable::UpdateAsyncJob,
-  # AsyncTouchable::TouchAsyncJob,
+  AsyncDestroyable::DestroyAsyncJob,
+  AsyncCreatable::CreateAsyncJob,
+  AsyncUpdatable::UpdateAsyncJob,
+  AsyncTouchable::TouchAsyncJob,
 ]
 
 Around do |_, scenario|
