@@ -233,7 +233,7 @@ module DualWrites
     end
 
     class_methods do
-      def dual_writes(to:, strategy:, ignored_columns: nil, sync: false, if: nil, extending: nil, **strategy_config, &extension)
+      def dual_writes(to:, strategy:, ignored_columns: nil, sync: false, if: nil, **strategy_config, &extension)
         databases = Array(to)
 
         raise ConfigurationError, 'to must be a symbol or array of symbols' unless
@@ -264,11 +264,11 @@ module DualWrites
           base_class = DualWrites.base_class_for(database)
           table      = table_name
 
-          database_class = Class.new(base_class) do
-            self.primary_key = false
-            self.table_name  = table
+          database_class = Class.new(base_class) do |klass|
+            klass.primary_key = false
+            klass.table_name  = table
 
-            # TODO(ezekg) add :extending/&extension functionality
+            klass.include Module.new(&extension)
           end
 
           const_set(database_class_name, database_class)
