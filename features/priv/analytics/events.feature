@@ -20,6 +20,14 @@ Feature: Event analytics
   Scenario: Admin retrieves event count for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
+    And time is frozen at "2024-01-10T00:00:00.000Z"
+    And the current account has the following "event_log" rows:
+      | id                                   | event                        | created_at               |
+      | d00998f9-d224-4ee7-ac4e-f1e5fe318ff7 | license.validation.succeeded | 2024-01-03T00:00:00.000Z |
+      | 96faacd6-16e6-4661-8e16-9e8064fbeb0a | license.validation.succeeded | 2024-01-03T00:00:00.000Z |
+      | 31e30cc1-d454-40dc-b4ae-93ad683ddf33 | license.validation.succeeded | 2024-01-04T00:00:00.000Z |
+      | 99e87418-ade4-460f-a5aa-a856a0059397 | license.validation.failed    | 2024-01-04T00:00:00.000Z |
+      | d1e6f594-7bcb-455f-971b-1e8b3ea63fd7 | license.validation.succeeded | 2023-01-01T00:00:00.000Z |
     And I use an authentication token
     When I send a GET request to "/-/accounts/test1/analytics/events/license.validation.succeeded?start_date=2024-01-01&end_date=2024-01-07"
     Then the response status should be "200"
@@ -29,16 +37,25 @@ Feature: Event analytics
         "data": [
           {
             "event": "license.validation.succeeded",
-            "count": 0
+            "count": 3
           }
         ]
       }
       """
     And sidekiq should have 0 "request-log" jobs
+    And time is unfrozen
 
   Scenario: Admin retrieves event count with wildcard event
     Given I am an admin of account "test1"
     And the current account is "test1"
+    And time is frozen at "2024-01-10T00:00:00.000Z"
+    And the current account has the following "event_log" rows:
+      | id                                   | event                        | created_at               |
+      | d00998f9-d224-4ee7-ac4e-f1e5fe318ff7 | license.validation.succeeded | 2024-01-03T00:00:00.000Z |
+      | 96faacd6-16e6-4661-8e16-9e8064fbeb0a | license.validation.succeeded | 2024-01-03T00:00:00.000Z |
+      | 31e30cc1-d454-40dc-b4ae-93ad683ddf33 | license.validation.succeeded | 2024-01-04T00:00:00.000Z |
+      | 99e87418-ade4-460f-a5aa-a856a0059397 | license.validation.failed    | 2024-01-04T00:00:00.000Z |
+      | d1e6f594-7bcb-455f-971b-1e8b3ea63fd7 | license.validation.succeeded | 2023-01-01T00:00:00.000Z |
     And I use an authentication token
     When I send a GET request to "/-/accounts/test1/analytics/events/license.validation.*?start_date=2024-01-01&end_date=2024-01-07"
     Then the response status should be "200"
@@ -58,10 +75,17 @@ Feature: Event analytics
       }
       """
     And sidekiq should have 0 "request-log" jobs
+    And time is unfrozen
 
   Scenario: Admin retrieves event count for license.created
     Given I am an admin of account "test1"
     And the current account is "test1"
+    And time is frozen at "2024-01-10T00:00:00.000Z"
+    And the current account has the following "event_log" rows:
+      | id                                   | event           | created_at               |
+      | d00998f9-d224-4ee7-ac4e-f1e5fe318ff7 | license.created | 2024-01-03T00:00:00.000Z |
+      | 96faacd6-16e6-4661-8e16-9e8064fbeb0a | license.created | 2024-01-04T00:00:00.000Z |
+      | d1e6f594-7bcb-455f-971b-1e8b3ea63fd7 | license.created | 2023-01-01T00:00:00.000Z |
     And I use an authentication token
     When I send a GET request to "/-/accounts/test1/analytics/events/license.created?start_date=2024-01-01&end_date=2024-01-07"
     Then the response status should be "200"
@@ -71,12 +95,13 @@ Feature: Event analytics
         "data": [
           {
             "event": "license.created",
-            "count": 0
+            "count": 2
           }
         ]
       }
       """
     And sidekiq should have 0 "request-log" jobs
+    And time is unfrozen
 
   Scenario: Product attempts to retrieve event count for their account
     Given the current account is "test1"
