@@ -127,6 +127,13 @@ Rails.application.configure do
     #              we're not eager loading anything.
     Bullet.unused_eager_loading_enable = false
   end
+
+  # FIXME(ezekg) make sure log subscribers use the same tagged logger
+  config.after_initialize do
+    ActiveSupport::LogSubscriber.logger =
+    ActiveRecord::Base.logger           =
+    ActionController::Base.logger       = Rails.logger
+  end
 end
 
 # Speed up tests by disabling the WAL.
