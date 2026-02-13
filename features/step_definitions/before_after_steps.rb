@@ -25,27 +25,26 @@ BeforeAll do
   Rails.cache.clear
 end
 
-# run subset of jobs inline so data is immediately available
-Around do |_scenario, block|
-  queue_adapter_was = ActiveJob::Base.queue_adapter
+# run subset of active jobs inline so data is immediately available
+ACTIVE_JOBS_TO_RUN_INLINE = [
+  ActiveRecord::DestroyAssociationAsyncJob,
+  DualWrites::BulkReplicationJob,
+  DualWrites::ReplicationJob,
+  # FIXME(ezekg) these are failing because readonly connections block any inline writes
+  # AsyncDestroyable::DestroyAsyncJob,
+  # AsyncCreatable::CreateAsyncJob,
+  # AsyncUpdatable::UpdateAsyncJob,
+  # AsyncTouchable::TouchAsyncJob,
+]
 
-  DualWrites::ReplicationJob.queue_adapter               =
-  DualWrites::BulkReplicationJob.queue_adapter           =
-  AsyncCreatable::CreateAsyncJob.queue_adapter           =
-  AsyncUpdatable::UpdateAsyncJob.queue_adapter           =
-  AsyncTouchable::TouchAsyncJob.queue_adapter            =
-  AsyncDestroyable::DestroyAsyncJob.queue_adapter        =
-  ActiveRecord::DestroyAssociationAsyncJob.queue_adapter = :inline
+Around do |_, scenario|
+  adapter_was, ActiveJob::Base.queue_adapter = ActiveJob::Base.queue_adapter, :test
 
-  block.call
+  perform_enqueued_jobs only: ACTIVE_JOBS_TO_RUN_INLINE do
+    scenario.call
+  end
 ensure
-  DualWrites::ReplicationJob.queue_adapter               =
-  DualWrites::BulkReplicationJob.queue_adapter           =
-  AsyncCreatable::CreateAsyncJob.queue_adapter           =
-  AsyncUpdatable::UpdateAsyncJob.queue_adapter           =
-  AsyncTouchable::TouchAsyncJob.queue_adapter            =
-  AsyncDestroyable::DestroyAsyncJob.queue_adapter        =
-  ActiveRecord::DestroyAssociationAsyncJob.queue_adapter = queue_adapter_was
+  ActiveJob::Base.queue_adapter = adapter_was
 end
 
 Before do |scenario|
