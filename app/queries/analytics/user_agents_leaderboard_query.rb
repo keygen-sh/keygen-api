@@ -9,27 +9,28 @@ module Analytics
       @environment = environment
       @start_date  = [start_date, 1.year.ago.to_date].max
       @end_date    = [Date.current, end_date].min
-      @limit       = [limit, MAX_LIMIT].min
+      @limit       = [limit.to_i, MAX_LIMIT].min
     end
 
     def call
-      # FIXME(ezekg) move to request log model once we fully migrate to clickhouse
-      rows = RequestLog::Clickhouse.where(account_id: account.id)
-                                   .where(environment_id: environment&.id)
-                                   .where(created_date: start_date..end_date)
-                                   .where(is_deleted: 0)
-                                   .where.not(user_agent: [nil, ''])
-                                   .group(:user_agent)
-                                   .order(Arel.sql('count DESC'))
-                                   .limit(limit)
-                                   .pluck(
-                                     :user_agent,
-                                     Arel.sql('count(*) AS count'),
-                                   )
+      binds = { account_id:, environment_id:, start_date:, end_date:, limit: }.compact
+      res   = exec_sql([<<~SQL.squish, binds])
+        SELECT
+          user_agent AS identifier,
+          count(*) AS count
+        FROM request_logs
+        WHERE account_id = :account_id
+          AND environment_id #{environment.nil? ? 'IS NULL' : '= :environment_id'}
+          AND created_date BETWEEN :start_date AND :end_date
+          AND is_deleted = 0
+          AND user_agent IS NOT NULL
+          AND user_agent != ''
+        GROUP BY user_agent
+        ORDER BY count DESC
+        LIMIT :limit
+      SQL
 
-      # pp(pg: RequestLog.all, ch: RequestLog::Clickhouse.all)
-
-      rows.map do |(identifier, count)|
+      res['data'].map do |(identifier, count)|
         Leaderboard::Entry.new(identifier:, count:)
       end
     end
@@ -41,5 +42,16 @@ module Analytics
                 :start_date,
                 :end_date,
                 :limit
+
+    def account_id     = account.id
+    def environment_id = environment&.id
+
+    def exec_sql(...)
+      klass = RequestLog::Clickhouse
+
+      klass.connection.execute(
+        klass.sanitize_sql(...),
+      )
+    end
   end
 end

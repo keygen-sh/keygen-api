@@ -3,7 +3,7 @@
 Feature: Leaderboard analytics
   Background:
     Given the following "accounts" exist:
-      | Name    | Slug  |
+      | name    | slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
@@ -21,7 +21,7 @@ Feature: Leaderboard analytics
   Scenario: Admin retrieves IPs leaderboard
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And time is frozen at "2024-01-05T00:00:00.000Z"
+    And time is frozen at "2024-01-10T00:00:00.000Z"
     And the current account has the following "request_log" rows:
       | id                                   | ip             | created_at               |
       | d00998f9-d224-4ee7-ac4e-f1e5fe318ff7 | 192.168.1.1    | 2024-01-03T00:00:00.000Z |
@@ -51,7 +51,7 @@ Feature: Leaderboard analytics
   Scenario: Admin retrieves URLs leaderboard
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And time is frozen at "2024-01-05T00:00:00.000Z"
+    And time is frozen at "2024-01-10T00:00:00.000Z"
     And the current account has the following "request_log" rows:
       | id                                   | method | url                               | created_at               |
       | d00998f9-d224-4ee7-ac4e-f1e5fe318ff7 | POST   | /v1/licenses/foo/actions/validate | 2024-01-03T00:00:00.000Z |
@@ -66,14 +66,14 @@ Feature: Leaderboard analytics
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
-      {
-        "data": [
-          { "identifier": "POST /v1/licenses/foo/validate", "count": 3 },
-          { "identifier": "POST /v1/licenses/bar/validate", "count": 1 },
-          { "identifier": "GET /v1/licenses", "count": 2 },
-          { "identifier": "POST /v1/machines", "count": 1 }
-        ]
-      }
+        {
+          "data": [
+            { "identifier": "GET /v1/licenses", "count": 2 },
+            { "identifier": "POST /v1/licenses/foo/actions/validate", "count": 2 },
+            { "identifier": "POST /v1/machines", "count": 1 },
+            { "identifier": "POST /v1/licenses/bar/actions/validate", "count": 1 }
+          ]
+        }
       """
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
@@ -82,7 +82,7 @@ Feature: Leaderboard analytics
   Scenario: Admin retrieves licenses leaderboard
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And time is frozen at "2024-01-05T00:00:00.000Z"
+    And time is frozen at "2024-01-10T00:00:00.000Z"
     And the current account has the following "license" rows:
       | id                                   | name      |
       | bf9b523f-dd65-48a2-9512-fb66ba6c3714 | License 1 |
@@ -128,7 +128,7 @@ Feature: Leaderboard analytics
       | 09d7a1f9-3c4a-401f-b6a9-839f4e35d493 | Mozilla/5.0  | 2024-01-05T00:00:00.000Z |
       | d1e6f594-7bcb-455f-971b-1e8b3ea63fd7 | keygen/1.0.0 | 2023-01-01T00:00:00.000Z |
     And I use an authentication token
-    When I send a GET request to "/-/accounts/test1/analytics/leaderboards/user-agents"
+    When I send a GET request to "/-/accounts/test1/analytics/leaderboards/user-agents?start_date=2024-01-01&end_date=2024-01-07"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """

@@ -9,6 +9,11 @@ FactoryBot.define do
     requestor   { build(:admin, account:, environment:) }
     resource    { build(:artifact, account:, environment:) }
 
+    # HACK(ezekg) sometimes we create logs in the past but that causes clickhouse
+    #             to immediately throw out the records during merge because our
+    #             table by default only keeps records for 30 days
+    ttl { 100.years }
+
     trait :in_isolated_environment do
       environment { build(:environment, :isolated, account:) }
     end

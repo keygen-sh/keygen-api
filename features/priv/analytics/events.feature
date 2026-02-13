@@ -3,7 +3,7 @@
 Feature: Event analytics
   Background:
     Given the following "accounts" exist:
-      | Name    | Slug  |
+      | name    | slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
@@ -48,11 +48,11 @@ Feature: Event analytics
         "data": [
           {
             "event": "license.validation.failed",
-            "count": 0
+            "count": 1
           },
           {
             "event": "license.validation.succeeded",
-            "count": 0
+            "count": 3
           }
         ]
       }
