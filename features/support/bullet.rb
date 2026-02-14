@@ -3,6 +3,12 @@
 require 'bullet'
 
 module Bullet
-  # be still my ocd, be still...
-  def self.enabled? = enable?
+  extend self
+
+  def request
+    start_request
+    yield
+  ensure
+    end_request
+  end
 end

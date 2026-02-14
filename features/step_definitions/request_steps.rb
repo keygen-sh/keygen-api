@@ -61,10 +61,12 @@ When /^I send a HEAD request to "([^\"]*)"$/ do |path|
   else
   end
 
-  unless path.starts_with?('//')
-    head "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
-  else
-    head path
+  Bullet.request do
+    unless path.starts_with?('//')
+      head "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
+    else
+      head path
+    end
   end
 end
 
@@ -79,10 +81,12 @@ When /^I send a GET request to "([^\"]*)"$/ do |path|
   else
   end
 
-  unless path.starts_with?('//')
-    get "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
-  else
-    get path
+  Bullet.request do
+    unless path.starts_with?('//')
+      get "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
+    else
+      get path
+    end
   end
 end
 
@@ -97,10 +101,12 @@ When /^I send a POST request to "([^\"]*)"$/ do |path|
   else
   end
 
-  unless path.starts_with?('//')
-    post "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
-  else
-    post path
+  Bullet.request do
+    unless path.starts_with?('//')
+      post "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
+    else
+      post path
+    end
   end
 end
 
@@ -115,10 +121,12 @@ When /^I send a PUT request to "([^\"]*)"$/ do |path|
   else
   end
 
-  unless path.starts_with?('//')
-    put "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
-  else
-    put path
+  Bullet.request do
+    unless path.starts_with?('//')
+      put "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
+    else
+      put path
+    end
   end
 end
 
@@ -133,10 +141,12 @@ When /^I send a PATCH request to "([^\"]*)"$/ do |path|
   else
   end
 
-  unless path.starts_with?('//')
-    patch "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
-  else
-    patch path
+  Bullet.request do
+    unless path.starts_with?('//')
+      patch "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
+    else
+      patch path
+    end
   end
 end
 
@@ -152,10 +162,12 @@ When /^I send a POST request to "([^\"]*)" with the following:$/ do |path, body|
   else
   end
 
-  unless path.starts_with?('//')
-    post "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
-  else
-    post path, body
+  Bullet.request do
+    unless path.starts_with?('//')
+      post "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
+    else
+      post path, body
+    end
   end
 end
 
@@ -171,10 +183,12 @@ When /^I send a POST request to "([^\"]*)" with the following badly encoded data
   else
   end
 
-  unless path.starts_with?('//')
-    post "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body.encode!('CP1252')
-  else
-    post path, body.encode!('CP1252')
+  Bullet.request do
+    unless path.starts_with?('//')
+      post "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body.encode!('CP1252')
+    else
+      post path, body.encode!('CP1252')
+    end
   end
 end
 
@@ -190,10 +204,12 @@ When /^I send a PATCH request to "([^\"]*)" with the following:$/ do |path, body
   else
   end
 
-  unless path.starts_with?('//')
-    patch "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
-  else
-    patch path, body
+  Bullet.request do
+    unless path.starts_with?('//')
+      patch "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
+    else
+      patch path, body
+    end
   end
 end
 
@@ -209,10 +225,12 @@ When /^I send a PUT request to "([^\"]*)" with the following:$/ do |path, body|
   else
   end
 
-  unless path.starts_with?('//')
-    put "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
-  else
-    put path, body
+  Bullet.request do
+    unless path.starts_with?('//')
+      put "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
+    else
+      put path, body
+    end
   end
 end
 
@@ -228,10 +246,12 @@ When /^I send a DELETE request to "([^\"]*)" with the following:$/ do |path, bod
   else
   end
 
-  unless path.starts_with?('//')
-    delete "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
-  else
-    delete path, body
+  Bullet.request do
+    unless path.starts_with?('//')
+      delete "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
+    else
+      delete path, body
+    end
   end
 
   # FIXME(ezekg) sidekiq doesn't have a way to run a subset of jobs
@@ -250,10 +270,12 @@ When /^I send a DELETE request to "([^\"]*)"$/ do |path|
   else
   end
 
-  unless path.starts_with?('//')
-    delete "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
-  else
-    delete path
+  Bullet.request do
+    unless path.starts_with?('//')
+      delete "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
+    else
+      delete path
+    end
   end
 
   YankArtifactWorker.drain

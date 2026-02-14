@@ -515,7 +515,7 @@ DEPENDENCIES
   aws-sdk-s3 (~> 1)
   barnes
   bcrypt (= 3.1.17)
-  bullet (~> 8)
+  bullet (~> 8.1)
   byebug
   clickhouse-activerecord!
   compact_index
