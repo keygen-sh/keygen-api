@@ -1,4 +1,3 @@
-@ee @clickhouse
 @api/priv
 Feature: Stat analytics
   Background:
@@ -158,6 +157,7 @@ Feature: Stat analytics
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
 
+  @ee
   Scenario: Admin retrieves machines count for isolated environment
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
@@ -183,6 +183,7 @@ Feature: Stat analytics
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
 
+  @ee
   Scenario: Admin retrieves machines count for shared environment
     Given the current account is "test1"
     And the current account has 1 shared "environment"
@@ -208,6 +209,7 @@ Feature: Stat analytics
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
 
+  @ee
   Scenario: Admin retrieves machines count for global environment
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
