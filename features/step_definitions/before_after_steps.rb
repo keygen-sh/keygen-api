@@ -71,8 +71,6 @@ Before do |scenario|
   return skip_this_scenario if
     scenario.tags.any? { it.name == '@skip' }
 
-  Bullet.start_request if Bullet.enabled?
-
   ActionMailer::Base.deliveries.clear
   Sidekiq::Worker.clear_all
   StripeHelper.start
@@ -85,11 +83,6 @@ Before do |scenario|
 end
 
 After do |scenario|
-  if Bullet.enabled?
-    Bullet.perform_out_of_channel_notifications if Bullet.notification?
-    Bullet.end_request
-  end
-
   if scenario.failed?
     # print additional information about the failed scenario to stderr when debug mode is enabled
     if ENV.true?('DEBUG')
