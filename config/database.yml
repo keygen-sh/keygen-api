@@ -1,10 +1,10 @@
 default: &postgres
   adapter: postgresql
-  pool: <%= ENV['DB_POOL'] || (Sidekiq.server? ? ENV.fetch('SIDEKIQ_CONCURRENCY', 10) : ENV.fetch('RAILS_MAX_THREADS', 2)) %>
-  timeout: <%= ENV['DB_TIMEOUT'] || 5000 %>
+  pool: <%= ENV['DATABASE_CONNECTION_POOL'] || ENV['DB_POOL'] || (Sidekiq.server? ? ENV.fetch('SIDEKIQ_CONCURRENCY', 10) : ENV.fetch('RAILS_MAX_THREADS', 2)) %>
+  timeout: <%= ENV['DATABASE_CONNECTION_TIMEOUT'] || ENV['DB_TIMEOUT'] || 5000 %>
   prepared_statements: false
   variables:
-    statement_timeout: <%= ENV["DB_STATEMENT_TIMEOUT"] || '15s' %>
+    statement_timeout: <%= ENV['DATABASE_STATEMENT_TIMEOUT'] || ENV['DB_STATEMENT_TIMEOUT'] || '15s' %>
 
 clickhouse: &clickhouse
   adapter: clickhouse
