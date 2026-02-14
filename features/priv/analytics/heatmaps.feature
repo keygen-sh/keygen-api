@@ -74,6 +74,7 @@ Feature: Heatmaps analytics
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
 
+  @ee
   Scenario: Admin retrieves heatmap for an isolated environment
     Given the current account is "test1"
     And the current account has the following "environment" rows:
@@ -125,6 +126,7 @@ Feature: Heatmaps analytics
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
 
+  @ee
   Scenario: Admin retrieves heatmap for a shared environment
     Given the current account is "test1"
     And the current account has the following "environment" rows:
