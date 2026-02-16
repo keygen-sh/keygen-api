@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Priv::Analytics
-  class EventsController < BaseController
+  class ActivitiesController < BaseController
     CACHE_TTL      = 10.minutes
     CACHE_RACE_TTL = 1.minute
 
@@ -14,15 +14,15 @@ module Priv::Analytics
     def show
       authorize! with: Accounts::AnalyticsPolicy
 
-      event = Analytics::Event.new(params[:event_id], **event_query)
+      activity = Analytics::Activity.new(params[:activity_id], **activity_query)
 
-      unless event.valid?
-        render_bad_request detail: event.errors.full_messages.to_sentence,
-                           source: { parameter: event.errors.attribute_names.first }
+      unless activity.valid?
+        render_bad_request detail: activity.errors.full_messages.to_sentence,
+                           source: { parameter: activity.errors.attribute_names.first }
         return
       end
 
-      data = cached { event.as_json }
+      data = cached { activity.as_json }
 
       render json: { data: }
     end
@@ -31,7 +31,7 @@ module Priv::Analytics
 
     def cached(&) = Rails.cache.fetch(cache_key, expires_in: CACHE_TTL, race_condition_ttl: CACHE_RACE_TTL, &)
     def cache_key
-      [:analytics, :events, params[:event_id], current_account.id, current_environment&.id, params[:start_date], params[:end_date], CACHE_KEY_VERSION].compact.join(':')
+      [:analytics, :activities, params[:activity_id], current_account.id, current_environment&.id, params[:start_date], params[:end_date], CACHE_KEY_VERSION].compact.join(':')
     end
   end
 end

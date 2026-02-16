@@ -1,6 +1,6 @@
 @ee @clickhouse
 @api/priv
-Feature: Event analytics
+Feature: Activity analytics
   Background:
     Given the following "accounts" exist:
       | name    | slug  |
@@ -13,14 +13,14 @@ Feature: Event analytics
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/events/license.validation.succeeded"
+    When I send a GET request to "/accounts/test1/analytics/activities/license.validation.succeeded"
     Then the response status should be "200"
     And sidekiq should have 0 "request-log" jobs
 
   # NB(ezekg) using future dates to avoid column-level TTL expiration during OPTIMIZE
   #           TABLE FINAL in tests, so dates MUST stay within clickhouse's Date type
   #           range (otherwise it overflows after 2149-06-06).
-  Scenario: Admin retrieves event count for their account
+  Scenario: Admin retrieves activity count for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
     And time is frozen at "2100-08-30T00:00:00.000Z"
@@ -32,7 +32,7 @@ Feature: Event analytics
       | 99e87418-ade4-460f-a5aa-a856a0059397 | license.validation.failed    | 2100-08-24T00:00:00.000Z |
       | d1e6f594-7bcb-455f-971b-1e8b3ea63fd7 | license.validation.succeeded | 2099-08-20T00:00:00.000Z |
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/events/license.validation.succeeded?start_date=2100-08-20&end_date=2100-08-27"
+    When I send a GET request to "/accounts/test1/analytics/activities/license.validation.succeeded?start_date=2100-08-20&end_date=2100-08-27"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
@@ -48,7 +48,7 @@ Feature: Event analytics
     And sidekiq should have 0 "request-log" jobs
     And time is unfrozen
 
-  Scenario: Admin retrieves event count with wildcard event
+  Scenario: Admin retrieves activity count with wildcard pattern
     Given I am an admin of account "test1"
     And the current account is "test1"
     And time is frozen at "2100-08-30T00:00:00.000Z"
@@ -60,7 +60,7 @@ Feature: Event analytics
       | 99e87418-ade4-460f-a5aa-a856a0059397 | license.validation.failed    | 2100-08-24T00:00:00.000Z |
       | d1e6f594-7bcb-455f-971b-1e8b3ea63fd7 | license.validation.succeeded | 2099-08-20T00:00:00.000Z |
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/events/license.validation.*?start_date=2100-08-20&end_date=2100-08-27"
+    When I send a GET request to "/accounts/test1/analytics/activities/license.validation.*?start_date=2100-08-20&end_date=2100-08-27"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
@@ -80,7 +80,7 @@ Feature: Event analytics
     And sidekiq should have 0 "request-log" jobs
     And time is unfrozen
 
-  Scenario: Admin retrieves event count for license.created
+  Scenario: Admin retrieves activity count for license.created
     Given I am an admin of account "test1"
     And the current account is "test1"
     And time is frozen at "2100-08-30T00:00:00.000Z"
@@ -90,7 +90,7 @@ Feature: Event analytics
       | 96faacd6-16e6-4661-8e16-9e8064fbeb0a | license.created | 2100-08-24T00:00:00.000Z |
       | d1e6f594-7bcb-455f-971b-1e8b3ea63fd7 | license.created | 2099-08-20T00:00:00.000Z |
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/events/license.created?start_date=2100-08-20&end_date=2100-08-27"
+    When I send a GET request to "/accounts/test1/analytics/activities/license.created?start_date=2100-08-20&end_date=2100-08-27"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
@@ -106,11 +106,11 @@ Feature: Event analytics
     And sidekiq should have 0 "request-log" jobs
     And time is unfrozen
 
-  Scenario: Admin retrieves event count with invalid event pattern
+  Scenario: Admin retrieves activity count with invalid pattern
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/events/invalid.event"
+    When I send a GET request to "/accounts/test1/analytics/activities/invalid.event"
     Then the response status should be "400"
     And the response body should be an array of 1 error
     And the first error should have the following properties:
@@ -119,11 +119,11 @@ Feature: Event analytics
       """
     And sidekiq should have 0 "request-log" jobs
 
-  Scenario: Admin retrieves event count with invalid wildcard pattern
+  Scenario: Admin retrieves activity count with invalid wildcard pattern
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/events/invalid.*"
+    When I send a GET request to "/accounts/test1/analytics/activities/invalid.*"
     Then the response status should be "400"
     And the response body should be an array of 1 error
     And the first error should have the following properties:
@@ -132,12 +132,12 @@ Feature: Event analytics
       """
     And sidekiq should have 0 "request-log" jobs
 
-  Scenario: Admin retrieves event count with start date too old
+  Scenario: Admin retrieves activity count with start date too old
     Given I am an admin of account "test1"
     And the current account is "test1"
     And time is frozen at "2024-01-15T00:00:00.000Z"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/events/license.validation.succeeded?start_date=2020-01-01"
+    When I send a GET request to "/accounts/test1/analytics/activities/license.validation.succeeded?start_date=2020-01-01"
     Then the response status should be "400"
     And the response body should be an array of 1 error
     And the first error should have the following properties:
@@ -147,12 +147,12 @@ Feature: Event analytics
     And sidekiq should have 0 "request-log" jobs
     And time is unfrozen
 
-  Scenario: Admin retrieves event count with end date in future
+  Scenario: Admin retrieves activity count with end date in future
     Given I am an admin of account "test1"
     And the current account is "test1"
     And time is frozen at "2024-01-15T00:00:00.000Z"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/events/license.validation.succeeded?end_date=2099-01-01"
+    When I send a GET request to "/accounts/test1/analytics/activities/license.validation.succeeded?end_date=2099-01-01"
     Then the response status should be "400"
     And the response body should be an array of 1 error
     And the first error should have the following properties:
@@ -162,22 +162,22 @@ Feature: Event analytics
     And sidekiq should have 0 "request-log" jobs
     And time is unfrozen
 
-  Scenario: Product attempts to retrieve event count for their account
+  Scenario: Product attempts to retrieve activity count for their account
     Given the current account is "test1"
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/events/license.validation.succeeded"
+    When I send a GET request to "/accounts/test1/analytics/activities/license.validation.succeeded"
     Then the response status should be "403"
     And the response body should be an array of 1 error
     And sidekiq should have 0 "request-log" jobs
 
-  Scenario: User attempts to retrieve event count for their account
+  Scenario: User attempts to retrieve activity count for their account
     Given the current account is "test1"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/events/license.validation.succeeded"
+    When I send a GET request to "/accounts/test1/analytics/activities/license.validation.succeeded"
     Then the response status should be "403"
     And the response body should be an array of 1 error
     And sidekiq should have 0 "request-log" jobs

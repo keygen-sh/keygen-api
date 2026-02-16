@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Analytics
-  class Event
+  class Activity
     module Counters
       module EventTypes
         def self.count(account:, environment:, event_type_ids:, start_date:, end_date:)
