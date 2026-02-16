@@ -15,7 +15,10 @@ module Priv::Analytics
     def show
       authorize! with: Accounts::AnalyticsPolicy
 
-      leaderboard = Analytics::Leaderboard.call(params[:leaderboard_id], account: current_account, environment: current_environment, **leaderboard_query)
+      leaderboard = Analytics::Leaderboard.new(
+        params[:leaderboard_id],
+        **leaderboard_query,
+      )
 
       unless leaderboard.valid?
         render_bad_request detail: leaderboard.errors.full_messages.to_sentence,
@@ -23,7 +26,7 @@ module Priv::Analytics
         return
       end
 
-      data = cached { leaderboard.result.as_json }
+      data = cached { leaderboard.as_json }
 
       render json: { data: }
     rescue Analytics::LeaderboardNotFoundError

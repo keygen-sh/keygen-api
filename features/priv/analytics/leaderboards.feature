@@ -41,9 +41,9 @@ Feature: Leaderboard analytics
       """
       {
         "data": [
-          { "identifier": "192.168.1.1", "count": 3 },
-          { "identifier": "10.0.0.1", "count": 2 },
-          { "identifier": "172.16.0.1", "count": 1 }
+          { "discriminator": "192.168.1.1", "count": 3 },
+          { "discriminator": "10.0.0.1", "count": 2 },
+          { "discriminator": "172.16.0.1", "count": 1 }
         ]
       }
       """
@@ -71,10 +71,10 @@ Feature: Leaderboard analytics
       """
         {
           "data": [
-            { "identifier": "GET /v1/licenses", "count": 2 },
-            { "identifier": "POST /v1/licenses/foo/actions/validate", "count": 2 },
-            { "identifier": "POST /v1/machines", "count": 1 },
-            { "identifier": "POST /v1/licenses/bar/actions/validate", "count": 1 }
+            { "discriminator": "GET /v1/licenses", "count": 2 },
+            { "discriminator": "POST /v1/licenses/foo/actions/validate", "count": 2 },
+            { "discriminator": "POST /v1/machines", "count": 1 },
+            { "discriminator": "POST /v1/licenses/bar/actions/validate", "count": 1 }
           ]
         }
       """
@@ -107,9 +107,9 @@ Feature: Leaderboard analytics
       """
       {
         "data": [
-          { "identifier": "bf9b523f-dd65-48a2-9512-fb66ba6c3714", "count": 3 },
-          { "identifier": "a499bb93-9902-4b52-8a04-76944ad7f660", "count": 2 },
-          { "identifier": "7559899f-2761-4b9c-a43e-2d919efa9b04", "count": 1 }
+          { "discriminator": "bf9b523f-dd65-48a2-9512-fb66ba6c3714", "count": 3 },
+          { "discriminator": "a499bb93-9902-4b52-8a04-76944ad7f660", "count": 2 },
+          { "discriminator": "7559899f-2761-4b9c-a43e-2d919efa9b04", "count": 1 }
         ]
       }
       """
@@ -137,9 +137,9 @@ Feature: Leaderboard analytics
       """
       {
         "data": [
-          { "identifier": "keygen/1.0.0", "count": 3 },
-          { "identifier": "curl/8.1.2", "count": 2 },
-          { "identifier": "Mozilla/5.0", "count": 1 }
+          { "discriminator": "keygen/1.0.0", "count": 3 },
+          { "discriminator": "curl/8.1.2", "count": 2 },
+          { "discriminator": "Mozilla/5.0", "count": 1 }
         ]
       }
       """
@@ -166,8 +166,8 @@ Feature: Leaderboard analytics
       """
       {
         "data": [
-          { "identifier": "192.168.1.1", "count": 3 },
-          { "identifier": "10.0.0.1", "count": 2 }
+          { "discriminator": "192.168.1.1", "count": 3 },
+          { "discriminator": "10.0.0.1", "count": 2 }
         ]
       }
       """
@@ -256,7 +256,7 @@ Feature: Leaderboard analytics
     Given the current account is "test1"
     And the current account has 1 "license"
     And I am a license of account "test1"
-    And I authenticate with my key
+    And I use an authentication token
     When I send a GET request to "/accounts/test1/analytics/leaderboards/ips"
     Then the response status should be "403"
     And the response body should be an array of 1 error
