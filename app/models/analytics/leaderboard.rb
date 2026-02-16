@@ -3,19 +3,55 @@
 module Analytics
   class LeaderboardNotFoundError < StandardError; end
 
-  module Leaderboard
-    def self.call(type, account:, environment: nil, start_date: 2.weeks.ago.to_date, end_date: Date.current, limit: 10)
-      klass = case type.to_s.underscore.to_sym
-              in :ips then Ips
-              in :urls then Urls
-              in :licenses then Licenses
-              in :user_agents then UserAgents
-              else nil
-              end
+  class Leaderboard
+    Row = Data.define(:discriminator, :count)
 
-      raise LeaderboardNotFoundError, "invalid leaderboard type: #{type.inspect}" if klass.nil?
+    include ActiveModel::Model
+    include ActiveModel::Attributes
 
-      klass.new(account:, environment:, start_date:, end_date:, limit:)
+    MAX_LIMIT = 100
+    COUNTERS  = {
+      user_agents: Counters::UserAgents,
+      licenses: Counters::Licenses,
+      urls: Counters::Urls,
+      ips: Counters::Ips,
+    }
+
+    attribute :account, default: -> { Current.account }
+    attribute :environment, default: -> { Current.environment }
+    attribute :start_date, default: -> { 2.weeks.ago.to_date }
+    attribute :end_date, default: -> { Date.current }
+    attribute :limit, default: -> { 10 }
+
+    validates :account, presence: true
+    validates :start_date, comparison: { greater_than_or_equal_to: -> { 1.year.ago.to_date } }
+    validates :end_date, comparison: { less_than_or_equal_to: -> { Date.current } }
+    validates :limit, numericality: { less_than_or_equal_to: MAX_LIMIT }
+
+    def initialize(counter_name, **)
+      @counter_name = counter_name.to_s.underscore.to_sym
+
+      raise LeaderboardNotFoundError, "invalid leaderboard: #{@counter_name.inspect}" unless
+        COUNTERS.key?(@counter_name)
+
+      super(**)
     end
+
+    def rows = @rows ||= begin
+      counts = counter.count(account:, environment:, start_date:, end_date:, limit:)
+
+      counts.map do |(discriminator, count)|
+        Row.new(discriminator:, count:)
+      end
+    end
+
+    delegate :as_json, :to_json,
+      to: :rows
+
+    private
+
+    attr_reader :counter_name
+
+    def counter = COUNTERS[counter_name]
   end
 end

@@ -13,7 +13,10 @@ module Priv::Analytics
     def show
       authorize! with: Accounts::AnalyticsPolicy
 
-      heatmap = Analytics::Heatmap.new(params[:heatmap_id], account: current_account, environment: current_environment, **heatmap_query)
+      heatmap = Analytics::Heatmap.new(
+        params[:heatmap_id],
+        **heatmap_query,
+      )
 
       unless heatmap.valid?
         render_bad_request detail: heatmap.errors.full_messages.to_sentence,
