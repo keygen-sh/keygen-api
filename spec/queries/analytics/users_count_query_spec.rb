@@ -11,7 +11,7 @@ describe Analytics::UsersCountQuery do
       it 'returns zero' do
         result = described_class.call(account:)
 
-        expect(result).to satisfy { it in Analytics::Stat::Count(count: 0) }
+        expect(result).to satisfy { it in Analytics::UsersCountQuery::Result(count: 0) }
       end
     end
 
@@ -23,7 +23,7 @@ describe Analytics::UsersCountQuery do
       it 'returns correct count' do
         result = described_class.call(account:)
 
-        expect(result).to satisfy { it in Analytics::Stat::Count(count: 3) }
+        expect(result).to satisfy { it in Analytics::UsersCountQuery::Result(count: 3) }
       end
     end
 
@@ -36,7 +36,7 @@ describe Analytics::UsersCountQuery do
       it 'excludes admins from count' do
         result = described_class.call(account:)
 
-        expect(result).to satisfy { it in Analytics::Stat::Count(count: 2) }
+        expect(result).to satisfy { it in Analytics::UsersCountQuery::Result(count: 2) }
       end
     end
 
@@ -51,13 +51,13 @@ describe Analytics::UsersCountQuery do
       it 'returns only environment-scoped users' do
         result = described_class.call(account:, environment:)
 
-        expect(result).to satisfy { it in Analytics::Stat::Count(count: 2) }
+        expect(result).to satisfy { it in Analytics::UsersCountQuery::Result(count: 2) }
       end
 
       it 'returns only global users when no environment' do
         result = described_class.call(account:)
 
-        expect(result).to satisfy { it in Analytics::Stat::Count(count: 3) }
+        expect(result).to satisfy { it in Analytics::UsersCountQuery::Result(count: 3) }
       end
     end
   end

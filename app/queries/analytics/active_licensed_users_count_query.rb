@@ -2,6 +2,8 @@
 
 module Analytics
   class ActiveLicensedUsersCountQuery < BaseQuery
+    Result = Data.define(:count)
+
     def initialize(account:, environment: nil)
       # NB(ezekg) environment is intentionally ignored
       @account = account
@@ -10,7 +12,7 @@ module Analytics
     def call
       count = account.active_licensed_user_count
 
-      Stat::Count.new(count:)
+      Result.new(count:)
     end
 
     private

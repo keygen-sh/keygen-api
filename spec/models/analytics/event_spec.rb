@@ -17,7 +17,7 @@ describe Analytics::Event do
 
       expect(result).to satisfy do
         it in [
-          Analytics::Event::Count(event: 'license.validation.succeeded', count: Integer)
+          Analytics::EventCountQuery::Result(event: 'license.validation.succeeded', count: Integer)
         ]
       end
     end
@@ -31,7 +31,7 @@ describe Analytics::Event do
       )
 
       expect(result).to satisfy do |counts|
-        counts.all? { it in Analytics::Event::Count(event: /\Alicense\./, count: Integer) }
+        counts.all? { it in Analytics::EventCountQuery::Result(event: /\Alicense\./, count: Integer) }
       end
     end
   end

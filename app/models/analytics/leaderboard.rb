@@ -6,8 +6,6 @@ module Analytics
   module Leaderboard
     extend self
 
-    Entry = Data.define(:identifier, :count)
-
     def call(leaderboard_id, account:, environment: nil, start_date: 2.weeks.ago.to_date, end_date: Date.current, limit: 10)
       leaderboard = case to_ident(leaderboard_id)
                     in :ips then IpsLeaderboardQuery

@@ -2,6 +2,8 @@
 
 module Analytics
   class UsersCountQuery < BaseQuery
+    Result = Data.define(:count)
+
     def initialize(account:, environment: nil)
       @account     = account
       @environment = environment
@@ -12,7 +14,7 @@ module Analytics
                            .with_roles(:user)
                            .count
 
-      Stat::Count.new(count:)
+      Result.new(count:)
     end
 
     private

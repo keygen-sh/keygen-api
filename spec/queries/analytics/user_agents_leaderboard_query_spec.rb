@@ -38,9 +38,9 @@ describe Analytics::UserAgentsLeaderboardQuery do
 
         expect(results).to satisfy do
           it in [
-            Analytics::Leaderboard::Entry(identifier: 'Mozilla/5.0 Chrome/120.0', count: 3),
-            Analytics::Leaderboard::Entry(identifier: 'curl/8.1.2', count: 2),
-            Analytics::Leaderboard::Entry(identifier: 'keygen/1.0.0', count: 1)
+            Analytics::UserAgentsLeaderboardQuery::Result(identifier: 'Mozilla/5.0 Chrome/120.0', count: 3),
+            Analytics::UserAgentsLeaderboardQuery::Result(identifier: 'curl/8.1.2', count: 2),
+            Analytics::UserAgentsLeaderboardQuery::Result(identifier: 'keygen/1.0.0', count: 1)
           ]
         end
       end
@@ -60,7 +60,7 @@ describe Analytics::UserAgentsLeaderboardQuery do
           end_date: Date.current,
         )
 
-        expect(results).to satisfy { it in [Analytics::Leaderboard::Entry(identifier: 'curl/8.1.2', count: 1)] }
+        expect(results).to satisfy { it in [Analytics::UserAgentsLeaderboardQuery::Result(identifier: 'curl/8.1.2', count: 1)] }
       end
     end
 
@@ -77,7 +77,7 @@ describe Analytics::UserAgentsLeaderboardQuery do
           end_date: Date.current,
         )
 
-        expect(results).to satisfy { it in [Analytics::Leaderboard::Entry(identifier: 'curl/8.1.2', count: 1)] }
+        expect(results).to satisfy { it in [Analytics::UserAgentsLeaderboardQuery::Result(identifier: 'curl/8.1.2', count: 1)] }
       end
     end
 
@@ -114,7 +114,7 @@ describe Analytics::UserAgentsLeaderboardQuery do
           end_date: Date.current,
         )
 
-        expect(results).to satisfy { it in [Analytics::Leaderboard::Entry(identifier: 'curl/8.1.2', count: 1)] }
+        expect(results).to satisfy { it in [Analytics::UserAgentsLeaderboardQuery::Result(identifier: 'curl/8.1.2', count: 1)] }
       end
     end
   end

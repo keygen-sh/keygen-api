@@ -4,8 +4,6 @@ module Analytics
   module Heatmap
     extend self
 
-    Cell = Data.define(:date, :x, :y, :temperature, :count)
-
     def call(heatmap_id, account:, environment: nil, start_date: Date.current, end_date: 364.days.from_now.to_date)
       heatmap = case to_ident(heatmap_id)
                 in :expirations then ExpirationsHeatmapQuery

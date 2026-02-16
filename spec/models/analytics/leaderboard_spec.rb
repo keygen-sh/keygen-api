@@ -12,7 +12,7 @@ describe Analytics::Leaderboard do
         results = described_class.call(:ips, account:)
 
         expect(results).to satisfy do |entries|
-          entries.all? { it in Analytics::Leaderboard::Entry(identifier: String, count: Integer) }
+          entries.all? { it in Analytics::IpsLeaderboardQuery::Result(identifier: String, count: Integer) }
         end
       end
 
@@ -20,7 +20,7 @@ describe Analytics::Leaderboard do
         results = described_class.call(:urls, account:)
 
         expect(results).to satisfy do |entries|
-          entries.all? { it in Analytics::Leaderboard::Entry(identifier: String, count: Integer) }
+          entries.all? { it in Analytics::UrlsLeaderboardQuery::Result(identifier: String, count: Integer) }
         end
       end
 
@@ -28,7 +28,7 @@ describe Analytics::Leaderboard do
         results = described_class.call(:licenses, account:)
 
         expect(results).to satisfy do |entries|
-          entries.all? { it in Analytics::Leaderboard::Entry(identifier: String, count: Integer) }
+          entries.all? { it in Analytics::LicensesLeaderboardQuery::Result(identifier: String, count: Integer) }
         end
       end
 
@@ -36,7 +36,7 @@ describe Analytics::Leaderboard do
         results = described_class.call(:user_agents, account:)
 
         expect(results).to satisfy do |entries|
-          entries.all? { it in Analytics::Leaderboard::Entry(identifier: String, count: Integer) }
+          entries.all? { it in Analytics::UserAgentsLeaderboardQuery::Result(identifier: String, count: Integer) }
         end
       end
 
@@ -44,7 +44,7 @@ describe Analytics::Leaderboard do
         results = described_class.call('ips', account:)
 
         expect(results).to satisfy do |entries|
-          entries.all? { it in Analytics::Leaderboard::Entry(identifier: String, count: Integer) }
+          entries.all? { it in Analytics::IpsLeaderboardQuery::Result(identifier: String, count: Integer) }
         end
       end
     end

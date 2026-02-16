@@ -2,6 +2,8 @@
 
 module Analytics
   class EventCountQuery < BaseQuery
+    Result = Data.define(:event, :count)
+
     def initialize(account:, environment:, event:, start_date:, end_date:)
       @account     = account
       @environment = environment
@@ -17,7 +19,7 @@ module Analytics
         event = EventType.lookup_event_by_id(event_type_id)
         count = counts[event_type_id].to_i
 
-        Event::Count.new(event:, count:)
+        Result.new(event:, count:)
       end
     end
 

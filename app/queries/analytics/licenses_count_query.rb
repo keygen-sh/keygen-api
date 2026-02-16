@@ -2,6 +2,8 @@
 
 module Analytics
   class LicensesCountQuery < BaseQuery
+    Result = Data.define(:count)
+
     def initialize(account:, environment: nil)
       @account     = account
       @environment = environment
@@ -11,7 +13,7 @@ module Analytics
       count = account.licenses.for_environment(environment)
                               .count
 
-      Stat::Count.new(count:)
+      Result.new(count:)
     end
 
     private

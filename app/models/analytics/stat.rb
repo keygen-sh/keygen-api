@@ -6,8 +6,6 @@ module Analytics
   module Stat
     extend self
 
-    Count = Data.define(:count)
-
     def call(stat_id, account:, environment: nil)
       stat = case to_ident(stat_id)
              in :machines then MachinesCountQuery

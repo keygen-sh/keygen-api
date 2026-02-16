@@ -46,9 +46,9 @@ describe Analytics::LicensesLeaderboardQuery do
 
         expect(results).to satisfy do
           it in [
-            Analytics::Leaderboard::Entry(identifier: ^license1_id, count: 3),
-            Analytics::Leaderboard::Entry(identifier: ^license2_id, count: 2),
-            Analytics::Leaderboard::Entry(identifier: ^license3_id, count: 1),
+            Analytics::LicensesLeaderboardQuery::Result(identifier: ^license1_id, count: 3),
+            Analytics::LicensesLeaderboardQuery::Result(identifier: ^license2_id, count: 2),
+            Analytics::LicensesLeaderboardQuery::Result(identifier: ^license3_id, count: 1),
           ]
         end
       end
@@ -72,7 +72,7 @@ describe Analytics::LicensesLeaderboardQuery do
           end_date: Date.current,
         )
 
-        expect(results).to satisfy { it in [Analytics::Leaderboard::Entry(identifier: ^license_id, count: 1)] }
+        expect(results).to satisfy { it in [Analytics::LicensesLeaderboardQuery::Result(identifier: ^license_id, count: 1)] }
       end
     end
 
@@ -93,7 +93,7 @@ describe Analytics::LicensesLeaderboardQuery do
           end_date: Date.current,
         )
 
-        expect(results).to satisfy { it in [Analytics::Leaderboard::Entry(identifier: ^license_id, count: 1)] }
+        expect(results).to satisfy { it in [Analytics::LicensesLeaderboardQuery::Result(identifier: ^license_id, count: 1)] }
       end
     end
 
@@ -115,7 +115,7 @@ describe Analytics::LicensesLeaderboardQuery do
           end_date: Date.current,
         )
 
-        expect(results).to satisfy { it in [Analytics::Leaderboard::Entry(identifier: ^license1_id, count: 1)] }
+        expect(results).to satisfy { it in [Analytics::LicensesLeaderboardQuery::Result(identifier: ^license1_id, count: 1)] }
       end
     end
 
@@ -159,7 +159,7 @@ describe Analytics::LicensesLeaderboardQuery do
           end_date: Date.current,
         )
 
-        expect(results).to satisfy { it in [Analytics::Leaderboard::Entry(identifier: ^license1_id, count: 1)] }
+        expect(results).to satisfy { it in [Analytics::LicensesLeaderboardQuery::Result(identifier: ^license1_id, count: 1)] }
       end
     end
   end

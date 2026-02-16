@@ -38,9 +38,9 @@ describe Analytics::IpsLeaderboardQuery do
 
         expect(results).to satisfy do
           it in [
-            Analytics::Leaderboard::Entry(identifier: '192.168.1.1', count: 3),
-            Analytics::Leaderboard::Entry(identifier: '192.168.1.2', count: 2),
-            Analytics::Leaderboard::Entry(identifier: '192.168.1.3', count: 1)
+            Analytics::IpsLeaderboardQuery::Result(identifier: '192.168.1.1', count: 3),
+            Analytics::IpsLeaderboardQuery::Result(identifier: '192.168.1.2', count: 2),
+            Analytics::IpsLeaderboardQuery::Result(identifier: '192.168.1.3', count: 1)
           ]
         end
       end
@@ -60,7 +60,7 @@ describe Analytics::IpsLeaderboardQuery do
           end_date: Date.current,
         )
 
-        expect(results).to satisfy { it in [Analytics::Leaderboard::Entry(identifier: '192.168.1.1', count: 1)] }
+        expect(results).to satisfy { it in [Analytics::IpsLeaderboardQuery::Result(identifier: '192.168.1.1', count: 1)] }
       end
     end
 
@@ -77,7 +77,7 @@ describe Analytics::IpsLeaderboardQuery do
           end_date: Date.current,
         )
 
-        expect(results).to satisfy { it in [Analytics::Leaderboard::Entry(identifier: '192.168.1.1', count: 1)] }
+        expect(results).to satisfy { it in [Analytics::IpsLeaderboardQuery::Result(identifier: '192.168.1.1', count: 1)] }
       end
     end
 
@@ -125,7 +125,7 @@ describe Analytics::IpsLeaderboardQuery do
           end_date: Date.current,
         )
 
-        expect(results).to satisfy { it in [Analytics::Leaderboard::Entry(identifier: '192.168.1.1', count: 1)] }
+        expect(results).to satisfy { it in [Analytics::IpsLeaderboardQuery::Result(identifier: '192.168.1.1', count: 1)] }
       end
     end
   end
