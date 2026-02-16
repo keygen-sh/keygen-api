@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Priv::Analytics
-  class RequestsController < BaseController
+  class UsageController < BaseController
     CACHE_TTL      = 10.minutes
     CACHE_RACE_TTL = 1.minute
 
@@ -14,16 +14,16 @@ module Priv::Analytics
     def show
       authorize! with: Accounts::AnalyticsPolicy
 
-      activity = Analytics::Request.new(**request_query)
+      usage = Analytics::Usage.new(**usage_query)
 
-      unless activity.valid?
-        render_bad_request detail: activity.errors.full_messages.to_sentence,
-                           source: { parameter: activity.errors.attribute_names.first }
+      unless usage.valid?
+        render_bad_request detail: usage.errors.full_messages.to_sentence,
+                           source: { parameter: usage.errors.attribute_names.first }
         return
       end
 
-      data = Rails.cache.fetch activity.cache_key, expires_in: CACHE_TTL, race_condition_ttl: CACHE_RACE_TTL do
-        activity.as_json
+      data = Rails.cache.fetch usage.cache_key, expires_in: CACHE_TTL, race_condition_ttl: CACHE_RACE_TTL do
+        usage.as_json
       end
 
       render json: { data: }

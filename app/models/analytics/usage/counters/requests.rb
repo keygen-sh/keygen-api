@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Analytics
-  class Request
+  class Usage
     module Counters
       class Requests
         def initialize(account:, environment:)
