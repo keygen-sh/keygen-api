@@ -13,7 +13,7 @@ module Priv::Analytics
     def show
       authorize! with: Accounts::AnalyticsPolicy
 
-      heatmap = Analytics::Heatmap.call(params[:heatmap_id], account: current_account, environment: current_environment, **heatmap_query)
+      heatmap = Analytics::Heatmap.new(params[:heatmap_id], account: current_account, environment: current_environment, **heatmap_query)
 
       unless heatmap.valid?
         render_bad_request detail: heatmap.errors.full_messages.to_sentence,
@@ -21,7 +21,7 @@ module Priv::Analytics
         return
       end
 
-      data = cached { heatmap.result.as_json }
+      data = cached { heatmap.as_json }
 
       render json: { data: }
     rescue Analytics::HeatmapNotFoundError
