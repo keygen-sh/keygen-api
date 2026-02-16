@@ -15,6 +15,7 @@ module Analytics
 
     attribute :account, default: -> { Current.account }
     attribute :environment, default: -> { Current.environment }
+
     attribute :start_date, default: -> { Date.current }
     attribute :end_date, default: -> { 364.days.from_now.to_date }
 
@@ -33,7 +34,7 @@ module Analytics
 
     def cells = @cells ||= begin
       grid_start = start_date.beginning_of_week(:sunday)
-      counts     = counter.count(account:, environment:, start_date:, end_date:)
+      counts     = counter.count(start_date:, end_date:)
       max_count  = counts.values.max || 1
 
       (start_date..end_date).map do |date|
@@ -59,6 +60,7 @@ module Analytics
 
     attr_reader :counter_name
 
-    def counter = COUNTERS[counter_name]
+    def counter_class = COUNTERS[counter_name]
+    def counter       = counter_class.new(account:, environment:)
   end
 end

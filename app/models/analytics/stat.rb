@@ -30,7 +30,7 @@ module Analytics
     end
 
     def count
-      @count ||= counter.count(account:, environment:)
+      @count ||= counter.count
     end
 
     def as_json(*) = { count: }
@@ -39,6 +39,7 @@ module Analytics
 
     attr_reader :counter_name
 
-    def counter = COUNTERS[counter_name]
+    def counter_class = COUNTERS[counter_name]
+    def counter       = counter_class.new(account:, environment:)
   end
 end

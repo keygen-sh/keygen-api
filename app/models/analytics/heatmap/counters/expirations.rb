@@ -3,8 +3,13 @@
 module Analytics
   class Heatmap
     module Counters
-      module Expirations
-        def self.count(account:, environment:, start_date:, end_date:)
+      class Expirations
+        def initialize(account:, environment:)
+          @account     = account
+          @environment = environment
+        end
+
+        def count(start_date:, end_date:)
           account.licenses.unordered
                           .for_environment(environment)
                           .where.not(expiry: nil)
@@ -12,6 +17,10 @@ module Analytics
                           .group(Arel.sql('DATE(expiry)'))
                           .count
         end
+
+        private
+
+        attr_reader :account, :environment
       end
     end
   end
