@@ -2,14 +2,13 @@
 
 module Analytics
   class Event
+    Row = Data.define(:event, :count)
+
     include ActiveModel::Model
     include ActiveModel::Attributes
 
-    Result = Data.define(:event, :count)
-
-    attribute :account
-    attribute :environment
-    attribute :pattern
+    attribute :account, default: -> { Current.account }
+    attribute :environment, default: -> { Current.environment }
     attribute :start_date, default: -> { 2.weeks.ago.to_date }
     attribute :end_date, default: -> { Date.current }
 
@@ -19,29 +18,23 @@ module Analytics
     validates :end_date, comparison: { less_than_or_equal_to: -> { Date.current } }
     validate :event_types_exist
 
-    def self.call(pattern, account:, environment: nil, start_date: 2.weeks.ago.to_date, end_date: Date.current)
-      new(pattern:, account:, environment:, start_date:, end_date:)
+    def initialize(pattern, **)
+      @pattern = pattern
+
+      super(**)
     end
 
-    def result
-      @result ||= build_results
-    end
-
-    def event_types
-      @event_types ||= lookup_event_types
-    end
-
-    private
-
-    def build_results
-      counts = fetch_event_log_count_by_event_type
+    def rows = @rows ||= begin
+      counts = counter.count(account:, environment:, event_type_ids:, start_date:, end_date:)
 
       event_types.map do |event_type|
-        Result.new(event: event_type.event, count: counts[event_type.id].to_i)
+        Row.new(event: event_type.event, count: counts[event_type.id].to_i)
       end
     end
 
-    def lookup_event_types
+    def event_types = @event_types ||= begin
+      return EventType.none if pattern.blank?
+
       types = if pattern.end_with?('.*')
                 EventType.where('event LIKE ?', "#{pattern.delete_suffix('.*')}.%")
               else
@@ -51,15 +44,16 @@ module Analytics
       types.order(:event)
     end
 
-    def fetch_event_log_count_by_event_type
-      EventLog::Clickhouse.where(account_id: account.id)
-                          .where(environment_id: environment&.id)
-                          .where(created_date: start_date..end_date)
-                          .where(event_type_id: event_types.pluck(:id))
-                          .where(is_deleted: 0)
-                          .group(:event_type_id)
-                          .count
-    end
+    def event_type_ids = event_types.ids
+
+    delegate :as_json, :to_json,
+      to: :rows
+
+    private
+
+    attr_reader :pattern
+
+    def counter = Counters::EventTypes
 
     def event_types_exist
       return if pattern.blank?

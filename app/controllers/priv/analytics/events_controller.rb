@@ -14,7 +14,7 @@ module Priv::Analytics
     def show
       authorize! with: Accounts::AnalyticsPolicy
 
-      event = Analytics::Event.call(params[:event_id], account: current_account, environment: current_environment, **event_query)
+      event = Analytics::Event.new(params[:event_id], **event_query)
 
       unless event.valid?
         render_bad_request detail: event.errors.full_messages.to_sentence,
@@ -22,7 +22,7 @@ module Priv::Analytics
         return
       end
 
-      data = cached { event.result.as_json }
+      data = cached { event.as_json }
 
       render json: { data: }
     end
