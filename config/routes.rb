@@ -492,6 +492,7 @@ Rails.application.routes.draw do
         get 'leaderboards/:leaderboard_id', to: 'leaderboards#show', as: :leaderboard
         get 'heatmaps/:heatmap_id',         to: 'heatmaps#show',     as: :heatmap
         get 'stats/:stat_id',               to: 'stats#show',        as: :stat
+        get 'requests',                     to: 'requests#show',     as: :requests
       end
     end
   end
