@@ -18,9 +18,9 @@ Feature: Leaderboard analytics
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
 
-  # NOTE(ezekg) Using future dates (2100) to avoid column-level TTL expiration
-  #             during OPTIMIZE TABLE FINAL in tests. Must stay within ClickHouse's
-  #             Date type range (max 2149-06-06).
+  # NB(ezekg) using future dates to avoid column-level TTL expiration during OPTIMIZE
+  #           TABLE FINAL in tests, so dates MUST stay within clickhouse's Date type
+  #           range (otherwise it overflows after 2149-06-06).
   Scenario: Admin retrieves IPs leaderboard
     Given I am an admin of account "test1"
     And the current account is "test1"
