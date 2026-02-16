@@ -3,19 +3,42 @@
 module Analytics
   class StatNotFoundError < StandardError; end
 
-  module Stat
-    def self.call(type, account:, environment: nil)
-      klass = case type.to_s.underscore.to_sym
-              in :machines then Machines
-              in :users then Users
-              in :licenses then Licenses
-              in :alus then ActiveLicensedUsers
-              else nil
-              end
+  class Stat
+    include ActiveModel::Model
+    include ActiveModel::Attributes
 
-      raise StatNotFoundError, "invalid stat type: #{type.inspect}" if klass.nil?
+    COUNTERS = {
+      active_licensed_users: Counters::ActiveLicensedUsers,
+      machines: Counters::Machines,
+      licenses: Counters::Licenses,
+      users: Counters::Users,
+      alus: Counters::ActiveLicensedUsers, # alias
+    }
 
-      klass.new(account:, environment:)
+    attribute :account, default: -> { Current.account }
+    attribute :environment, default: -> { Current.environment }
+
+    validates :account, presence: true
+
+    def initialize(counter_name, **)
+      @counter_name = counter_name.to_s.underscore.to_sym
+
+      raise StatNotFoundError, "invalid stat: #{@counter_name.inspect}" unless
+        COUNTERS.key?(@counter_name)
+
+      super(**)
     end
+
+    def count
+      @count ||= counter.count(account:, environment:)
+    end
+
+    def as_json(*) = { count: }
+
+    private
+
+    attr_reader :counter_name
+
+    def counter = COUNTERS[counter_name]
   end
 end
