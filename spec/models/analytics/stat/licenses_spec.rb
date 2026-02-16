@@ -3,15 +3,15 @@
 require 'rails_helper'
 require 'spec_helper'
 
-describe Analytics::LicensesCountQuery do
+describe Analytics::Stat::Licenses do
   let(:account) { create(:account) }
 
-  describe '.call' do
+  describe '#result' do
     context 'with no licenses' do
       it 'returns zero' do
-        result = described_class.call(account:)
+        result = described_class.new(account:).result
 
-        expect(result).to satisfy { it in Analytics::LicensesCountQuery::Result(count: 0) }
+        expect(result).to satisfy { it in Analytics::Stat::Licenses::Result(count: 0) }
       end
     end
 
@@ -21,9 +21,9 @@ describe Analytics::LicensesCountQuery do
       end
 
       it 'returns correct count' do
-        result = described_class.call(account:)
+        result = described_class.new(account:).result
 
-        expect(result).to satisfy { it in Analytics::LicensesCountQuery::Result(count: 3) }
+        expect(result).to satisfy { it in Analytics::Stat::Licenses::Result(count: 3) }
       end
     end
 
@@ -36,15 +36,15 @@ describe Analytics::LicensesCountQuery do
       end
 
       it 'returns only environment-scoped licenses' do
-        result = described_class.call(account:, environment:)
+        result = described_class.new(account:, environment:).result
 
-        expect(result).to satisfy { it in Analytics::LicensesCountQuery::Result(count: 2) }
+        expect(result).to satisfy { it in Analytics::Stat::Licenses::Result(count: 2) }
       end
 
       it 'returns only global licenses when no environment' do
-        result = described_class.call(account:)
+        result = described_class.new(account:).result
 
-        expect(result).to satisfy { it in Analytics::LicensesCountQuery::Result(count: 3) }
+        expect(result).to satisfy { it in Analytics::Stat::Licenses::Result(count: 3) }
       end
     end
   end

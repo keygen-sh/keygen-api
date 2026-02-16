@@ -3,20 +3,20 @@
 require 'rails_helper'
 require 'spec_helper'
 
-describe Analytics::UrlsLeaderboardQuery do
+describe Analytics::Leaderboard::Urls do
   let(:account) { create(:account) }
 
   before { Sidekiq::Testing.inline! }
   after  { Sidekiq::Testing.fake! }
 
-  describe '.call', :only_clickhouse do
+  describe '#result', :only_clickhouse do
     context 'with no requests' do
       it 'returns empty array' do
-        results = described_class.call(
+        results = described_class.new(
           account:,
           start_date: 7.days.ago.to_date,
           end_date: Date.current,
-        )
+        ).result
 
         expect(results).to eq([])
       end
@@ -30,17 +30,17 @@ describe Analytics::UrlsLeaderboardQuery do
       end
 
       it 'returns entries ordered by count descending' do
-        results = described_class.call(
+        results = described_class.new(
           account:,
           start_date: 7.days.ago.to_date,
           end_date: Date.current,
-        )
+        ).result
 
         expect(results).to satisfy do
           it in [
-            Analytics::UrlsLeaderboardQuery::Result(identifier: 'GET /v1/licenses', count: 3),
-            Analytics::UrlsLeaderboardQuery::Result(identifier: 'POST /v1/licenses', count: 2),
-            Analytics::UrlsLeaderboardQuery::Result(identifier: 'GET /v1/machines', count: 1)
+            Analytics::Leaderboard::Base::Result(identifier: 'GET /v1/licenses', count: 3),
+            Analytics::Leaderboard::Base::Result(identifier: 'POST /v1/licenses', count: 2),
+            Analytics::Leaderboard::Base::Result(identifier: 'GET /v1/machines', count: 1)
           ]
         end
       end
@@ -54,13 +54,13 @@ describe Analytics::UrlsLeaderboardQuery do
       end
 
       it 'excludes nil URLs and methods' do
-        results = described_class.call(
+        results = described_class.new(
           account:,
           start_date: 7.days.ago.to_date,
           end_date: Date.current,
-        )
+        ).result
 
-        expect(results).to satisfy { it in [Analytics::UrlsLeaderboardQuery::Result(identifier: 'GET /v1/licenses', count: 1)] }
+        expect(results).to satisfy { it in [Analytics::Leaderboard::Base::Result(identifier: 'GET /v1/licenses', count: 1)] }
       end
     end
 
@@ -71,13 +71,13 @@ describe Analytics::UrlsLeaderboardQuery do
       end
 
       it 'only includes requests within date range' do
-        results = described_class.call(
+        results = described_class.new(
           account:,
           start_date: 7.days.ago.to_date,
           end_date: Date.current,
-        )
+        ).result
 
-        expect(results).to satisfy { it in [Analytics::UrlsLeaderboardQuery::Result(identifier: 'GET /v1/licenses', count: 1)] }
+        expect(results).to satisfy { it in [Analytics::Leaderboard::Base::Result(identifier: 'GET /v1/licenses', count: 1)] }
       end
     end
 
@@ -87,11 +87,11 @@ describe Analytics::UrlsLeaderboardQuery do
       end
 
       it 'respects custom limit' do
-        results = described_class.call(
+        results = described_class.new(
           account:,
           start_date: 7.days.ago.to_date,
           end_date: Date.current,
-        )
+        ).result
 
         expect(results.length).to eq(5)
       end
@@ -106,14 +106,14 @@ describe Analytics::UrlsLeaderboardQuery do
       end
 
       it 'filters by environment' do
-        results = described_class.call(
+        results = described_class.new(
           account:,
           environment:,
           start_date: 7.days.ago.to_date,
           end_date: Date.current,
-        )
+        ).result
 
-        expect(results).to satisfy { it in [Analytics::UrlsLeaderboardQuery::Result(identifier: 'GET /v1/licenses', count: 1)] }
+        expect(results).to satisfy { it in [Analytics::Leaderboard::Base::Result(identifier: 'GET /v1/licenses', count: 1)] }
       end
     end
   end

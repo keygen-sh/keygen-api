@@ -3,20 +3,20 @@
 require 'rails_helper'
 require 'spec_helper'
 
-describe Analytics::LicensesLeaderboardQuery do
+describe Analytics::Leaderboard::Licenses do
   let(:account) { create(:account) }
 
   before { Sidekiq::Testing.inline! }
   after  { Sidekiq::Testing.fake! }
 
-  describe '.call', :only_clickhouse do
+  describe '#result', :only_clickhouse do
     context 'with no requests' do
       it 'returns empty array' do
-        results = described_class.call(
+        results = described_class.new(
           account:,
           start_date: 7.days.ago.to_date,
           end_date: Date.current,
-        )
+        ).result
 
         expect(results).to eq([])
       end
@@ -38,17 +38,17 @@ describe Analytics::LicensesLeaderboardQuery do
         license2_id = license2.id
         license3_id = license3.id
 
-        results = described_class.call(
+        results = described_class.new(
           account:,
           start_date: 7.days.ago.to_date,
           end_date: Date.current,
-        )
+        ).result
 
         expect(results).to satisfy do
           it in [
-            Analytics::LicensesLeaderboardQuery::Result(identifier: ^license1_id, count: 3),
-            Analytics::LicensesLeaderboardQuery::Result(identifier: ^license2_id, count: 2),
-            Analytics::LicensesLeaderboardQuery::Result(identifier: ^license3_id, count: 1),
+            Analytics::Leaderboard::Base::Result(identifier: ^license1_id, count: 3),
+            Analytics::Leaderboard::Base::Result(identifier: ^license2_id, count: 2),
+            Analytics::Leaderboard::Base::Result(identifier: ^license3_id, count: 1),
           ]
         end
       end
@@ -66,13 +66,13 @@ describe Analytics::LicensesLeaderboardQuery do
       it 'only includes license resources' do
         license_id = license.id
 
-        results = described_class.call(
+        results = described_class.new(
           account:,
           start_date: 7.days.ago.to_date,
           end_date: Date.current,
-        )
+        ).result
 
-        expect(results).to satisfy { it in [Analytics::LicensesLeaderboardQuery::Result(identifier: ^license_id, count: 1)] }
+        expect(results).to satisfy { it in [Analytics::Leaderboard::Base::Result(identifier: ^license_id, count: 1)] }
       end
     end
 
@@ -87,13 +87,13 @@ describe Analytics::LicensesLeaderboardQuery do
       it 'excludes nil resources' do
         license_id = license.id
 
-        results = described_class.call(
+        results = described_class.new(
           account:,
           start_date: 7.days.ago.to_date,
           end_date: Date.current,
-        )
+        ).result
 
-        expect(results).to satisfy { it in [Analytics::LicensesLeaderboardQuery::Result(identifier: ^license_id, count: 1)] }
+        expect(results).to satisfy { it in [Analytics::Leaderboard::Base::Result(identifier: ^license_id, count: 1)] }
       end
     end
 
@@ -109,13 +109,13 @@ describe Analytics::LicensesLeaderboardQuery do
       it 'only includes requests within date range' do
         license1_id = license1.id
 
-        results = described_class.call(
+        results = described_class.new(
           account:,
           start_date: 7.days.ago.to_date,
           end_date: Date.current,
-        )
+        ).result
 
-        expect(results).to satisfy { it in [Analytics::LicensesLeaderboardQuery::Result(identifier: ^license1_id, count: 1)] }
+        expect(results).to satisfy { it in [Analytics::Leaderboard::Base::Result(identifier: ^license1_id, count: 1)] }
       end
     end
 
@@ -128,12 +128,12 @@ describe Analytics::LicensesLeaderboardQuery do
       end
 
       it 'respects custom limit' do
-        results = described_class.call(
+        results = described_class.new(
           account:,
           start_date: 7.days.ago.to_date,
           end_date: Date.current,
           limit: 3,
-        )
+        ).result
 
         expect(results.length).to eq(3)
       end
@@ -152,14 +152,14 @@ describe Analytics::LicensesLeaderboardQuery do
       it 'filters by environment' do
         license1_id = license1.id
 
-        results = described_class.call(
+        results = described_class.new(
           account:,
           environment:,
           start_date: 7.days.ago.to_date,
           end_date: Date.current,
-        )
+        ).result
 
-        expect(results).to satisfy { it in [Analytics::LicensesLeaderboardQuery::Result(identifier: ^license1_id, count: 1)] }
+        expect(results).to satisfy { it in [Analytics::Leaderboard::Base::Result(identifier: ^license1_id, count: 1)] }
       end
     end
   end

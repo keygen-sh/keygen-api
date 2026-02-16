@@ -3,15 +3,15 @@
 require 'rails_helper'
 require 'spec_helper'
 
-describe Analytics::ActiveLicensedUsersCountQuery do
+describe Analytics::Stat::ActiveLicensedUsers do
   let(:account) { create(:account) }
 
-  describe '.call' do
+  describe '#result' do
     context 'with no active licensed users' do
       it 'returns zero' do
-        result = described_class.call(account:)
+        result = described_class.new(account:).result
 
-        expect(result).to satisfy { it in Analytics::ActiveLicensedUsersCountQuery::Result(count: 0) }
+        expect(result).to satisfy { it in Analytics::Stat::ActiveLicensedUsers::Result(count: 0) }
       end
     end
 
@@ -21,9 +21,9 @@ describe Analytics::ActiveLicensedUsersCountQuery do
       end
 
       it 'returns zero' do
-        result = described_class.call(account:)
+        result = described_class.new(account:).result
 
-        expect(result).to satisfy { it in Analytics::ActiveLicensedUsersCountQuery::Result(count: 0) }
+        expect(result).to satisfy { it in Analytics::Stat::ActiveLicensedUsers::Result(count: 0) }
       end
     end
 
@@ -36,9 +36,9 @@ describe Analytics::ActiveLicensedUsersCountQuery do
       end
 
       it 'returns correct count' do
-        result = described_class.call(account:)
+        result = described_class.new(account:).result
 
-        expect(result).to satisfy { it in Analytics::ActiveLicensedUsersCountQuery::Result(count: 3) }
+        expect(result).to satisfy { it in Analytics::Stat::ActiveLicensedUsers::Result(count: 3) }
       end
     end
 
@@ -51,9 +51,9 @@ describe Analytics::ActiveLicensedUsersCountQuery do
       end
 
       it 'counts users with expired but recently active licenses' do
-        result = described_class.call(account:)
+        result = described_class.new(account:).result
 
-        expect(result).to satisfy { it in Analytics::ActiveLicensedUsersCountQuery::Result(count: 2) }
+        expect(result).to satisfy { it in Analytics::Stat::ActiveLicensedUsers::Result(count: 2) }
       end
     end
 
@@ -63,9 +63,9 @@ describe Analytics::ActiveLicensedUsersCountQuery do
       end
 
       it 'counts each unassigned license as one licensed user' do
-        result = described_class.call(account:)
+        result = described_class.new(account:).result
 
-        expect(result).to satisfy { it in Analytics::ActiveLicensedUsersCountQuery::Result(count: 3) }
+        expect(result).to satisfy { it in Analytics::Stat::ActiveLicensedUsers::Result(count: 3) }
       end
     end
 
@@ -78,9 +78,9 @@ describe Analytics::ActiveLicensedUsersCountQuery do
       end
 
       it 'ignores environment scoping' do
-        result = described_class.call(account:, environment:)
+        result = described_class.new(account:, environment:).result
 
-        expect(result).to satisfy { it in Analytics::ActiveLicensedUsersCountQuery::Result(count: 1) }
+        expect(result).to satisfy { it in Analytics::Stat::ActiveLicensedUsers::Result(count: 1) }
       end
     end
   end

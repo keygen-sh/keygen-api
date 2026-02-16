@@ -4,25 +4,18 @@ module Analytics
   class LeaderboardNotFoundError < StandardError; end
 
   module Leaderboard
-    extend self
+    def self.call(type, account:, environment: nil, start_date: 2.weeks.ago.to_date, end_date: Date.current, limit: 10)
+      klass = case type.to_s.underscore.to_sym
+              in :ips then Ips
+              in :urls then Urls
+              in :licenses then Licenses
+              in :user_agents then UserAgents
+              else nil
+              end
 
-    def call(leaderboard_id, account:, environment: nil, start_date: 2.weeks.ago.to_date, end_date: Date.current, limit: 10)
-      leaderboard = case to_ident(leaderboard_id)
-                    in :ips then IpsLeaderboardQuery
-                    in :urls then UrlsLeaderboardQuery
-                    in :licenses then LicensesLeaderboardQuery
-                    in :user_agents then UserAgentsLeaderboardQuery
-                    else nil
-                    end
+      raise LeaderboardNotFoundError, "invalid leaderboard type: #{type.inspect}" if klass.nil?
 
-      raise LeaderboardNotFoundError, "invalid leaderboard identifier: #{leaderboard_id.inspect}" unless
-        leaderboard.present?
-
-      leaderboard.call(account:, environment:, start_date:, end_date:, limit:)
+      klass.new(account:, environment:, start_date:, end_date:, limit:).result
     end
-
-    private
-
-    def to_ident(id) = id.to_s.underscore.to_sym
   end
 end

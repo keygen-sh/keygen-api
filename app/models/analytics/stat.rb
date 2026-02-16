@@ -4,25 +4,18 @@ module Analytics
   class StatNotFoundError < StandardError; end
 
   module Stat
-    extend self
+    def self.call(type, account:, environment: nil)
+      klass = case type.to_s.underscore.to_sym
+              in :machines then Machines
+              in :users then Users
+              in :licenses then Licenses
+              in :alus then ActiveLicensedUsers
+              else nil
+              end
 
-    def call(stat_id, account:, environment: nil)
-      stat = case to_ident(stat_id)
-             in :machines then MachinesCountQuery
-             in :users then UsersCountQuery
-             in :licenses then LicensesCountQuery
-             in :alus then ActiveLicensedUsersCountQuery
-             else nil
-             end
+      raise StatNotFoundError, "invalid stat type: #{type.inspect}" if klass.nil?
 
-      raise StatNotFoundError, "invalid stat identifier: #{stat_id.inspect}" unless
-        stat.present?
-
-      stat.call(account:, environment:)
+      klass.new(account:, environment:).result
     end
-
-    private
-
-    def to_ident(id) = id.to_s.underscore.to_sym
   end
 end
