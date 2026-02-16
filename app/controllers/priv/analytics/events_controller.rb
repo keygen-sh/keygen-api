@@ -17,7 +17,8 @@ module Priv::Analytics
       event = Analytics::Event.call(params[:event_id], account: current_account, environment: current_environment, **event_query)
 
       unless event.valid?
-        render_unprocessable_entity detail: event.errors.full_messages.to_sentence
+        render_bad_request detail: event.errors.full_messages.to_sentence,
+                           source: { parameter: event.errors.attribute_names.first }
         return
       end
 

@@ -65,6 +65,22 @@ Feature: Heatmaps analytics
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
 
+  Scenario: Admin retrieves heatmap with end date too far in future
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And time is frozen at "2024-01-15T00:00:00.000Z"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/analytics/heatmaps/expirations?end_date=2099-01-01"
+    Then the response status should be "400"
+    And the response body should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      { "title": "Bad request", "detail": "End date must be less than or equal to 2025-01-15", "source": { "parameter": "end_date" } }
+      """
+    And sidekiq should have 0 "request-log" jobs
+    And sidekiq should have 0 "event-log" jobs
+    And time is unfrozen
+
   Scenario: Admin retrieves invalid heatmap type
     Given I am an admin of account "test1"
     And the current account is "test1"
