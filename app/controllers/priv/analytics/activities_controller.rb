@@ -10,6 +10,8 @@ module Priv::Analytics
     typed_query {
       param :start_date, type: :date, coerce: true, optional: true
       param :end_date, type: :date, coerce: true, optional: true
+      param :resource_type, type: :string, coerce: true, optional: true
+      param :resource_id, type: :uuid, coerce: true, optional: true
     }
     def show
       authorize! with: Accounts::AnalyticsPolicy
@@ -31,7 +33,7 @@ module Priv::Analytics
 
     def cached(&) = Rails.cache.fetch(cache_key, expires_in: CACHE_TTL, race_condition_ttl: CACHE_RACE_TTL, &)
     def cache_key
-      [:analytics, :activities, params[:activity_id], current_account.id, current_environment&.id, params[:start_date], params[:end_date], CACHE_KEY_VERSION].compact.join(':')
+      [:analytics, :activities, params[:activity_id], current_account.id, current_environment&.id, params[:start_date], params[:end_date], params[:resource_type], params[:resource_id], CACHE_KEY_VERSION].compact.join(':')
     end
   end
 end
