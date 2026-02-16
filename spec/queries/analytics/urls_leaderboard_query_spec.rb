@@ -36,11 +36,13 @@ describe Analytics::UrlsLeaderboardQuery do
           end_date: Date.current,
         )
 
-        expect(results).to all be_a(Analytics::Leaderboard::Entry)
-        expect(results.length).to eq(3)
-        expect(results[0]).to have_attributes(identifier: 'GET /v1/licenses', count: 3)
-        expect(results[1]).to have_attributes(identifier: 'POST /v1/licenses', count: 2)
-        expect(results[2]).to have_attributes(identifier: 'GET /v1/machines', count: 1)
+        expect(results).to satisfy do
+          it in [
+            Analytics::Leaderboard::Entry(identifier: 'GET /v1/licenses', count: 3),
+            Analytics::Leaderboard::Entry(identifier: 'POST /v1/licenses', count: 2),
+            Analytics::Leaderboard::Entry(identifier: 'GET /v1/machines', count: 1)
+          ]
+        end
       end
     end
 
@@ -58,8 +60,7 @@ describe Analytics::UrlsLeaderboardQuery do
           end_date: Date.current,
         )
 
-        expect(results.length).to eq(1)
-        expect(results[0].identifier).to eq('GET /v1/licenses')
+        expect(results).to satisfy { it in [Analytics::Leaderboard::Entry(identifier: 'GET /v1/licenses', count: 1)] }
       end
     end
 
@@ -76,14 +77,13 @@ describe Analytics::UrlsLeaderboardQuery do
           end_date: Date.current,
         )
 
-        expect(results.length).to eq(1)
-        expect(results[0].identifier).to eq('GET /v1/licenses')
+        expect(results).to satisfy { it in [Analytics::Leaderboard::Entry(identifier: 'GET /v1/licenses', count: 1)] }
       end
     end
 
     context 'with limit parameter' do
       before do
-        5.times { |i| create(:request_log, account:, method: 'GET', url: "/v1/resource#{i + 1}") }
+        5.times { create(:request_log, account:, method: 'GET', url: "/v1/resource#{it + 1}") }
       end
 
       it 'respects custom limit' do
@@ -113,8 +113,7 @@ describe Analytics::UrlsLeaderboardQuery do
           end_date: Date.current,
         )
 
-        expect(results.length).to eq(1)
-        expect(results[0].identifier).to eq('GET /v1/licenses')
+        expect(results).to satisfy { it in [Analytics::Leaderboard::Entry(identifier: 'GET /v1/licenses', count: 1)] }
       end
     end
   end

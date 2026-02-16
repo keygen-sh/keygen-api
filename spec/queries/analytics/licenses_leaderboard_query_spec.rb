@@ -34,17 +34,23 @@ describe Analytics::LicensesLeaderboardQuery do
       end
 
       it 'returns entries ordered by count descending' do
+        license1_id = license1.id
+        license2_id = license2.id
+        license3_id = license3.id
+
         results = described_class.call(
           account:,
           start_date: 7.days.ago.to_date,
           end_date: Date.current,
         )
 
-        expect(results).to all be_a(Analytics::Leaderboard::Entry)
-        expect(results.length).to eq(3)
-        expect(results[0]).to have_attributes(identifier: license1.id, count: 3)
-        expect(results[1]).to have_attributes(identifier: license2.id, count: 2)
-        expect(results[2]).to have_attributes(identifier: license3.id, count: 1)
+        expect(results).to satisfy do
+          it in [
+            Analytics::Leaderboard::Entry(identifier: ^license1_id, count: 3),
+            Analytics::Leaderboard::Entry(identifier: ^license2_id, count: 2),
+            Analytics::Leaderboard::Entry(identifier: ^license3_id, count: 1),
+          ]
+        end
       end
     end
 
@@ -58,14 +64,15 @@ describe Analytics::LicensesLeaderboardQuery do
       end
 
       it 'only includes license resources' do
+        license_id = license.id
+
         results = described_class.call(
           account:,
           start_date: 7.days.ago.to_date,
           end_date: Date.current,
         )
 
-        expect(results.length).to eq(1)
-        expect(results[0].identifier).to eq(license.id)
+        expect(results).to satisfy { it in [Analytics::Leaderboard::Entry(identifier: ^license_id, count: 1)] }
       end
     end
 
@@ -78,14 +85,15 @@ describe Analytics::LicensesLeaderboardQuery do
       end
 
       it 'excludes nil resources' do
+        license_id = license.id
+
         results = described_class.call(
           account:,
           start_date: 7.days.ago.to_date,
           end_date: Date.current,
         )
 
-        expect(results.length).to eq(1)
-        expect(results[0].identifier).to eq(license.id)
+        expect(results).to satisfy { it in [Analytics::Leaderboard::Entry(identifier: ^license_id, count: 1)] }
       end
     end
 
@@ -99,14 +107,15 @@ describe Analytics::LicensesLeaderboardQuery do
       end
 
       it 'only includes requests within date range' do
+        license1_id = license1.id
+
         results = described_class.call(
           account:,
           start_date: 7.days.ago.to_date,
           end_date: Date.current,
         )
 
-        expect(results.length).to eq(1)
-        expect(results[0].identifier).to eq(license1.id)
+        expect(results).to satisfy { it in [Analytics::Leaderboard::Entry(identifier: ^license1_id, count: 1)] }
       end
     end
 
@@ -141,6 +150,8 @@ describe Analytics::LicensesLeaderboardQuery do
       end
 
       it 'filters by environment' do
+        license1_id = license1.id
+
         results = described_class.call(
           account:,
           environment:,
@@ -148,8 +159,7 @@ describe Analytics::LicensesLeaderboardQuery do
           end_date: Date.current,
         )
 
-        expect(results.length).to eq(1)
-        expect(results[0].identifier).to eq(license1.id)
+        expect(results).to satisfy { it in [Analytics::Leaderboard::Entry(identifier: ^license1_id, count: 1)] }
       end
     end
   end

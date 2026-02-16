@@ -11,8 +11,7 @@ describe Analytics::MachinesCountQuery do
       it 'returns zero' do
         result = described_class.call(account:)
 
-        expect(result).to be_a(Analytics::Stat::Count)
-        expect(result.count).to eq(0)
+        expect(result).to satisfy { it in Analytics::Stat::Count(count: 0) }
       end
     end
 
@@ -24,8 +23,7 @@ describe Analytics::MachinesCountQuery do
       it 'returns correct count' do
         result = described_class.call(account:)
 
-        expect(result).to be_a(Analytics::Stat::Count)
-        expect(result.count).to eq(3)
+        expect(result).to satisfy { it in Analytics::Stat::Count(count: 3) }
       end
     end
 
@@ -40,13 +38,13 @@ describe Analytics::MachinesCountQuery do
       it 'returns only environment-scoped machines' do
         result = described_class.call(account:, environment:)
 
-        expect(result.count).to eq(2)
+        expect(result).to satisfy { it in Analytics::Stat::Count(count: 2) }
       end
 
       it 'returns only global machines when no environment' do
         result = described_class.call(account:)
 
-        expect(result.count).to eq(3)
+        expect(result).to satisfy { it in Analytics::Stat::Count(count: 3) }
       end
     end
   end
