@@ -34,5 +34,19 @@ describe Analytics::Event do
         counts.all? { it in Analytics::EventCountQuery::Result(event: /\Alicense\./, count: Integer) }
       end
     end
+
+    context 'with invalid event' do
+      it 'raises EventNotFoundError for unknown event' do
+        expect {
+          described_class.call('invalid.event', account:)
+        }.to raise_error(Analytics::EventNotFoundError)
+      end
+
+      it 'raises EventNotFoundError for invalid wildcard' do
+        expect {
+          described_class.call('invalid.*', account:)
+        }.to raise_error(Analytics::EventNotFoundError)
+      end
+    end
   end
 end

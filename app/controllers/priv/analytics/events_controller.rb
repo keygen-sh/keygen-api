@@ -20,6 +20,8 @@ module Priv::Analytics
       end
 
       render json: { data: }
+    rescue Analytics::EventNotFoundError
+      render_not_found
     end
 
     private

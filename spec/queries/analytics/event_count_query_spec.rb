@@ -11,11 +11,13 @@ describe Analytics::EventCountQuery do
 
   describe '.call', :only_clickhouse do
     context 'with no events' do
+      let(:event_types) { EventType.where(event: 'license.validation.succeeded') }
+
       it 'returns zero count' do
         counts = described_class.call(
           account:,
           environment: nil,
-          event: 'license.validation.succeeded',
+          event_types:,
           start_date: 7.days.ago.to_date,
           end_date: Date.current,
         )
@@ -25,11 +27,13 @@ describe Analytics::EventCountQuery do
     end
 
     context 'with wildcard event' do
+      let(:event_types) { EventType.where('event LIKE ?', 'license.validation.%').order(:event) }
+
       it 'returns counts for matching event types ordered by event name' do
         counts = described_class.call(
           account:,
           environment: nil,
-          event: 'license.validation.*',
+          event_types:,
           start_date: 7.days.ago.to_date,
           end_date: Date.current,
         )
@@ -41,23 +45,11 @@ describe Analytics::EventCountQuery do
           ]
         end
       end
-
-      it 'returns entries for all matching event types' do
-        counts = described_class.call(
-          account:,
-          environment: nil,
-          event: 'license.*',
-          start_date: 7.days.ago.to_date,
-          end_date: Date.current,
-        )
-
-        events = counts.map(&:event)
-        expect(events).to all start_with('license.')
-      end
     end
 
     context 'with events' do
-      let(:event_type) { EventType.find_by!(event: 'license.validation.succeeded') }
+      let(:event_types) { EventType.where(event: 'license.validation.succeeded') }
+      let(:event_type)  { event_types.sole }
 
       before do
         3.times { create(:event_log, account:, event_type:) }
@@ -67,7 +59,7 @@ describe Analytics::EventCountQuery do
         counts = described_class.call(
           account:,
           environment: nil,
-          event: 'license.validation.succeeded',
+          event_types:,
           start_date: 7.days.ago.to_date,
           end_date: Date.current,
         )
@@ -77,7 +69,8 @@ describe Analytics::EventCountQuery do
     end
 
     context 'with date range filtering' do
-      let(:event_type) { EventType.find_by!(event: 'license.validation.succeeded') }
+      let(:event_types) { EventType.where(event: 'license.validation.succeeded') }
+      let(:event_type)  { event_types.sole }
 
       before do
         create(:event_log, account:, event_type:, created_at: 3.days.ago)
@@ -88,7 +81,7 @@ describe Analytics::EventCountQuery do
         counts = described_class.call(
           account:,
           environment: nil,
-          event: 'license.validation.succeeded',
+          event_types:,
           start_date: 7.days.ago.to_date,
           end_date: Date.current,
         )
@@ -99,7 +92,8 @@ describe Analytics::EventCountQuery do
 
     context 'with environment scoping' do
       let(:environment) { create(:environment, account:) }
-      let(:event_type) { EventType.find_by!(event: 'license.validation.succeeded') }
+      let(:event_types) { EventType.where(event: 'license.validation.succeeded') }
+      let(:event_type)  { event_types.sole }
 
       before do
         create(:event_log, account:, environment:, event_type:)
@@ -110,7 +104,7 @@ describe Analytics::EventCountQuery do
         counts = described_class.call(
           account:,
           environment:,
-          event: 'license.validation.succeeded',
+          event_types:,
           start_date: 7.days.ago.to_date,
           end_date: Date.current,
         )
@@ -121,7 +115,8 @@ describe Analytics::EventCountQuery do
 
     context 'with events from different accounts' do
       let(:other_account) { create(:account) }
-      let(:event_type) { EventType.find_by!(event: 'license.validation.succeeded') }
+      let(:event_types)   { EventType.where(event: 'license.validation.succeeded') }
+      let(:event_type)    { event_types.sole }
 
       before do
         create(:event_log, account:, event_type:)
@@ -132,7 +127,7 @@ describe Analytics::EventCountQuery do
         counts = described_class.call(
           account:,
           environment: nil,
-          event: 'license.validation.succeeded',
+          event_types:,
           start_date: 7.days.ago.to_date,
           end_date: Date.current,
         )
