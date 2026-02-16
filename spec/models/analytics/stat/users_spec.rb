@@ -3,15 +3,15 @@
 require 'rails_helper'
 require 'spec_helper'
 
-describe Analytics::UsersCountQuery do
+describe Analytics::Stat::Users do
   let(:account) { create(:account) }
 
-  describe '.call' do
+  describe '#result' do
     context 'with no users' do
       it 'returns zero' do
-        result = described_class.call(account:)
+        result = described_class.new(account:).result
 
-        expect(result).to satisfy { it in Analytics::UsersCountQuery::Result(count: 0) }
+        expect(result).to satisfy { it in Analytics::Stat::Users::Result(count: 0) }
       end
     end
 
@@ -21,9 +21,9 @@ describe Analytics::UsersCountQuery do
       end
 
       it 'returns correct count' do
-        result = described_class.call(account:)
+        result = described_class.new(account:).result
 
-        expect(result).to satisfy { it in Analytics::UsersCountQuery::Result(count: 3) }
+        expect(result).to satisfy { it in Analytics::Stat::Users::Result(count: 3) }
       end
     end
 
@@ -34,9 +34,9 @@ describe Analytics::UsersCountQuery do
       end
 
       it 'excludes admins from count' do
-        result = described_class.call(account:)
+        result = described_class.new(account:).result
 
-        expect(result).to satisfy { it in Analytics::UsersCountQuery::Result(count: 2) }
+        expect(result).to satisfy { it in Analytics::Stat::Users::Result(count: 2) }
       end
     end
 
@@ -49,15 +49,15 @@ describe Analytics::UsersCountQuery do
       end
 
       it 'returns only environment-scoped users' do
-        result = described_class.call(account:, environment:)
+        result = described_class.new(account:, environment:).result
 
-        expect(result).to satisfy { it in Analytics::UsersCountQuery::Result(count: 2) }
+        expect(result).to satisfy { it in Analytics::Stat::Users::Result(count: 2) }
       end
 
       it 'returns only global users when no environment' do
-        result = described_class.call(account:)
+        result = described_class.new(account:).result
 
-        expect(result).to satisfy { it in Analytics::UsersCountQuery::Result(count: 3) }
+        expect(result).to satisfy { it in Analytics::Stat::Users::Result(count: 3) }
       end
     end
   end

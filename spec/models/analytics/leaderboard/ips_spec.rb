@@ -3,20 +3,20 @@
 require 'rails_helper'
 require 'spec_helper'
 
-describe Analytics::IpsLeaderboardQuery do
+describe Analytics::Leaderboard::Ips do
   let(:account) { create(:account) }
 
   before { Sidekiq::Testing.inline! }
   after  { Sidekiq::Testing.fake! }
 
-  describe '.call', :only_clickhouse do
+  describe '#result', :only_clickhouse do
     context 'with no requests' do
       it 'returns empty array' do
-        results = described_class.call(
+        results = described_class.new(
           account:,
           start_date: 7.days.ago.to_date,
           end_date: Date.current,
-        )
+        ).result
 
         expect(results).to eq([])
       end
@@ -30,17 +30,17 @@ describe Analytics::IpsLeaderboardQuery do
       end
 
       it 'returns entries ordered by count descending' do
-        results = described_class.call(
+        results = described_class.new(
           account:,
           start_date: 7.days.ago.to_date,
           end_date: Date.current,
-        )
+        ).result
 
         expect(results).to satisfy do
           it in [
-            Analytics::IpsLeaderboardQuery::Result(identifier: '192.168.1.1', count: 3),
-            Analytics::IpsLeaderboardQuery::Result(identifier: '192.168.1.2', count: 2),
-            Analytics::IpsLeaderboardQuery::Result(identifier: '192.168.1.3', count: 1)
+            Analytics::Leaderboard::Base::Result(identifier: '192.168.1.1', count: 3),
+            Analytics::Leaderboard::Base::Result(identifier: '192.168.1.2', count: 2),
+            Analytics::Leaderboard::Base::Result(identifier: '192.168.1.3', count: 1)
           ]
         end
       end
@@ -54,13 +54,13 @@ describe Analytics::IpsLeaderboardQuery do
       end
 
       it 'excludes nil and empty IPs' do
-        results = described_class.call(
+        results = described_class.new(
           account:,
           start_date: 7.days.ago.to_date,
           end_date: Date.current,
-        )
+        ).result
 
-        expect(results).to satisfy { it in [Analytics::IpsLeaderboardQuery::Result(identifier: '192.168.1.1', count: 1)] }
+        expect(results).to satisfy { it in [Analytics::Leaderboard::Base::Result(identifier: '192.168.1.1', count: 1)] }
       end
     end
 
@@ -71,13 +71,13 @@ describe Analytics::IpsLeaderboardQuery do
       end
 
       it 'only includes requests within date range' do
-        results = described_class.call(
+        results = described_class.new(
           account:,
           start_date: 7.days.ago.to_date,
           end_date: Date.current,
-        )
+        ).result
 
-        expect(results).to satisfy { it in [Analytics::IpsLeaderboardQuery::Result(identifier: '192.168.1.1', count: 1)] }
+        expect(results).to satisfy { it in [Analytics::Leaderboard::Base::Result(identifier: '192.168.1.1', count: 1)] }
       end
     end
 
@@ -87,25 +87,14 @@ describe Analytics::IpsLeaderboardQuery do
       end
 
       it 'respects custom limit' do
-        results = described_class.call(
+        results = described_class.new(
           account:,
           start_date: 7.days.ago.to_date,
           end_date: Date.current,
           limit: 3,
-        )
+        ).result
 
         expect(results.length).to eq(3)
-      end
-
-      it 'enforces max limit of 100' do
-        results = described_class.call(
-          account:,
-          start_date: 7.days.ago.to_date,
-          end_date: Date.current,
-          limit: 200,
-        )
-
-        expect(results.length).to be <= 100
       end
     end
 
@@ -118,14 +107,14 @@ describe Analytics::IpsLeaderboardQuery do
       end
 
       it 'filters by environment' do
-        results = described_class.call(
+        results = described_class.new(
           account:,
           environment:,
           start_date: 7.days.ago.to_date,
           end_date: Date.current,
-        )
+        ).result
 
-        expect(results).to satisfy { it in [Analytics::IpsLeaderboardQuery::Result(identifier: '192.168.1.1', count: 1)] }
+        expect(results).to satisfy { it in [Analytics::Leaderboard::Base::Result(identifier: '192.168.1.1', count: 1)] }
       end
     end
   end

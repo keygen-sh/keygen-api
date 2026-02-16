@@ -12,7 +12,7 @@ describe Analytics::Heatmap do
         results = described_class.call(:expirations, account:)
 
         expect(results).to satisfy do |cells|
-          cells.all? { it in Analytics::ExpirationsHeatmapQuery::Result(date: Date, x: Integer, y: Integer, temperature: Float, count: Integer) }
+          cells.all? { it in Analytics::Heatmap::Expirations::Result(date: Date, x: Integer, y: Integer, temperature: Float, count: Integer) }
         end
       end
 
@@ -20,7 +20,7 @@ describe Analytics::Heatmap do
         results = described_class.call('expirations', account:)
 
         expect(results).to satisfy do |cells|
-          cells.all? { it in Analytics::ExpirationsHeatmapQuery::Result(date: Date, x: Integer, y: Integer, temperature: Float, count: Integer) }
+          cells.all? { it in Analytics::Heatmap::Expirations::Result(date: Date, x: Integer, y: Integer, temperature: Float, count: Integer) }
         end
       end
     end
@@ -49,9 +49,9 @@ describe Analytics::Heatmap do
         expect(results.length).to eq(date_range.length)
         expect(results).to satisfy do
           it in [
-            Analytics::ExpirationsHeatmapQuery::Result(date: ^start_date, x: Integer, y: Integer, temperature: Float, count: Integer),
+            Analytics::Heatmap::Expirations::Result(date: ^start_date, x: Integer, y: Integer, temperature: Float, count: Integer),
             *,
-            Analytics::ExpirationsHeatmapQuery::Result(date: ^end_date, x: Integer, y: Integer, temperature: Float, count: Integer)
+            Analytics::Heatmap::Expirations::Result(date: ^end_date, x: Integer, y: Integer, temperature: Float, count: Integer)
           ]
         end
       end

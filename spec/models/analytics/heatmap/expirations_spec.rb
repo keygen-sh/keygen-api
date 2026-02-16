@@ -3,23 +3,23 @@
 require 'rails_helper'
 require 'spec_helper'
 
-describe Analytics::ExpirationsHeatmapQuery do
+describe Analytics::Heatmap::Expirations do
   let(:account) { create(:account) }
 
-  describe '.call' do
+  describe '#result' do
     context 'with no expiring licenses' do
       it 'returns cells with temperature 0' do
         start_date = Date.current
         end_date   = 7.days.from_now.to_date
 
-        results = described_class.call(account:, start_date:, end_date:)
+        results = described_class.new(account:, start_date:, end_date:).result
 
         expect(results.length).to eq(8)
         expect(results).to satisfy do
           it in [
-            Analytics::ExpirationsHeatmapQuery::Result(date: ^start_date, temperature: 0.0, count: 0),
+            Analytics::Heatmap::Expirations::Result(date: ^start_date, temperature: 0.0, count: 0),
             *,
-            Analytics::ExpirationsHeatmapQuery::Result(date: ^end_date, temperature: 0.0, count: 0)
+            Analytics::Heatmap::Expirations::Result(date: ^end_date, temperature: 0.0, count: 0)
           ]
         end
       end
@@ -41,21 +41,21 @@ describe Analytics::ExpirationsHeatmapQuery do
         date_5_days_from_now = 5.days.from_now.to_date
         end_date             = 6.days.from_now.to_date
 
-        results = described_class.call(
+        results = described_class.new(
           account:,
           start_date:,
           end_date:,
-        )
+        ).result
 
         expect(results).to satisfy do
           it in [
-            Analytics::ExpirationsHeatmapQuery::Result(date: ^start_date, count: 0),
-            Analytics::ExpirationsHeatmapQuery::Result(date: ^date_1_day_from_now, count: 0),
-            Analytics::ExpirationsHeatmapQuery::Result(date: ^date_2_days_from_now, count: 0),
-            Analytics::ExpirationsHeatmapQuery::Result(date: ^date_3_days_from_now, count: 2),
-            Analytics::ExpirationsHeatmapQuery::Result(date: ^date_4_days_from_now, count: 0),
-            Analytics::ExpirationsHeatmapQuery::Result(date: ^date_5_days_from_now, count: 1),
-            Analytics::ExpirationsHeatmapQuery::Result(date: ^end_date, count: 0)
+            Analytics::Heatmap::Expirations::Result(date: ^start_date, count: 0),
+            Analytics::Heatmap::Expirations::Result(date: ^date_1_day_from_now, count: 0),
+            Analytics::Heatmap::Expirations::Result(date: ^date_2_days_from_now, count: 0),
+            Analytics::Heatmap::Expirations::Result(date: ^date_3_days_from_now, count: 2),
+            Analytics::Heatmap::Expirations::Result(date: ^date_4_days_from_now, count: 0),
+            Analytics::Heatmap::Expirations::Result(date: ^date_5_days_from_now, count: 1),
+            Analytics::Heatmap::Expirations::Result(date: ^end_date, count: 0)
           ]
         end
       end
@@ -63,16 +63,16 @@ describe Analytics::ExpirationsHeatmapQuery do
       it 'assigns correct temperature based on count distribution' do
         mid_date = 3.days.from_now.to_date
 
-        results = described_class.call(
+        results = described_class.new(
           account:,
           start_date: Date.current,
           end_date: 7.days.from_now.to_date,
-        )
+        ).result
 
         expect(results).to satisfy do
           it in [
             *,
-            Analytics::ExpirationsHeatmapQuery::Result(date: ^mid_date, temperature: 1.0),
+            Analytics::Heatmap::Expirations::Result(date: ^mid_date, temperature: 1.0),
             *
           ]
         end
@@ -84,13 +84,13 @@ describe Analytics::ExpirationsHeatmapQuery do
         start_date = Date.current
         end_date   = 364.days.from_now.to_date
 
-        results = described_class.call(account:)
+        results = described_class.new(account:).result
 
         expect(results).to satisfy do
           it in [
-            Analytics::ExpirationsHeatmapQuery::Result(date: ^start_date),
+            Analytics::Heatmap::Expirations::Result(date: ^start_date),
             *,
-            Analytics::ExpirationsHeatmapQuery::Result(date: ^end_date)
+            Analytics::Heatmap::Expirations::Result(date: ^end_date)
           ]
         end
       end
