@@ -48,7 +48,10 @@ module Analytics
       counts = counter.count(event_type_ids:, start_date:, end_date:, resource_type:, resource_id:)
 
       event_types.map do |event_type|
-        Row.new(event: event_type.event, count: counts[event_type.id].to_i)
+        count = counts[event_type.id].to_i
+        event = event_type.event
+
+        Row.new(event:, count:)
       end
     end
 

@@ -4,7 +4,7 @@ module Analytics
   class Stat
     module Counters
       class ActiveLicensedUsers
-        def initialize(account:, environment:) # environment intentionally ignored
+        def initialize(account:, **) # environment intentionally ignored
           @account = account
         end
 
