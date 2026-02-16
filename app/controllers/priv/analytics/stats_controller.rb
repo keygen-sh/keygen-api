@@ -8,7 +8,7 @@ module Priv::Analytics
     def show
       authorize! with: Accounts::AnalyticsPolicy
 
-      stat = Analytics::Stat.call(params[:stat_id], account: current_account, environment: current_environment)
+      stat = Analytics::Stat.new(params[:stat_id])
 
       unless stat.valid?
         render_bad_request detail: stat.errors.full_messages.to_sentence,
@@ -16,7 +16,7 @@ module Priv::Analytics
         return
       end
 
-      data = cached { stat.result.as_json }
+      data = cached { stat.as_json }
 
       render json: { data: }
     rescue Analytics::StatNotFoundError
