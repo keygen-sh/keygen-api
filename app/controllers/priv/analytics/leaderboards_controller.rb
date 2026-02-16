@@ -18,7 +18,8 @@ module Priv::Analytics
       leaderboard = Analytics::Leaderboard.call(params[:leaderboard_id], account: current_account, environment: current_environment, **leaderboard_query)
 
       unless leaderboard.valid?
-        render_unprocessable_entity detail: leaderboard.errors.full_messages.to_sentence
+        render_bad_request detail: leaderboard.errors.full_messages.to_sentence,
+                           source: { parameter: leaderboard.errors.attribute_names.first }
         return
       end
 

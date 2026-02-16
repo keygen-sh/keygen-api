@@ -11,7 +11,8 @@ module Priv::Analytics
       stat = Analytics::Stat.call(params[:stat_id], account: current_account, environment: current_environment)
 
       unless stat.valid?
-        render_unprocessable_entity detail: stat.errors.full_messages.to_sentence
+        render_bad_request detail: stat.errors.full_messages.to_sentence,
+                           source: { parameter: stat.errors.attribute_names.first }
         return
       end
 

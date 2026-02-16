@@ -106,6 +106,62 @@ Feature: Event analytics
     And sidekiq should have 0 "request-log" jobs
     And time is unfrozen
 
+  Scenario: Admin retrieves event count with invalid event pattern
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/analytics/events/invalid.event"
+    Then the response status should be "400"
+    And the response body should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      { "title": "Bad request", "detail": "Pattern is invalid", "source": { "parameter": "pattern" } }
+      """
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin retrieves event count with invalid wildcard pattern
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/analytics/events/invalid.*"
+    Then the response status should be "400"
+    And the response body should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      { "title": "Bad request", "detail": "Pattern is invalid", "source": { "parameter": "pattern" } }
+      """
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin retrieves event count with start date too old
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And time is frozen at "2024-01-15T00:00:00.000Z"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/analytics/events/license.validation.succeeded?start_date=2020-01-01"
+    Then the response status should be "400"
+    And the response body should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      { "title": "Bad request", "detail": "Start date must be greater than or equal to 2023-01-15", "source": { "parameter": "start_date" } }
+      """
+    And sidekiq should have 0 "request-log" jobs
+    And time is unfrozen
+
+  Scenario: Admin retrieves event count with end date in future
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And time is frozen at "2024-01-15T00:00:00.000Z"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/analytics/events/license.validation.succeeded?end_date=2099-01-01"
+    Then the response status should be "400"
+    And the response body should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      { "title": "Bad request", "detail": "End date must be less than or equal to 2024-01-15", "source": { "parameter": "end_date" } }
+      """
+    And sidekiq should have 0 "request-log" jobs
+    And time is unfrozen
+
   Scenario: Product attempts to retrieve event count for their account
     Given the current account is "test1"
     And the current account has 1 "product"

@@ -16,7 +16,8 @@ module Priv::Analytics
       heatmap = Analytics::Heatmap.call(params[:heatmap_id], account: current_account, environment: current_environment, **heatmap_query)
 
       unless heatmap.valid?
-        render_unprocessable_entity detail: heatmap.errors.full_messages.to_sentence
+        render_bad_request detail: heatmap.errors.full_messages.to_sentence,
+                           source: { parameter: heatmap.errors.attribute_names.first }
         return
       end
 
