@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Analytics
-  class Event
+  class Activity
     Row = Data.define(:event, :count)
 
     include ActiveModel::Model
@@ -16,7 +16,10 @@ module Analytics
     validates :pattern, presence: true
     validates :start_date, comparison: { greater_than_or_equal_to: -> { 1.year.ago.to_date } }
     validates :end_date, comparison: { less_than_or_equal_to: -> { Date.current } }
-    validate :event_types_exist
+
+    validate do
+      errors.add(:pattern, :invalid) if event_types.empty?
+    end
 
     def initialize(pattern, **)
       @pattern = pattern
@@ -33,7 +36,8 @@ module Analytics
     end
 
     def event_types = @event_types ||= begin
-      return EventType.none if pattern.blank?
+      return EventType.none if
+        pattern.blank?
 
       types = if pattern.end_with?('.*')
                 EventType.where('event LIKE ?', "#{pattern.delete_suffix('.*')}.%")
@@ -54,11 +58,5 @@ module Analytics
     attr_reader :pattern
 
     def counter = Counters::EventTypes
-
-    def event_types_exist
-      return if pattern.blank?
-
-      errors.add(:pattern, :invalid) if event_types.empty?
-    end
   end
 end
