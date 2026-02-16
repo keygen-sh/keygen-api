@@ -20,7 +20,7 @@ describe Analytics::EventCountQuery do
           end_date: Date.current,
         )
 
-        expect(counts).to satisfy { it in [Analytics::Event::Count(event: 'license.validation.succeeded', count: 0)] }
+        expect(counts).to satisfy { it in [Analytics::EventCountQuery::Result(event: 'license.validation.succeeded', count: 0)] }
       end
     end
 
@@ -36,8 +36,8 @@ describe Analytics::EventCountQuery do
 
         expect(counts).to satisfy do
           it in [
-            Analytics::Event::Count(event: 'license.validation.failed', count: Integer),
-            Analytics::Event::Count(event: 'license.validation.succeeded', count: Integer),
+            Analytics::EventCountQuery::Result(event: 'license.validation.failed', count: Integer),
+            Analytics::EventCountQuery::Result(event: 'license.validation.succeeded', count: Integer),
           ]
         end
       end
@@ -72,7 +72,7 @@ describe Analytics::EventCountQuery do
           end_date: Date.current,
         )
 
-        expect(counts).to satisfy { it in [Analytics::Event::Count(event: 'license.validation.succeeded', count: 3)] }
+        expect(counts).to satisfy { it in [Analytics::EventCountQuery::Result(event: 'license.validation.succeeded', count: 3)] }
       end
     end
 
@@ -93,7 +93,7 @@ describe Analytics::EventCountQuery do
           end_date: Date.current,
         )
 
-        expect(counts).to satisfy { it in [Analytics::Event::Count(event: 'license.validation.succeeded', count: 1)] }
+        expect(counts).to satisfy { it in [Analytics::EventCountQuery::Result(event: 'license.validation.succeeded', count: 1)] }
       end
     end
 
@@ -115,7 +115,7 @@ describe Analytics::EventCountQuery do
           end_date: Date.current,
         )
 
-        expect(counts).to satisfy { it in [Analytics::Event::Count(event: 'license.validation.succeeded', count: 1)] }
+        expect(counts).to satisfy { it in [Analytics::EventCountQuery::Result(event: 'license.validation.succeeded', count: 1)] }
       end
     end
 
@@ -137,7 +137,7 @@ describe Analytics::EventCountQuery do
           end_date: Date.current,
         )
 
-        expect(counts).to satisfy { it in [Analytics::Event::Count(event: 'license.validation.succeeded', count: 1)] }
+        expect(counts).to satisfy { it in [Analytics::EventCountQuery::Result(event: 'license.validation.succeeded', count: 1)] }
       end
     end
   end

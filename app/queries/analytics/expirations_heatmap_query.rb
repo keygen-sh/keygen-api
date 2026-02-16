@@ -2,6 +2,8 @@
 
 module Analytics
   class ExpirationsHeatmapQuery < BaseQuery
+    Result = Data.define(:date, :x, :y, :temperature, :count)
+
     START_DAY_OF_WEEK = :sunday
 
     def initialize(account:, environment: nil, start_date: Date.current, end_date: 364.days.from_now.to_date)
@@ -23,7 +25,7 @@ module Analytics
         count  = expirations[date] || 0
         temp   = (count.to_f / max_count).round(1)
 
-        Heatmap::Cell.new(
+        Result.new(
           x: offset / 7,
           y: date.wday,
           temperature: temp,

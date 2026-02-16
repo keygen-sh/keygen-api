@@ -11,7 +11,7 @@ describe Analytics::ActiveLicensedUsersCountQuery do
       it 'returns zero' do
         result = described_class.call(account:)
 
-        expect(result).to satisfy { it in Analytics::Stat::Count(count: 0) }
+        expect(result).to satisfy { it in Analytics::ActiveLicensedUsersCountQuery::Result(count: 0) }
       end
     end
 
@@ -23,7 +23,7 @@ describe Analytics::ActiveLicensedUsersCountQuery do
       it 'returns zero' do
         result = described_class.call(account:)
 
-        expect(result).to satisfy { it in Analytics::Stat::Count(count: 0) }
+        expect(result).to satisfy { it in Analytics::ActiveLicensedUsersCountQuery::Result(count: 0) }
       end
     end
 
@@ -38,7 +38,7 @@ describe Analytics::ActiveLicensedUsersCountQuery do
       it 'returns correct count' do
         result = described_class.call(account:)
 
-        expect(result).to satisfy { it in Analytics::Stat::Count(count: 3) }
+        expect(result).to satisfy { it in Analytics::ActiveLicensedUsersCountQuery::Result(count: 3) }
       end
     end
 
@@ -53,7 +53,7 @@ describe Analytics::ActiveLicensedUsersCountQuery do
       it 'counts users with expired but recently active licenses' do
         result = described_class.call(account:)
 
-        expect(result).to satisfy { it in Analytics::Stat::Count(count: 2) }
+        expect(result).to satisfy { it in Analytics::ActiveLicensedUsersCountQuery::Result(count: 2) }
       end
     end
 
@@ -65,7 +65,7 @@ describe Analytics::ActiveLicensedUsersCountQuery do
       it 'counts each unassigned license as one licensed user' do
         result = described_class.call(account:)
 
-        expect(result).to satisfy { it in Analytics::Stat::Count(count: 3) }
+        expect(result).to satisfy { it in Analytics::ActiveLicensedUsersCountQuery::Result(count: 3) }
       end
     end
 
@@ -80,7 +80,7 @@ describe Analytics::ActiveLicensedUsersCountQuery do
       it 'ignores environment scoping' do
         result = described_class.call(account:, environment:)
 
-        expect(result).to satisfy { it in Analytics::Stat::Count(count: 1) }
+        expect(result).to satisfy { it in Analytics::ActiveLicensedUsersCountQuery::Result(count: 1) }
       end
     end
   end

@@ -17,9 +17,9 @@ describe Analytics::ExpirationsHeatmapQuery do
         expect(results.length).to eq(8)
         expect(results).to satisfy do
           it in [
-            Analytics::Heatmap::Cell(date: ^start_date, temperature: 0.0, count: 0),
+            Analytics::ExpirationsHeatmapQuery::Result(date: ^start_date, temperature: 0.0, count: 0),
             *,
-            Analytics::Heatmap::Cell(date: ^end_date, temperature: 0.0, count: 0)
+            Analytics::ExpirationsHeatmapQuery::Result(date: ^end_date, temperature: 0.0, count: 0)
           ]
         end
       end
@@ -49,13 +49,13 @@ describe Analytics::ExpirationsHeatmapQuery do
 
         expect(results).to satisfy do
           it in [
-            Analytics::Heatmap::Cell(date: ^start_date, count: 0),
-            Analytics::Heatmap::Cell(date: ^date_1_day_from_now, count: 0),
-            Analytics::Heatmap::Cell(date: ^date_2_days_from_now, count: 0),
-            Analytics::Heatmap::Cell(date: ^date_3_days_from_now, count: 2),
-            Analytics::Heatmap::Cell(date: ^date_4_days_from_now, count: 0),
-            Analytics::Heatmap::Cell(date: ^date_5_days_from_now, count: 1),
-            Analytics::Heatmap::Cell(date: ^end_date, count: 0)
+            Analytics::ExpirationsHeatmapQuery::Result(date: ^start_date, count: 0),
+            Analytics::ExpirationsHeatmapQuery::Result(date: ^date_1_day_from_now, count: 0),
+            Analytics::ExpirationsHeatmapQuery::Result(date: ^date_2_days_from_now, count: 0),
+            Analytics::ExpirationsHeatmapQuery::Result(date: ^date_3_days_from_now, count: 2),
+            Analytics::ExpirationsHeatmapQuery::Result(date: ^date_4_days_from_now, count: 0),
+            Analytics::ExpirationsHeatmapQuery::Result(date: ^date_5_days_from_now, count: 1),
+            Analytics::ExpirationsHeatmapQuery::Result(date: ^end_date, count: 0)
           ]
         end
       end
@@ -72,7 +72,7 @@ describe Analytics::ExpirationsHeatmapQuery do
         expect(results).to satisfy do
           it in [
             *,
-            Analytics::Heatmap::Cell(date: ^mid_date, temperature: 1.0),
+            Analytics::ExpirationsHeatmapQuery::Result(date: ^mid_date, temperature: 1.0),
             *
           ]
         end
@@ -88,9 +88,9 @@ describe Analytics::ExpirationsHeatmapQuery do
 
         expect(results).to satisfy do
           it in [
-            Analytics::Heatmap::Cell(date: ^start_date),
+            Analytics::ExpirationsHeatmapQuery::Result(date: ^start_date),
             *,
-            Analytics::Heatmap::Cell(date: ^end_date)
+            Analytics::ExpirationsHeatmapQuery::Result(date: ^end_date)
           ]
         end
       end

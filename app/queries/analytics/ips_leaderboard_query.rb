@@ -2,6 +2,8 @@
 
 module Analytics
   class IpsLeaderboardQuery < BaseQuery
+    Result = Data.define(:identifier, :count)
+
     MAX_LIMIT = 100
 
     def initialize(account:, environment: nil, start_date: 2.weeks.ago.to_date, end_date: Date.current, limit: 10)
@@ -31,7 +33,7 @@ module Analytics
       SQL
 
       res['data'].map do |(identifier, count)|
-        Leaderboard::Entry.new(identifier:, count:)
+        Result.new(identifier:, count:)
       end
     end
 

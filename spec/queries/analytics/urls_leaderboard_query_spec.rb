@@ -38,9 +38,9 @@ describe Analytics::UrlsLeaderboardQuery do
 
         expect(results).to satisfy do
           it in [
-            Analytics::Leaderboard::Entry(identifier: 'GET /v1/licenses', count: 3),
-            Analytics::Leaderboard::Entry(identifier: 'POST /v1/licenses', count: 2),
-            Analytics::Leaderboard::Entry(identifier: 'GET /v1/machines', count: 1)
+            Analytics::UrlsLeaderboardQuery::Result(identifier: 'GET /v1/licenses', count: 3),
+            Analytics::UrlsLeaderboardQuery::Result(identifier: 'POST /v1/licenses', count: 2),
+            Analytics::UrlsLeaderboardQuery::Result(identifier: 'GET /v1/machines', count: 1)
           ]
         end
       end
@@ -60,7 +60,7 @@ describe Analytics::UrlsLeaderboardQuery do
           end_date: Date.current,
         )
 
-        expect(results).to satisfy { it in [Analytics::Leaderboard::Entry(identifier: 'GET /v1/licenses', count: 1)] }
+        expect(results).to satisfy { it in [Analytics::UrlsLeaderboardQuery::Result(identifier: 'GET /v1/licenses', count: 1)] }
       end
     end
 
@@ -77,7 +77,7 @@ describe Analytics::UrlsLeaderboardQuery do
           end_date: Date.current,
         )
 
-        expect(results).to satisfy { it in [Analytics::Leaderboard::Entry(identifier: 'GET /v1/licenses', count: 1)] }
+        expect(results).to satisfy { it in [Analytics::UrlsLeaderboardQuery::Result(identifier: 'GET /v1/licenses', count: 1)] }
       end
     end
 
@@ -113,7 +113,7 @@ describe Analytics::UrlsLeaderboardQuery do
           end_date: Date.current,
         )
 
-        expect(results).to satisfy { it in [Analytics::Leaderboard::Entry(identifier: 'GET /v1/licenses', count: 1)] }
+        expect(results).to satisfy { it in [Analytics::UrlsLeaderboardQuery::Result(identifier: 'GET /v1/licenses', count: 1)] }
       end
     end
   end
