@@ -6,60 +6,54 @@ require 'spec_helper'
 describe Analytics::Leaderboard do
   let(:account) { create(:account) }
 
-  describe '.call' do
-    context 'when ClickHouse is available', :clickhouse do
-      before do
-        skip 'ClickHouse is not available' unless Keygen.database.clickhouse_available?
-      end
+  describe '.call', :only_clickhouse do
+    context 'with valid leaderboard' do
+      it 'returns results for ips leaderboard' do
+        results = described_class.call(:ips, account:)
 
-      context 'with valid leaderboard' do
-        it 'returns results for ips leaderboard' do
-          results = described_class.call(:ips, account:)
-
-          expect(results).to satisfy do |entries|
-            entries.all? { it in Analytics::Leaderboard::Entry(identifier: String, count: Integer) }
-          end
-        end
-
-        it 'returns results for urls leaderboard' do
-          results = described_class.call(:urls, account:)
-
-          expect(results).to satisfy do |entries|
-            entries.all? { it in Analytics::Leaderboard::Entry(identifier: String, count: Integer) }
-          end
-        end
-
-        it 'returns results for licenses leaderboard' do
-          results = described_class.call(:licenses, account:)
-
-          expect(results).to satisfy do |entries|
-            entries.all? { it in Analytics::Leaderboard::Entry(identifier: String, count: Integer) }
-          end
-        end
-
-        it 'returns results for user_agents leaderboard' do
-          results = described_class.call(:user_agents, account:)
-
-          expect(results).to satisfy do |entries|
-            entries.all? { it in Analytics::Leaderboard::Entry(identifier: String, count: Integer) }
-          end
-        end
-
-        it 'accepts string type names' do
-          results = described_class.call('ips', account:)
-
-          expect(results).to satisfy do |entries|
-            entries.all? { it in Analytics::Leaderboard::Entry(identifier: String, count: Integer) }
-          end
+        expect(results).to satisfy do |entries|
+          entries.all? { it in Analytics::Leaderboard::Entry(identifier: String, count: Integer) }
         end
       end
 
-      context 'with invalid leaderboard' do
-        it 'raises LeaderboardNotFoundError' do
-          expect {
-            described_class.call(:invalid, account:)
-          }.to raise_error(Analytics::LeaderboardNotFoundError)
+      it 'returns results for urls leaderboard' do
+        results = described_class.call(:urls, account:)
+
+        expect(results).to satisfy do |entries|
+          entries.all? { it in Analytics::Leaderboard::Entry(identifier: String, count: Integer) }
         end
+      end
+
+      it 'returns results for licenses leaderboard' do
+        results = described_class.call(:licenses, account:)
+
+        expect(results).to satisfy do |entries|
+          entries.all? { it in Analytics::Leaderboard::Entry(identifier: String, count: Integer) }
+        end
+      end
+
+      it 'returns results for user_agents leaderboard' do
+        results = described_class.call(:user_agents, account:)
+
+        expect(results).to satisfy do |entries|
+          entries.all? { it in Analytics::Leaderboard::Entry(identifier: String, count: Integer) }
+        end
+      end
+
+      it 'accepts string type names' do
+        results = described_class.call('ips', account:)
+
+        expect(results).to satisfy do |entries|
+          entries.all? { it in Analytics::Leaderboard::Entry(identifier: String, count: Integer) }
+        end
+      end
+    end
+
+    context 'with invalid leaderboard' do
+      it 'raises LeaderboardNotFoundError' do
+        expect {
+          described_class.call(:invalid, account:)
+        }.to raise_error(Analytics::LeaderboardNotFoundError)
       end
     end
   end
