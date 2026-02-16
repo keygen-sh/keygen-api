@@ -35,6 +35,9 @@ jobs:
           - 6379:6379
     strategy:
       matrix:
+        TEST_RUNNER:
+          - rspec
+          - cucumber
         KEYGEN_EDITION:
           - CE
           - EE
@@ -92,12 +95,12 @@ jobs:
       - name: Setup
         run: bundle exec rake test:setup
       - name: Test
-        run: bundle exec rake test
+        run: bundle exec rake test:${{matrix.TEST_RUNNER}}
       - name: Debug
         uses: actions/upload-artifact@v4
         if: ${{failure()}}
         with:
           path: ${{github.workspace}}/log/test.log
-          name: test-${{github.run_id}}-log
+          name: test-${{matrix.TEST_RUNNER}}-${{github.run_id}}-log
           if-no-files-found: ignore
           retention-days: 1
