@@ -8,10 +8,14 @@ module Priv::Analytics
     def show
       authorize! with: Accounts::AnalyticsPolicy
 
-      data = cached do
-        Analytics::Stat.call(params[:stat_id], account: current_account, environment: current_environment)
-                       .as_json
+      stat = Analytics::Stat.call(params[:stat_id], account: current_account, environment: current_environment)
+
+      unless stat.valid?
+        render_unprocessable_entity detail: stat.errors.full_messages.to_sentence
+        return
       end
+
+      data = cached { stat.result.as_json }
 
       render json: { data: }
     rescue Analytics::StatNotFoundError

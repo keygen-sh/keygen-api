@@ -9,41 +9,46 @@ describe Analytics::Leaderboard do
   describe '.call', :only_clickhouse do
     context 'with valid leaderboard' do
       it 'returns results for ips leaderboard' do
-        results = described_class.call(:ips, account:)
+        leaderboard = described_class.call(:ips, account:)
 
-        expect(results).to satisfy do |entries|
+        expect(leaderboard).to be_valid
+        expect(leaderboard.result).to satisfy do |entries|
           entries.all? { it in Analytics::Leaderboard::Base::Result(identifier: String, count: Integer) }
         end
       end
 
       it 'returns results for urls leaderboard' do
-        results = described_class.call(:urls, account:)
+        leaderboard = described_class.call(:urls, account:)
 
-        expect(results).to satisfy do |entries|
+        expect(leaderboard).to be_valid
+        expect(leaderboard.result).to satisfy do |entries|
           entries.all? { it in Analytics::Leaderboard::Base::Result(identifier: String, count: Integer) }
         end
       end
 
       it 'returns results for licenses leaderboard' do
-        results = described_class.call(:licenses, account:)
+        leaderboard = described_class.call(:licenses, account:)
 
-        expect(results).to satisfy do |entries|
+        expect(leaderboard).to be_valid
+        expect(leaderboard.result).to satisfy do |entries|
           entries.all? { it in Analytics::Leaderboard::Base::Result(identifier: String, count: Integer) }
         end
       end
 
       it 'returns results for user_agents leaderboard' do
-        results = described_class.call(:user_agents, account:)
+        leaderboard = described_class.call(:user_agents, account:)
 
-        expect(results).to satisfy do |entries|
+        expect(leaderboard).to be_valid
+        expect(leaderboard.result).to satisfy do |entries|
           entries.all? { it in Analytics::Leaderboard::Base::Result(identifier: String, count: Integer) }
         end
       end
 
       it 'accepts string type names' do
-        results = described_class.call('ips', account:)
+        leaderboard = described_class.call('ips', account:)
 
-        expect(results).to satisfy do |entries|
+        expect(leaderboard).to be_valid
+        expect(leaderboard.result).to satisfy do |entries|
           entries.all? { it in Analytics::Leaderboard::Base::Result(identifier: String, count: Integer) }
         end
       end

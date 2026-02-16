@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module Analytics
-  class EventNotFoundError < StandardError; end
-
   class Event
     include ActiveModel::Model
     include ActiveModel::Attributes
@@ -19,14 +17,10 @@ module Analytics
     validates :pattern, presence: true
     validates :start_date, comparison: { greater_than_or_equal_to: -> { 1.year.ago.to_date } }
     validates :end_date, comparison: { less_than_or_equal_to: -> { Date.current } }
+    validate :event_types_exist
 
     def self.call(pattern, account:, environment: nil, start_date: 2.weeks.ago.to_date, end_date: Date.current)
-      event = new(pattern:, account:, environment:, start_date:, end_date:)
-
-      raise EventNotFoundError, "invalid event pattern: #{pattern.inspect}" if
-        event.event_types.empty?
-
-      event.result
+      new(pattern:, account:, environment:, start_date:, end_date:)
     end
 
     def result
@@ -65,6 +59,12 @@ module Analytics
                           .where(is_deleted: 0)
                           .group(:event_type_id)
                           .count
+    end
+
+    def event_types_exist
+      return if pattern.blank?
+
+      errors.add(:pattern, :invalid) if event_types.empty?
     end
   end
 end

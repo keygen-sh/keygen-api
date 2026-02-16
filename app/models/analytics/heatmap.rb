@@ -12,7 +12,7 @@ module Analytics
 
       raise HeatmapNotFoundError, "invalid heatmap type: #{type.inspect}" if klass.nil?
 
-      klass.new(account:, environment:, start_date:, end_date:).result
+      klass.new(account:, environment:, start_date:, end_date:)
     end
   end
 end
