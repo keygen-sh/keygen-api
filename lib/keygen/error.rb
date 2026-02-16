@@ -70,9 +70,5 @@ module Keygen
     class InvalidAccountIdError < StandardError; end
     class InvalidEnvironmentError < StandardError; end
     class BadRequestError < StandardError; end
-
-    class NotSupportedError < JSONAPIError
-      def initialize(message = 'is not supported', code:, **) = super(message, code:, **)
-    end
   end
 end

@@ -529,19 +529,6 @@ class ApplicationController < ActionController::API
     end
 
     render_forbidden(**kwargs)
-  rescue Keygen::Error::NotSupportedError => e
-    kwargs = { code: e.code }
-
-    kwargs[:detail] = e.detail if
-      e.detail.present?
-
-    kwargs[:source] = e.source if
-      e.source.present?
-
-    kwargs[:links] = e.links if
-      e.links.present?
-
-    render_not_supported(**kwargs)
   rescue Keygen::Error::NotFoundError,
          ActiveRecord::RecordNotFound => e
     if e.model.present?
