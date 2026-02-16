@@ -19,6 +19,7 @@ module Analytics
 
     attribute :account, default: -> { Current.account }
     attribute :environment, default: -> { Current.environment }
+
     attribute :start_date, default: -> { 2.weeks.ago.to_date }
     attribute :end_date, default: -> { Date.current }
     attribute :limit, default: -> { 10 }
@@ -38,7 +39,7 @@ module Analytics
     end
 
     def rows = @rows ||= begin
-      counts = counter.count(account:, environment:, start_date:, end_date:, limit:)
+      counts = counter.count(start_date:, end_date:, limit:)
 
       counts.map do |(discriminator, count)|
         Row.new(discriminator:, count:)
@@ -52,6 +53,7 @@ module Analytics
 
     attr_reader :counter_name
 
-    def counter = COUNTERS[counter_name]
+    def counter_class = COUNTERS[counter_name]
+    def counter       = counter_class.new(account:, environment:)
   end
 end

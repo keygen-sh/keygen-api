@@ -3,10 +3,19 @@
 module Analytics
   class Stat
     module Counters
-      module Licenses
-        def self.count(account:, environment:)
+      class Licenses
+        def initialize(account:, environment:)
+          @account     = account
+          @environment = environment
+        end
+
+        def count
           account.licenses.for_environment(environment).count
         end
+
+        private
+
+        attr_reader :account, :environment
       end
     end
   end

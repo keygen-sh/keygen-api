@@ -3,8 +3,13 @@
 module Analytics
   class Leaderboard
     module Counters
-      module Ips
-        def self.count(account:, environment:, start_date:, end_date:, limit:)
+      class Ips
+        def initialize(account:, environment:)
+          @account     = account
+          @environment = environment
+        end
+
+        def count(start_date:, end_date:, limit:)
           binds = { account_id: account.id, environment_id: environment&.id, start_date:, end_date:, limit: }.compact
           res   = exec_sql([<<~SQL.squish, binds])
             SELECT
@@ -31,7 +36,9 @@ module Analytics
 
         private
 
-        def self.exec_sql(...)
+        attr_reader :account, :environment
+
+        def exec_sql(...)
           RequestLog::Clickhouse.connection.execute(
             RequestLog::Clickhouse.sanitize_sql(...),
           )

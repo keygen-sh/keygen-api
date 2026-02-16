@@ -9,10 +9,11 @@ module Analytics
 
     attribute :account, default: -> { Current.account }
     attribute :environment, default: -> { Current.environment }
-    attribute :resource_type
-    attribute :resource_id
+
     attribute :start_date, default: -> { 2.weeks.ago.to_date }
     attribute :end_date, default: -> { Date.current }
+    attribute :resource_type
+    attribute :resource_id
 
     validates :account, presence: true
     validates :pattern, presence: true
@@ -20,7 +21,7 @@ module Analytics
     validates :end_date, comparison: { less_than_or_equal_to: -> { Date.current } }
 
     validate do
-      errors.add(:pattern, :invalid) if event_types.empty?
+      errors.add :pattern, :invalid, message: 'is invalid' if event_types.empty?
     end
 
     def initialize(pattern, **)
@@ -29,15 +30,8 @@ module Analytics
       super(**)
     end
 
-    def rows = @rows ||= begin
-      counts = counter.count(account:, environment:, resource_type:, resource_id:, event_type_ids:, start_date:, end_date:)
-
-      event_types.map do |event_type|
-        Row.new(event: event_type.event, count: counts[event_type.id].to_i)
-      end
-    end
-
-    def event_types = @event_types ||= begin
+    def event_type_ids = event_types.ids
+    def event_types    = @event_types ||= begin
       return EventType.none if
         pattern.blank?
 
@@ -50,7 +44,13 @@ module Analytics
       types.order(:event)
     end
 
-    def event_type_ids = event_types.ids
+    def rows = @rows ||= begin
+      counts = counter.count(event_type_ids:, start_date:, end_date:, resource_type:, resource_id:)
+
+      event_types.map do |event_type|
+        Row.new(event: event_type.event, count: counts[event_type.id].to_i)
+      end
+    end
 
     delegate :as_json, :to_json,
       to: :rows
@@ -59,6 +59,6 @@ module Analytics
 
     attr_reader :pattern
 
-    def counter = Counters::EventTypes
+    def counter = Counters::EventTypes.new(account:, environment:)
   end
 end

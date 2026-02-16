@@ -3,7 +3,7 @@
 module Analytics
   class Leaderboard
     module Counters
-      module Licenses
+      class Licenses
         QUERY = <<~SQL.squish
           SELECT
             resource_id AS identifier,
@@ -20,7 +20,12 @@ module Analytics
           LIMIT :limit
         SQL
 
-        def self.count(account:, environment:, start_date:, end_date:, limit:)
+        def initialize(account:, environment:)
+          @account     = account
+          @environment = environment
+        end
+
+        def count(start_date:, end_date:, limit:)
           environment_clause = environment.nil? ? 'IS NULL' : '= :environment_id'
 
           binds = { account_id: account.id, environment_id: environment&.id, start_date:, end_date:, limit: }.compact
@@ -30,7 +35,11 @@ module Analytics
           res['data']
         end
 
-        def self.exec_sql(...)
+        private
+
+        attr_reader :account, :environment
+
+        def exec_sql(...)
           RequestLog::Clickhouse.connection.execute(
             RequestLog::Clickhouse.sanitize_sql(...),
           )

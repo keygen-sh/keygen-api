@@ -3,10 +3,18 @@
 module Analytics
   class Stat
     module Counters
-      module ActiveLicensedUsers
-        def self.count(account:, environment:) # environment intentionally ignored
+      class ActiveLicensedUsers
+        def initialize(account:, environment:) # environment intentionally ignored
+          @account = account
+        end
+
+        def count
           account.active_licensed_user_count
         end
+
+        private
+
+        attr_reader :account
       end
     end
   end
