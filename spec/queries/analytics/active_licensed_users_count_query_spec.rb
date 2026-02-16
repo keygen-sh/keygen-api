@@ -53,8 +53,6 @@ describe Analytics::ActiveLicensedUsersCountQuery do
       end
 
       it 'counts users with expired but recently active licenses' do
-        # "Active" refers to recent activity (created or validated within 90 days),
-        # not license expiry status
         result = described_class.call(account:)
 
         expect(result.count).to eq(2)
@@ -67,7 +65,6 @@ describe Analytics::ActiveLicensedUsersCountQuery do
       end
 
       it 'counts each unassigned license as one licensed user' do
-        # Unassigned licenses each count as 1 "licensed user" for billing purposes
         result = described_class.call(account:)
 
         expect(result.count).to eq(3)
@@ -83,7 +80,6 @@ describe Analytics::ActiveLicensedUsersCountQuery do
       end
 
       it 'ignores environment scoping' do
-        # ALUs are account-wide, not environment-scoped
         result = described_class.call(account:, environment:)
 
         expect(result.count).to eq(1)
