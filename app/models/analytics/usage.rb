@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Analytics
-  class Request
+  class Usage
     Bucket = Data.define(:date, :count)
 
     include ActiveModel::Model
@@ -33,7 +33,7 @@ module Analytics
     def cache_key
       digest = Digest::SHA2.hexdigest("#{start_date}:#{end_date}")
 
-      "analytics:requests:#{account.id}:#{environment&.id}:#{digest}:#{CACHE_KEY_VERSION}"
+      "analytics:usage:#{account.id}:#{environment&.id}:#{digest}:#{CACHE_KEY_VERSION}"
     end
 
     private
