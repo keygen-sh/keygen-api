@@ -15,7 +15,7 @@ module Analytics
 
       raise LeaderboardNotFoundError, "invalid leaderboard type: #{type.inspect}" if klass.nil?
 
-      klass.new(account:, environment:, start_date:, end_date:, limit:).result
+      klass.new(account:, environment:, start_date:, end_date:, limit:)
     end
   end
 end

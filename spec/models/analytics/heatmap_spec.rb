@@ -9,17 +9,19 @@ describe Analytics::Heatmap do
   describe '.call' do
     context 'with valid type' do
       it 'returns heatmap for license expirations' do
-        results = described_class.call(:expirations, account:)
+        heatmap = described_class.call(:expirations, account:)
 
-        expect(results).to satisfy do |cells|
+        expect(heatmap).to be_valid
+        expect(heatmap.result).to satisfy do |cells|
           cells.all? { it in Analytics::Heatmap::Expirations::Result(date: Date, x: Integer, y: Integer, temperature: Float, count: Integer) }
         end
       end
 
       it 'accepts string types' do
-        results = described_class.call('expirations', account:)
+        heatmap = described_class.call('expirations', account:)
 
-        expect(results).to satisfy do |cells|
+        expect(heatmap).to be_valid
+        expect(heatmap.result).to satisfy do |cells|
           cells.all? { it in Analytics::Heatmap::Expirations::Result(date: Date, x: Integer, y: Integer, temperature: Float, count: Integer) }
         end
       end
@@ -39,15 +41,16 @@ describe Analytics::Heatmap do
         end_date   = 30.days.from_now.to_date
         date_range = (start_date..end_date).to_a
 
-        results = described_class.call(
+        heatmap = described_class.call(
           :expirations,
           account:,
           start_date:,
           end_date:,
         )
 
-        expect(results.length).to eq(date_range.length)
-        expect(results).to satisfy do
+        expect(heatmap).to be_valid
+        expect(heatmap.result.length).to eq(date_range.length)
+        expect(heatmap.result).to satisfy do
           it in [
             Analytics::Heatmap::Expirations::Result(date: ^start_date, x: Integer, y: Integer, temperature: Float, count: Integer),
             *,

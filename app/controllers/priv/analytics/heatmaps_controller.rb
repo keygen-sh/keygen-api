@@ -13,10 +13,14 @@ module Priv::Analytics
     def show
       authorize! with: Accounts::AnalyticsPolicy
 
-      data = cached do
-        Analytics::Heatmap.call(params[:heatmap_id], account: current_account, environment: current_environment, **heatmap_query)
-                          .as_json
+      heatmap = Analytics::Heatmap.call(params[:heatmap_id], account: current_account, environment: current_environment, **heatmap_query)
+
+      unless heatmap.valid?
+        render_unprocessable_entity detail: heatmap.errors.full_messages.to_sentence
+        return
       end
+
+      data = cached { heatmap.result.as_json }
 
       render json: { data: }
     rescue Analytics::HeatmapNotFoundError

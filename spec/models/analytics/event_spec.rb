@@ -8,14 +8,15 @@ describe Analytics::Event do
 
   describe '.call', :only_clickhouse do
     it 'returns event count' do
-      result = described_class.call(
+      event = described_class.call(
         'license.validation.succeeded',
         account:,
         start_date: 7.days.ago.to_date,
         end_date: Date.current,
       )
 
-      expect(result).to satisfy do
+      expect(event).to be_valid
+      expect(event.result).to satisfy do
         it in [
           Analytics::Event::Result(event: 'license.validation.succeeded', count: Integer)
         ]
@@ -23,29 +24,32 @@ describe Analytics::Event do
     end
 
     it 'supports wildcard events' do
-      result = described_class.call(
+      event = described_class.call(
         'license.*',
         account:,
         start_date: 7.days.ago.to_date,
         end_date: Date.current,
       )
 
-      expect(result).to satisfy do |counts|
+      expect(event).to be_valid
+      expect(event.result).to satisfy do |counts|
         counts.all? { it in Analytics::Event::Result(event: /\Alicense\./, count: Integer) }
       end
     end
 
-    context 'with invalid event' do
-      it 'raises EventNotFoundError for unknown event' do
-        expect {
-          described_class.call('invalid.event', account:)
-        }.to raise_error(Analytics::EventNotFoundError)
+    context 'with invalid pattern' do
+      it 'is invalid for unknown event' do
+        event = described_class.call('invalid.event', account:)
+
+        expect(event).not_to be_valid
+        expect(event.errors[:pattern]).to include('is invalid')
       end
 
-      it 'raises EventNotFoundError for invalid wildcard' do
-        expect {
-          described_class.call('invalid.*', account:)
-        }.to raise_error(Analytics::EventNotFoundError)
+      it 'is invalid for unknown wildcard' do
+        event = described_class.call('invalid.*', account:)
+
+        expect(event).not_to be_valid
+        expect(event.errors[:pattern]).to include('is invalid')
       end
     end
   end

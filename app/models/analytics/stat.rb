@@ -15,7 +15,7 @@ module Analytics
 
       raise StatNotFoundError, "invalid stat type: #{type.inspect}" if klass.nil?
 
-      klass.new(account:, environment:).result
+      klass.new(account:, environment:)
     end
   end
 end

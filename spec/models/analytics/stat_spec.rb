@@ -11,31 +11,35 @@ describe Analytics::Stat do
       it 'returns results for machines stat' do
         create_list(:machine, 3, account:)
 
-        result = described_class.call(:machines, account:)
+        stat = described_class.call(:machines, account:)
 
-        expect(result).to satisfy { it in Analytics::Stat::Machines::Result(count: 3) }
+        expect(stat).to be_valid
+        expect(stat.result).to satisfy { it in Analytics::Stat::Machines::Result(count: 3) }
       end
 
       it 'returns results for users stat' do
         create_list(:user, 2, account:)
 
-        result = described_class.call(:users, account:)
+        stat = described_class.call(:users, account:)
 
-        expect(result).to satisfy { it in Analytics::Stat::Users::Result(count: 2) }
+        expect(stat).to be_valid
+        expect(stat.result).to satisfy { it in Analytics::Stat::Users::Result(count: 2) }
       end
 
       it 'returns results for licenses stat' do
         create_list(:license, 4, account:)
 
-        result = described_class.call(:licenses, account:)
+        stat = described_class.call(:licenses, account:)
 
-        expect(result).to satisfy { it in Analytics::Stat::Licenses::Result(count: 4) }
+        expect(stat).to be_valid
+        expect(stat.result).to satisfy { it in Analytics::Stat::Licenses::Result(count: 4) }
       end
 
       it 'accepts string type names' do
-        result = described_class.call('machines', account:)
+        stat = described_class.call('machines', account:)
 
-        expect(result).to satisfy { it in Analytics::Stat::Machines::Result(count: Integer) }
+        expect(stat).to be_valid
+        expect(stat.result).to satisfy { it in Analytics::Stat::Machines::Result(count: Integer) }
       end
     end
 
@@ -56,15 +60,17 @@ describe Analytics::Stat do
       end
 
       it 'scopes to environment' do
-        result = described_class.call(:machines, account:, environment:)
+        stat = described_class.call(:machines, account:, environment:)
 
-        expect(result).to satisfy { it in Analytics::Stat::Machines::Result(count: 2) }
+        expect(stat).to be_valid
+        expect(stat.result).to satisfy { it in Analytics::Stat::Machines::Result(count: 2) }
       end
 
       it 'returns global count when no environment' do
-        result = described_class.call(:machines, account:)
+        stat = described_class.call(:machines, account:)
 
-        expect(result).to satisfy { it in Analytics::Stat::Machines::Result(count: 3) }
+        expect(stat).to be_valid
+        expect(stat.result).to satisfy { it in Analytics::Stat::Machines::Result(count: 3) }
       end
     end
   end

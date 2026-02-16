@@ -14,14 +14,16 @@ module Priv::Analytics
     def show
       authorize! with: Accounts::AnalyticsPolicy
 
-      data = cached do
-        Analytics::Event.call(params[:event_id], account: current_account, environment: current_environment, **event_query)
-                        .as_json
+      event = Analytics::Event.call(params[:event_id], account: current_account, environment: current_environment, **event_query)
+
+      unless event.valid?
+        render_unprocessable_entity detail: event.errors.full_messages.to_sentence
+        return
       end
 
+      data = cached { event.result.as_json }
+
       render json: { data: }
-    rescue Analytics::EventNotFoundError
-      render_not_found
     end
 
     private
