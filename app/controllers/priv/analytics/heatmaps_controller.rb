@@ -24,18 +24,13 @@ module Priv::Analytics
         return
       end
 
-      data = cached { heatmap.as_json }
+      data = Rails.cache.fetch heatmap.cache_key, expires_in: CACHE_TTL, race_condition_ttl: CACHE_RACE_TTL do
+        heatmap.as_json
+      end
 
       render json: { data: }
     rescue Analytics::HeatmapNotFoundError
       render_not_found
-    end
-
-    private
-
-    def cached(&) = Rails.cache.fetch(cache_key, expires_in: CACHE_TTL, race_condition_ttl: CACHE_RACE_TTL, &)
-    def cache_key
-      [:analytics, :heatmaps, params[:heatmap_id], current_account.id, current_environment&.id, params[:start_date], params[:end_date], CACHE_KEY_VERSION].compact.join(':')
     end
   end
 end
