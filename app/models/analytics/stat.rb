@@ -35,6 +35,12 @@ module Analytics
 
     def as_json(*) = { count: }
 
+    def cache_key
+      digest = Digest::SHA2.hexdigest("#{counter_name}")
+
+      "analytics:stats:#{account.id}:#{environment&.id}:#{digest}:#{CACHE_KEY_VERSION}"
+    end
+
     private
 
     attr_reader :counter_name

@@ -26,18 +26,13 @@ module Priv::Analytics
         return
       end
 
-      data = cached { leaderboard.as_json }
+      data = Rails.cache.fetch leaderboard.cache_key, expires_in: CACHE_TTL, race_condition_ttl: CACHE_RACE_TTL do
+        leaderboard.as_json
+      end
 
       render json: { data: }
     rescue Analytics::LeaderboardNotFoundError
       render_not_found
-    end
-
-    private
-
-    def cached(&) = Rails.cache.fetch(cache_key, expires_in: CACHE_TTL, race_condition_ttl: CACHE_RACE_TTL, &)
-    def cache_key
-      [:analytics, :leaderboards, params[:leaderboard_id], current_account.id, current_environment&.id, params[:start_date], params[:end_date], params[:limit], CACHE_KEY_VERSION].compact.join(':')
     end
   end
 end

@@ -30,6 +30,12 @@ module Analytics
     delegate :as_json, :to_json,
       to: :buckets
 
+    def cache_key
+      digest = Digest::SHA2.hexdigest("#{start_date}:#{end_date}")
+
+      "analytics:requests:#{account.id}:#{environment&.id}:#{digest}:#{CACHE_KEY_VERSION}"
+    end
+
     private
 
     def counter = Counters::Requests.new(account:, environment:)

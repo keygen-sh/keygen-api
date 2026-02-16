@@ -58,6 +58,12 @@ module Analytics
     delegate :as_json, :to_json,
       to: :buckets
 
+    def cache_key
+      digest = Digest::SHA2.hexdigest("#{pattern}:#{start_date}:#{end_date}:#{resource_type}:#{resource_id}")
+
+      "analytics:activities:#{account.id}:#{environment&.id}:#{digest}:#{CACHE_KEY_VERSION}"
+    end
+
     private
 
     attr_reader :pattern

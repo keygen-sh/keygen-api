@@ -16,18 +16,13 @@ module Priv::Analytics
         return
       end
 
-      data = cached { stat.as_json }
+      data = Rails.cache.fetch stat.cache_key, expires_in: CACHE_TTL, race_condition_ttl: CACHE_RACE_TTL do
+        stat.as_json
+      end
 
       render json: { data: }
     rescue Analytics::StatNotFoundError
       render_not_found
-    end
-
-    private
-
-    def cached(&) = Rails.cache.fetch(cache_key, expires_in: CACHE_TTL, race_condition_ttl: CACHE_RACE_TTL, &)
-    def cache_key
-      [:analytics, :stats, params[:stat_id], current_account.id, current_environment&.id, CACHE_KEY_VERSION].compact.join(':')
     end
   end
 end

@@ -56,6 +56,12 @@ module Analytics
     delegate :as_json, :to_json,
       to: :cells
 
+    def cache_key
+      digest = Digest::SHA2.hexdigest("#{counter_name}:#{start_date}:#{end_date}")
+
+      "analytics:heatmaps:#{account.id}:#{environment&.id}:#{digest}:#{CACHE_KEY_VERSION}"
+    end
+
     private
 
     attr_reader :counter_name
