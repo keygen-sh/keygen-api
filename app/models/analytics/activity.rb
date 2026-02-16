@@ -9,6 +9,8 @@ module Analytics
 
     attribute :account, default: -> { Current.account }
     attribute :environment, default: -> { Current.environment }
+    attribute :resource_type
+    attribute :resource_id
     attribute :start_date, default: -> { 2.weeks.ago.to_date }
     attribute :end_date, default: -> { Date.current }
 
@@ -28,7 +30,7 @@ module Analytics
     end
 
     def rows = @rows ||= begin
-      counts = counter.count(account:, environment:, event_type_ids:, start_date:, end_date:)
+      counts = counter.count(account:, environment:, resource_type:, resource_id:, event_type_ids:, start_date:, end_date:)
 
       event_types.map do |event_type|
         Row.new(event: event_type.event, count: counts[event_type.id].to_i)
