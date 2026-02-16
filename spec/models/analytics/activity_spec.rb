@@ -20,9 +20,9 @@ describe Analytics::Activity do
 
       expect(activity).to be_a(Analytics::Activity)
       expect(activity).to be_valid
-      expect(activity.rows).to satisfy do
+      expect(activity.buckets).to satisfy do
         it in [
-          Analytics::Activity::Row(event: 'license.validation.succeeded', count: Integer)
+          Analytics::Activity::Bucket(event: 'license.validation.succeeded', count: Integer)
         ]
       end
     end
@@ -37,8 +37,8 @@ describe Analytics::Activity do
 
       expect(activity).to be_a(Analytics::Activity)
       expect(activity).to be_valid
-      expect(activity.rows).to satisfy do |rows|
-        rows.all? { it in Analytics::Activity::Row(event: /\Alicense\./, count: Integer) }
+      expect(activity.buckets).to satisfy do |buckets|
+        buckets.all? { it in Analytics::Activity::Bucket(event: /\Alicense\./, count: Integer) }
       end
     end
 
@@ -59,8 +59,8 @@ describe Analytics::Activity do
       )
 
       expect(activity).to be_valid
-      expect(activity.rows).to eq [
-        Analytics::Activity::Row.new(event: 'license.validation.succeeded', count: 3),
+      expect(activity.buckets).to eq [
+        Analytics::Activity::Bucket.new(event: 'license.validation.succeeded', count: 3),
       ]
     end
 

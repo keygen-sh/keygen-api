@@ -2,7 +2,7 @@
 
 module Analytics
   class Request
-    Row = Data.define(:date, :count)
+    Bucket = Data.define(:date, :count)
 
     include ActiveModel::Model
     include ActiveModel::Attributes
@@ -17,18 +17,18 @@ module Analytics
     validates :start_date, comparison: { greater_than_or_equal_to: -> { 1.year.ago.to_date } }
     validates :end_date, comparison: { less_than_or_equal_to: -> { Date.current } }
 
-    def rows = @rows ||= begin
+    def buckets = @buckets ||= begin
       counts = counter.count(start_date:, end_date:)
 
       (start_date..end_date).map do |date|
         count = counts[date].to_i
 
-        Row.new(date:, count:)
+        Bucket.new(date:, count:)
       end
     end
 
     delegate :as_json, :to_json,
-      to: :rows
+      to: :buckets
 
     private
 

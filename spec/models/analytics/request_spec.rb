@@ -24,11 +24,11 @@ describe Analytics::Request do
       )
 
       expect(request).to be_valid
-      expect(request.rows).to satisfy do |rows|
-        rows in [
+      expect(request.buckets).to satisfy do |buckets|
+        buckets in [
           *,
-          Analytics::Request::Row(date: ^two_days_ago, count: 3),
-          Analytics::Request::Row(date: ^one_day_ago, count: 2),
+          Analytics::Request::Bucket(date: ^two_days_ago, count: 3),
+          Analytics::Request::Bucket(date: ^one_day_ago, count: 2),
           *
         ]
       end
@@ -47,10 +47,10 @@ describe Analytics::Request do
       )
 
       expect(request).to be_valid
-      expect(request.rows).to satisfy do |rows|
-        rows in [
-          Analytics::Request::Row(date: ^three_days_ago, count: 1),
-          Analytics::Request::Row(date: ^two_days_ago, count: 0),
+      expect(request.buckets).to satisfy do |buckets|
+        buckets in [
+          Analytics::Request::Bucket(date: ^three_days_ago, count: 1),
+          Analytics::Request::Bucket(date: ^two_days_ago, count: 0),
           *
         ]
       end

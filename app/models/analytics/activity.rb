@@ -2,7 +2,7 @@
 
 module Analytics
   class Activity
-    Row = Data.define(:event, :count)
+    Bucket = Data.define(:event, :count)
 
     include ActiveModel::Model
     include ActiveModel::Attributes
@@ -44,19 +44,19 @@ module Analytics
       types.order(:event)
     end
 
-    def rows = @rows ||= begin
+    def buckets = @buckets ||= begin
       counts = counter.count(event_type_ids:, start_date:, end_date:, resource_type:, resource_id:)
 
       event_types.map do |event_type|
         count = counts[event_type.id].to_i
         event = event_type.event
 
-        Row.new(event:, count:)
+        Bucket.new(event:, count:)
       end
     end
 
     delegate :as_json, :to_json,
-      to: :rows
+      to: :buckets
 
     private
 

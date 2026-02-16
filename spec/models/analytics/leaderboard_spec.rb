@@ -16,8 +16,8 @@ describe Analytics::Leaderboard do
 
         expect(leaderboard).to be_a(Analytics::Leaderboard)
         expect(leaderboard).to be_valid
-        expect(leaderboard.rows).to satisfy do |rows|
-          rows.all? { it in Analytics::Leaderboard::Row(discriminator: String, count: Integer) }
+        expect(leaderboard.scores).to satisfy do |scores|
+          scores.all? { it in Analytics::Leaderboard::Score(discriminator: String, count: Integer) }
         end
       end
 
@@ -26,8 +26,8 @@ describe Analytics::Leaderboard do
 
         expect(leaderboard).to be_a(Analytics::Leaderboard)
         expect(leaderboard).to be_valid
-        expect(leaderboard.rows).to satisfy do |rows|
-          rows.all? { it in Analytics::Leaderboard::Row(discriminator: String, count: Integer) }
+        expect(leaderboard.scores).to satisfy do |scores|
+          scores.all? { it in Analytics::Leaderboard::Score(discriminator: String, count: Integer) }
         end
       end
 
@@ -36,8 +36,8 @@ describe Analytics::Leaderboard do
 
         expect(leaderboard).to be_a(Analytics::Leaderboard)
         expect(leaderboard).to be_valid
-        expect(leaderboard.rows).to satisfy do |rows|
-          rows.all? { it in Analytics::Leaderboard::Row(discriminator: String, count: Integer) }
+        expect(leaderboard.scores).to satisfy do |scores|
+          scores.all? { it in Analytics::Leaderboard::Score(discriminator: String, count: Integer) }
         end
       end
 
@@ -46,8 +46,8 @@ describe Analytics::Leaderboard do
 
         expect(leaderboard).to be_a(Analytics::Leaderboard)
         expect(leaderboard).to be_valid
-        expect(leaderboard.rows).to satisfy do |rows|
-          rows.all? { it in Analytics::Leaderboard::Row(discriminator: String, count: Integer) }
+        expect(leaderboard.scores).to satisfy do |scores|
+          scores.all? { it in Analytics::Leaderboard::Score(discriminator: String, count: Integer) }
         end
       end
 
@@ -56,8 +56,8 @@ describe Analytics::Leaderboard do
 
         expect(leaderboard).to be_a(Analytics::Leaderboard)
         expect(leaderboard).to be_valid
-        expect(leaderboard.rows).to satisfy do |rows|
-          rows.all? { it in Analytics::Leaderboard::Row(discriminator: String, count: Integer) }
+        expect(leaderboard.scores).to satisfy do |scores|
+          scores.all? { it in Analytics::Leaderboard::Score(discriminator: String, count: Integer) }
         end
       end
     end
@@ -74,7 +74,7 @@ describe Analytics::Leaderboard do
       it 'returns empty array' do
         leaderboard = described_class.new(:ips, account:, start_date: 7.days.ago.to_date, end_date: Date.current)
 
-        expect(leaderboard.rows).to eq([])
+        expect(leaderboard.scores).to eq([])
       end
     end
 
@@ -85,14 +85,14 @@ describe Analytics::Leaderboard do
         1.times { create(:request_log, account:, ip: '192.168.1.3') }
       end
 
-      it 'returns rows ordered by count descending' do
+      it 'returns scores ordered by count descending' do
         leaderboard = described_class.new(:ips, account:, start_date: 7.days.ago.to_date, end_date: Date.current)
 
-        expect(leaderboard.rows).to satisfy do
+        expect(leaderboard.scores).to satisfy do
           it in [
-            Analytics::Leaderboard::Row(discriminator: '192.168.1.1', count: 3),
-            Analytics::Leaderboard::Row(discriminator: '192.168.1.2', count: 2),
-            Analytics::Leaderboard::Row(discriminator: '192.168.1.3', count: 1)
+            Analytics::Leaderboard::Score(discriminator: '192.168.1.1', count: 3),
+            Analytics::Leaderboard::Score(discriminator: '192.168.1.2', count: 2),
+            Analytics::Leaderboard::Score(discriminator: '192.168.1.3', count: 1)
           ]
         end
       end
@@ -108,7 +108,7 @@ describe Analytics::Leaderboard do
       it 'excludes nil and empty IPs' do
         leaderboard = described_class.new(:ips, account:, start_date: 7.days.ago.to_date, end_date: Date.current)
 
-        expect(leaderboard.rows).to satisfy { it in [Analytics::Leaderboard::Row(discriminator: '192.168.1.1', count: 1)] }
+        expect(leaderboard.scores).to satisfy { it in [Analytics::Leaderboard::Score(discriminator: '192.168.1.1', count: 1)] }
       end
     end
 
@@ -121,7 +121,7 @@ describe Analytics::Leaderboard do
       it 'only includes requests within date range' do
         leaderboard = described_class.new(:ips, account:, start_date: 7.days.ago.to_date, end_date: Date.current)
 
-        expect(leaderboard.rows).to satisfy { it in [Analytics::Leaderboard::Row(discriminator: '192.168.1.1', count: 1)] }
+        expect(leaderboard.scores).to satisfy { it in [Analytics::Leaderboard::Score(discriminator: '192.168.1.1', count: 1)] }
       end
     end
 
@@ -133,7 +133,7 @@ describe Analytics::Leaderboard do
       it 'respects custom limit' do
         leaderboard = described_class.new(:ips, account:, start_date: 7.days.ago.to_date, end_date: Date.current, limit: 3)
 
-        expect(leaderboard.rows.length).to eq(3)
+        expect(leaderboard.scores.length).to eq(3)
       end
     end
 
@@ -148,7 +148,7 @@ describe Analytics::Leaderboard do
       it 'filters by environment' do
         leaderboard = described_class.new(:ips, account:, environment:, start_date: 7.days.ago.to_date, end_date: Date.current)
 
-        expect(leaderboard.rows).to satisfy { it in [Analytics::Leaderboard::Row(discriminator: '192.168.1.1', count: 1)] }
+        expect(leaderboard.scores).to satisfy { it in [Analytics::Leaderboard::Score(discriminator: '192.168.1.1', count: 1)] }
       end
     end
   end
@@ -158,7 +158,7 @@ describe Analytics::Leaderboard do
       it 'returns empty array' do
         leaderboard = described_class.new(:licenses, account:, start_date: 7.days.ago.to_date, end_date: Date.current)
 
-        expect(leaderboard.rows).to eq([])
+        expect(leaderboard.scores).to eq([])
       end
     end
 
@@ -173,18 +173,18 @@ describe Analytics::Leaderboard do
         1.times { create(:request_log, account:, resource: license3) }
       end
 
-      it 'returns rows ordered by count descending' do
+      it 'returns scores ordered by count descending' do
         license1_id = license1.id
         license2_id = license2.id
         license3_id = license3.id
 
         leaderboard = described_class.new(:licenses, account:, start_date: 7.days.ago.to_date, end_date: Date.current)
 
-        expect(leaderboard.rows).to satisfy do
+        expect(leaderboard.scores).to satisfy do
           it in [
-            Analytics::Leaderboard::Row(discriminator: ^license1_id, count: 3),
-            Analytics::Leaderboard::Row(discriminator: ^license2_id, count: 2),
-            Analytics::Leaderboard::Row(discriminator: ^license3_id, count: 1),
+            Analytics::Leaderboard::Score(discriminator: ^license1_id, count: 3),
+            Analytics::Leaderboard::Score(discriminator: ^license2_id, count: 2),
+            Analytics::Leaderboard::Score(discriminator: ^license3_id, count: 1),
           ]
         end
       end
@@ -204,7 +204,7 @@ describe Analytics::Leaderboard do
 
         leaderboard = described_class.new(:licenses, account:, start_date: 7.days.ago.to_date, end_date: Date.current)
 
-        expect(leaderboard.rows).to satisfy { it in [Analytics::Leaderboard::Row(discriminator: ^license_id, count: 1)] }
+        expect(leaderboard.scores).to satisfy { it in [Analytics::Leaderboard::Score(discriminator: ^license_id, count: 1)] }
       end
     end
 
@@ -221,7 +221,7 @@ describe Analytics::Leaderboard do
 
         leaderboard = described_class.new(:licenses, account:, start_date: 7.days.ago.to_date, end_date: Date.current)
 
-        expect(leaderboard.rows).to satisfy { it in [Analytics::Leaderboard::Row(discriminator: ^license_id, count: 1)] }
+        expect(leaderboard.scores).to satisfy { it in [Analytics::Leaderboard::Score(discriminator: ^license_id, count: 1)] }
       end
     end
 
@@ -239,7 +239,7 @@ describe Analytics::Leaderboard do
 
         leaderboard = described_class.new(:licenses, account:, start_date: 7.days.ago.to_date, end_date: Date.current)
 
-        expect(leaderboard.rows).to satisfy { it in [Analytics::Leaderboard::Row(discriminator: ^license1_id, count: 1)] }
+        expect(leaderboard.scores).to satisfy { it in [Analytics::Leaderboard::Score(discriminator: ^license1_id, count: 1)] }
       end
     end
 
@@ -254,7 +254,7 @@ describe Analytics::Leaderboard do
       it 'respects custom limit' do
         leaderboard = described_class.new(:licenses, account:, start_date: 7.days.ago.to_date, end_date: Date.current, limit: 3)
 
-        expect(leaderboard.rows.length).to eq(3)
+        expect(leaderboard.scores.length).to eq(3)
       end
     end
 
@@ -273,7 +273,7 @@ describe Analytics::Leaderboard do
 
         leaderboard = described_class.new(:licenses, account:, environment:, start_date: 7.days.ago.to_date, end_date: Date.current)
 
-        expect(leaderboard.rows).to satisfy { it in [Analytics::Leaderboard::Row(discriminator: ^license1_id, count: 1)] }
+        expect(leaderboard.scores).to satisfy { it in [Analytics::Leaderboard::Score(discriminator: ^license1_id, count: 1)] }
       end
     end
   end
@@ -283,7 +283,7 @@ describe Analytics::Leaderboard do
       it 'returns empty array' do
         leaderboard = described_class.new(:urls, account:, start_date: 7.days.ago.to_date, end_date: Date.current)
 
-        expect(leaderboard.rows).to eq([])
+        expect(leaderboard.scores).to eq([])
       end
     end
 
@@ -294,14 +294,14 @@ describe Analytics::Leaderboard do
         1.times { create(:request_log, account:, method: 'GET', url: '/v1/machines') }
       end
 
-      it 'returns rows ordered by count descending' do
+      it 'returns scores ordered by count descending' do
         leaderboard = described_class.new(:urls, account:, start_date: 7.days.ago.to_date, end_date: Date.current)
 
-        expect(leaderboard.rows).to satisfy do
+        expect(leaderboard.scores).to satisfy do
           it in [
-            Analytics::Leaderboard::Row(discriminator: 'GET /v1/licenses', count: 3),
-            Analytics::Leaderboard::Row(discriminator: 'POST /v1/licenses', count: 2),
-            Analytics::Leaderboard::Row(discriminator: 'GET /v1/machines', count: 1)
+            Analytics::Leaderboard::Score(discriminator: 'GET /v1/licenses', count: 3),
+            Analytics::Leaderboard::Score(discriminator: 'POST /v1/licenses', count: 2),
+            Analytics::Leaderboard::Score(discriminator: 'GET /v1/machines', count: 1)
           ]
         end
       end
@@ -317,7 +317,7 @@ describe Analytics::Leaderboard do
       it 'excludes nil URLs and methods' do
         leaderboard = described_class.new(:urls, account:, start_date: 7.days.ago.to_date, end_date: Date.current)
 
-        expect(leaderboard.rows).to satisfy { it in [Analytics::Leaderboard::Row(discriminator: 'GET /v1/licenses', count: 1)] }
+        expect(leaderboard.scores).to satisfy { it in [Analytics::Leaderboard::Score(discriminator: 'GET /v1/licenses', count: 1)] }
       end
     end
 
@@ -330,7 +330,7 @@ describe Analytics::Leaderboard do
       it 'only includes requests within date range' do
         leaderboard = described_class.new(:urls, account:, start_date: 7.days.ago.to_date, end_date: Date.current)
 
-        expect(leaderboard.rows).to satisfy { it in [Analytics::Leaderboard::Row(discriminator: 'GET /v1/licenses', count: 1)] }
+        expect(leaderboard.scores).to satisfy { it in [Analytics::Leaderboard::Score(discriminator: 'GET /v1/licenses', count: 1)] }
       end
     end
 
@@ -342,7 +342,7 @@ describe Analytics::Leaderboard do
       it 'respects custom limit' do
         leaderboard = described_class.new(:urls, account:, start_date: 7.days.ago.to_date, end_date: Date.current, limit: 3)
 
-        expect(leaderboard.rows.length).to eq(3)
+        expect(leaderboard.scores.length).to eq(3)
       end
     end
 
@@ -357,7 +357,7 @@ describe Analytics::Leaderboard do
       it 'filters by environment' do
         leaderboard = described_class.new(:urls, account:, environment:, start_date: 7.days.ago.to_date, end_date: Date.current)
 
-        expect(leaderboard.rows).to satisfy { it in [Analytics::Leaderboard::Row(discriminator: 'GET /v1/licenses', count: 1)] }
+        expect(leaderboard.scores).to satisfy { it in [Analytics::Leaderboard::Score(discriminator: 'GET /v1/licenses', count: 1)] }
       end
     end
   end
@@ -367,7 +367,7 @@ describe Analytics::Leaderboard do
       it 'returns empty array' do
         leaderboard = described_class.new(:user_agents, account:, start_date: 7.days.ago.to_date, end_date: Date.current)
 
-        expect(leaderboard.rows).to eq([])
+        expect(leaderboard.scores).to eq([])
       end
     end
 
@@ -378,14 +378,14 @@ describe Analytics::Leaderboard do
         1.times { create(:request_log, account:, user_agent: 'keygen/1.0.0') }
       end
 
-      it 'returns rows ordered by count descending' do
+      it 'returns scores ordered by count descending' do
         leaderboard = described_class.new(:user_agents, account:, start_date: 7.days.ago.to_date, end_date: Date.current)
 
-        expect(leaderboard.rows).to satisfy do
+        expect(leaderboard.scores).to satisfy do
           it in [
-            Analytics::Leaderboard::Row(discriminator: 'Mozilla/5.0 Chrome/120.0', count: 3),
-            Analytics::Leaderboard::Row(discriminator: 'curl/8.1.2', count: 2),
-            Analytics::Leaderboard::Row(discriminator: 'keygen/1.0.0', count: 1)
+            Analytics::Leaderboard::Score(discriminator: 'Mozilla/5.0 Chrome/120.0', count: 3),
+            Analytics::Leaderboard::Score(discriminator: 'curl/8.1.2', count: 2),
+            Analytics::Leaderboard::Score(discriminator: 'keygen/1.0.0', count: 1)
           ]
         end
       end
@@ -401,7 +401,7 @@ describe Analytics::Leaderboard do
       it 'excludes nil and empty user agents' do
         leaderboard = described_class.new(:user_agents, account:, start_date: 7.days.ago.to_date, end_date: Date.current)
 
-        expect(leaderboard.rows).to satisfy { it in [Analytics::Leaderboard::Row(discriminator: 'curl/8.1.2', count: 1)] }
+        expect(leaderboard.scores).to satisfy { it in [Analytics::Leaderboard::Score(discriminator: 'curl/8.1.2', count: 1)] }
       end
     end
 
@@ -414,7 +414,7 @@ describe Analytics::Leaderboard do
       it 'only includes requests within date range' do
         leaderboard = described_class.new(:user_agents, account:, start_date: 7.days.ago.to_date, end_date: Date.current)
 
-        expect(leaderboard.rows).to satisfy { it in [Analytics::Leaderboard::Row(discriminator: 'curl/8.1.2', count: 1)] }
+        expect(leaderboard.scores).to satisfy { it in [Analytics::Leaderboard::Score(discriminator: 'curl/8.1.2', count: 1)] }
       end
     end
 
@@ -426,7 +426,7 @@ describe Analytics::Leaderboard do
       it 'respects custom limit' do
         leaderboard = described_class.new(:user_agents, account:, start_date: 7.days.ago.to_date, end_date: Date.current, limit: 3)
 
-        expect(leaderboard.rows.length).to eq(3)
+        expect(leaderboard.scores.length).to eq(3)
       end
     end
 
@@ -441,7 +441,7 @@ describe Analytics::Leaderboard do
       it 'filters by environment' do
         leaderboard = described_class.new(:user_agents, account:, environment:, start_date: 7.days.ago.to_date, end_date: Date.current)
 
-        expect(leaderboard.rows).to satisfy { it in [Analytics::Leaderboard::Row(discriminator: 'curl/8.1.2', count: 1)] }
+        expect(leaderboard.scores).to satisfy { it in [Analytics::Leaderboard::Score(discriminator: 'curl/8.1.2', count: 1)] }
       end
     end
   end

@@ -4,7 +4,7 @@ module Analytics
   class LeaderboardNotFoundError < StandardError; end
 
   class Leaderboard
-    Row = Data.define(:discriminator, :count)
+    Score = Data.define(:discriminator, :count)
 
     include ActiveModel::Model
     include ActiveModel::Attributes
@@ -38,16 +38,16 @@ module Analytics
       super(**)
     end
 
-    def rows = @rows ||= begin
+    def scores = @scores ||= begin
       counts = counter.count(start_date:, end_date:, limit:)
 
       counts.map do |(discriminator, count)|
-        Row.new(discriminator:, count:)
+        Score.new(discriminator:, count:)
       end
     end
 
     delegate :as_json, :to_json,
-      to: :rows
+      to: :scores
 
     private
 
