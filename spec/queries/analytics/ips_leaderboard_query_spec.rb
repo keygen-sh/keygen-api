@@ -36,11 +36,13 @@ describe Analytics::IpsLeaderboardQuery do
           end_date: Date.current,
         )
 
-        expect(results).to all be_a(Analytics::Leaderboard::Entry)
-        expect(results.length).to eq(3)
-        expect(results[0]).to have_attributes(identifier: '192.168.1.1', count: 3)
-        expect(results[1]).to have_attributes(identifier: '192.168.1.2', count: 2)
-        expect(results[2]).to have_attributes(identifier: '192.168.1.3', count: 1)
+        expect(results).to satisfy do
+          it in [
+            Analytics::Leaderboard::Entry(identifier: '192.168.1.1', count: 3),
+            Analytics::Leaderboard::Entry(identifier: '192.168.1.2', count: 2),
+            Analytics::Leaderboard::Entry(identifier: '192.168.1.3', count: 1)
+          ]
+        end
       end
     end
 
@@ -58,8 +60,7 @@ describe Analytics::IpsLeaderboardQuery do
           end_date: Date.current,
         )
 
-        expect(results.length).to eq(1)
-        expect(results[0].identifier).to eq('192.168.1.1')
+        expect(results).to satisfy { it in [Analytics::Leaderboard::Entry(identifier: '192.168.1.1', count: 1)] }
       end
     end
 
@@ -76,14 +77,13 @@ describe Analytics::IpsLeaderboardQuery do
           end_date: Date.current,
         )
 
-        expect(results.length).to eq(1)
-        expect(results[0].identifier).to eq('192.168.1.1')
+        expect(results).to satisfy { it in [Analytics::Leaderboard::Entry(identifier: '192.168.1.1', count: 1)] }
       end
     end
 
     context 'with limit parameter' do
       before do
-        5.times { |i| create(:request_log, account:, ip: "192.168.1.#{i + 1}") }
+        5.times { create(:request_log, account:, ip: "192.168.1.#{it + 1}") }
       end
 
       it 'respects custom limit' do
@@ -125,8 +125,7 @@ describe Analytics::IpsLeaderboardQuery do
           end_date: Date.current,
         )
 
-        expect(results.length).to eq(1)
-        expect(results[0].identifier).to eq('192.168.1.1')
+        expect(results).to satisfy { it in [Analytics::Leaderboard::Entry(identifier: '192.168.1.1', count: 1)] }
       end
     end
   end
