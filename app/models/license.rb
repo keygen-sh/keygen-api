@@ -574,7 +574,7 @@ class License < ApplicationRecord
       where 'expiry IS NULL OR expiry < ? OR expiry > ?', Time.current, 3.days.from_now
     end
   }
-  scope :expired, -> (status = true, within: nil, in: nil, before: nil, after: nil) {
+  scope :expired, -> (status = true, within: nil, in: nil, before: nil, after: nil, on: nil) {
     within ||= binding.local_variable_get(:in)
 
     begin
@@ -592,6 +592,10 @@ class License < ApplicationRecord
         t = after.to_s.match?(/\A\d+\z/) ? Time.at(after.to_i) : after.to_time
 
         where 'expiry IS NOT NULL AND expiry < ? AND expiry >= ?', Time.current, t
+      when on.present?
+        d = on.to_date
+
+        where 'expiry IS NOT NULL AND expiry < ? AND expiry >= ? AND expiry <= ?', Time.current, d.beginning_of_day, d.end_of_day
       else
         if ActiveRecord::Type::Boolean.new.cast(status) # general expired/unexpired scopes
           where 'expiry IS NOT NULL AND expiry < ?', Time.current
@@ -600,11 +604,12 @@ class License < ApplicationRecord
         end
       end
     rescue ActiveSupport::Duration::ISO8601Parser::ParsingError,
-           ArgumentError # to_time raises for invalid input
+           ArgumentError, # to_time raises for invalid input
+           Date::Error
       none
     end
   }
-  scope :expires, -> (within: nil, in: nil, before: nil, after: nil) {
+  scope :expires, -> (within: nil, in: nil, before: nil, after: nil, on: nil) {
     within ||= binding.local_variable_get(:in)
 
     begin
@@ -622,11 +627,16 @@ class License < ApplicationRecord
         t = after.to_s.match?(/\A\d+\z/) ? Time.at(after.to_i) : after.to_time
 
         where 'expiry IS NOT NULL AND expiry >= ? AND expiry >= ?', Time.current, t
+      when on.present?
+        d = on.to_date
+
+        where 'expiry IS NOT NULL AND expiry >= ? AND expiry <= ?', d.beginning_of_day, d.end_of_day
       else
         none
       end
     rescue ActiveSupport::Duration::ISO8601Parser::ParsingError,
-           ArgumentError # to_time raises for invalid input
+           ArgumentError, # to_time raises for invalid input
+           Date::Error
       none
     end
   }
