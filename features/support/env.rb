@@ -26,19 +26,14 @@ Cucumber::Rails::Database.autorun_database_cleaner = false
 #
 ActionController::Base.allow_rescue = false
 
-# Remove/comment out the lines below if your app doesn't have a database.
-# For some databases (like MongoDB and CouchDB) you may need to use :truncation instead.
-begin
-  Rails.application.eager_load!
+# eager load our application before configuring database cleaners
+Rails.application.eager_load!
 
-  # NB(ezekg) for integration tests, our database resolver will select the replica on GETs
-  #           so we need to use :truncation instead of :transaction, otherwise we can't read
-  #           the other connection's uncommitted transaction before rollback.
-  DatabaseCleaner[:active_record].strategy                  = [:truncation, except: %w[event_types permissions]]
-  DatabaseCleaner[:active_record, db: :clickhouse].strategy = :truncation
-rescue NameError
-  raise "You need to add database_cleaner to your Gemfile (in the :test group) if you wish to use it."
-end
+# NB(ezekg) for integration tests, our database resolver will select the replica on GETs
+#           so we need to use :truncation instead of :transaction, otherwise we can't read
+#           the other connection's uncommitted transaction before rollback.
+DatabaseCleaner[:active_record].strategy                  = [:truncation, except: %w[event_types permissions]]
+DatabaseCleaner[:active_record, db: :clickhouse].strategy = :truncation
 
 # You may also want to configure DatabaseCleaner to use different strategies for certain features and scenarios.
 # See the DatabaseCleaner documentation for details. Example:
