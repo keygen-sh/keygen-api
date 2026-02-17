@@ -2,23 +2,45 @@
 
 module Priv::Analytics
   class UsageController < BaseController
+    use_clickhouse
+
     CACHE_TTL      = 10.minutes
     CACHE_RACE_TTL = 1.minute
 
-    before_action :require_clickhouse!
-
     typed_query {
-      param :start_date, type: :date, coerce: true, optional: true
-      param :end_date, type: :date, coerce: true, optional: true
+      param :date, type: :hash, optional: true do
+        param :start, type: :date, coerce: true
+        param :end, type: :date, coerce: true
+      end
     }
     def show
       authorize! with: Accounts::AnalyticsPolicy
 
-      usage = Analytics::Usage.new(**usage_query)
+      options = usage_query.reduce({}) do |hash, (key, value)|
+        hash.merge(
+          case { key => value }
+          in date: { start: start_date, end: end_date }
+            { start_date:, end_date: }
+          else
+            { key => value }
+          end
+        )
+      end
+
+      usage = Analytics::Usage.new(**options)
 
       unless usage.valid?
-        render_bad_request detail: usage.errors.full_messages.to_sentence,
-                           source: { parameter: usage.errors.attribute_names.first }
+        render_bad_request *usage.errors.as_jsonapi(
+          title: 'Bad request',
+          source: :parameter,
+          sources: {
+            parameters: {
+              start_date: 'date[start]',
+              end_date: 'date[end]',
+            },
+          },
+        )
+
         return
       end
 

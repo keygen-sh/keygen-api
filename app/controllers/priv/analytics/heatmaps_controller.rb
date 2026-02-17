@@ -6,21 +6,42 @@ module Priv::Analytics
     CACHE_RACE_TTL = 1.minute
 
     typed_query {
-      # TODO(ezekg) rename to hash-based date range to follow existing filtering conventions
-      param :start_date, type: :date, coerce: true, optional: true
-      param :end_date, type: :date, coerce: true, optional: true
+      param :date, type: :hash, optional: true do
+        param :start, type: :date, coerce: true
+        param :end, type: :date, coerce: true
+      end
     }
     def show
       authorize! with: Accounts::AnalyticsPolicy
 
+      options = heatmap_query.reduce({}) do |hash, (key, value)|
+        hash.merge(
+          case { key => value }
+          in date: { start: start_date, end: end_date }
+            { start_date:, end_date: }
+          else
+            { key => value }
+          end
+        )
+      end
+
       heatmap = Analytics::Heatmap.new(
         params[:heatmap_id],
-        **heatmap_query,
+        **options,
       )
 
       unless heatmap.valid?
-        render_bad_request detail: heatmap.errors.full_messages.to_sentence,
-                           source: { parameter: heatmap.errors.attribute_names.first }
+        render_bad_request *heatmap.errors.as_jsonapi(
+          title: 'Bad request',
+          source: :parameter,
+          sources: {
+            parameters: {
+              start_date: 'date[start]',
+              end_date: 'date[end]',
+            },
+          },
+        )
+
         return
       end
 

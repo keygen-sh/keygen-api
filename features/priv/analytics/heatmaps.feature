@@ -27,7 +27,7 @@ Feature: Heatmaps analytics
       | 96faacd6-16e6-4661-8e16-9e8064fbeb0a | 2024-03-05T00:00:00.000Z |
       | 31e30cc1-d454-40dc-b4ae-93ad683ddf33 | 2024-03-10T00:00:00.000Z |
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/heatmaps/expirations?start_date=2024-03-01&end_date=2024-03-14"
+    When I send a GET request to "/accounts/test1/analytics/heatmaps/expirations?date[start]=2024-03-01&date[end]=2024-03-14"
     Then the response status should be "200"
     And the response body should be a "data" array with 14 items
     And the response body should be a JSON document with the following content:
@@ -70,12 +70,18 @@ Feature: Heatmaps analytics
     And the current account is "test1"
     And time is frozen at "2024-01-15T00:00:00.000Z"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/heatmaps/expirations?end_date=2099-01-01"
+    When I send a GET request to "/accounts/test1/analytics/heatmaps/expirations?date[start]=2024-01-15&date[end]=2099-01-01"
     Then the response status should be "400"
     And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
-      { "title": "Bad request", "detail": "End date must be less than or equal to 2025-01-15", "source": { "parameter": "end_date" } }
+      {
+        "title": "Bad request",
+        "detail": "must be less than or equal to 2025-01-15",
+        "source": {
+          "parameter": "date[end]"
+        }
+      }
       """
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
@@ -123,7 +129,7 @@ Feature: Heatmaps analytics
       """
       { "Keygen-Environment": "isolated" }
       """
-    When I send a GET request to "/accounts/test1/analytics/heatmaps/expirations?start_date=2026-03-05&end_date=2026-03-10"
+    When I send a GET request to "/accounts/test1/analytics/heatmaps/expirations?date[start]=2026-03-05&date[end]=2026-03-10"
     Then the response status should be "200"
     And the response body should be a "data" array with 6 items
     And the response body should be a JSON document with the following content:
@@ -174,7 +180,7 @@ Feature: Heatmaps analytics
       """
       { "Keygen-Environment": "shared" }
       """
-    When I send a GET request to "/accounts/test1/analytics/heatmaps/expirations?start_date=2026-03-05&end_date=2026-03-10"
+    When I send a GET request to "/accounts/test1/analytics/heatmaps/expirations?date[start]=2026-03-05&date[end]=2026-03-10"
     Then the response status should be "200"
     And the response body should be a "data" array with 6 items
     And the response body should be a JSON document with the following content:

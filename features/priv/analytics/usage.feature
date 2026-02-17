@@ -34,7 +34,7 @@ Feature: Usage analytics
       | 09d7a1f9-3c4a-401f-b6a9-839f4e35d493 | 2100-08-25T00:00:00.000Z |
       | d1e6f594-7bcb-455f-971b-1e8b3ea63fd7 | 2099-08-20T00:00:00.000Z |
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/usage?start_date=2100-08-23&end_date=2100-08-25"
+    When I send a GET request to "/accounts/test1/analytics/usage?date[start]=2100-08-23&date[end]=2100-08-25"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
@@ -58,7 +58,7 @@ Feature: Usage analytics
       | d00998f9-d224-4ee7-ac4e-f1e5fe318ff7 | 2100-08-23T00:00:00.000Z |
       | 96faacd6-16e6-4661-8e16-9e8064fbeb0a | 2100-08-25T00:00:00.000Z |
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/usage?start_date=2100-08-23&end_date=2100-08-25"
+    When I send a GET request to "/accounts/test1/analytics/usage?date[start]=2100-08-23&date[end]=2100-08-25"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
@@ -78,12 +78,18 @@ Feature: Usage analytics
     And the current account is "test1"
     And time is frozen at "2024-01-15T00:00:00.000Z"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/usage?start_date=2020-01-01"
+    When I send a GET request to "/accounts/test1/analytics/usage?date[start]=2020-01-01&date[end]=2024-01-15"
     Then the response status should be "400"
     And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
-      { "title": "Bad request", "detail": "Start date must be greater than or equal to 2023-01-15", "source": { "parameter": "start_date" } }
+      {
+        "title": "Bad request",
+        "detail": "must be greater than or equal to 2023-01-15",
+        "source": {
+          "parameter": "date[start]"
+        }
+      }
       """
     And sidekiq should have 0 "request-log" jobs
     And time is unfrozen
@@ -93,12 +99,18 @@ Feature: Usage analytics
     And the current account is "test1"
     And time is frozen at "2024-01-15T00:00:00.000Z"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/usage?end_date=2099-01-01"
+    When I send a GET request to "/accounts/test1/analytics/usage?date[start]=2024-01-01&date[end]=2099-01-01"
     Then the response status should be "400"
     And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
-      { "title": "Bad request", "detail": "End date must be less than or equal to 2024-01-15", "source": { "parameter": "end_date" } }
+      {
+        "title": "Bad request",
+        "detail": "must be less than or equal to 2024-01-15",
+        "source": {
+          "parameter": "date[end]"
+        }
+      }
       """
     And sidekiq should have 0 "request-log" jobs
     And time is unfrozen

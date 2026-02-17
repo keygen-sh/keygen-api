@@ -18,7 +18,7 @@ module Analytics
 
           if resource_type.present? && resource_id.present?
             scope = scope.where(
-              resource_type: resource_type.classify,
+              resource_type: resource_type.underscore.classify,
               resource_id:,
             )
           end
