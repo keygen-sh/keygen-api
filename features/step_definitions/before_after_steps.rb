@@ -93,7 +93,7 @@ After do |scenario|
   Faker::UniqueGenerator.clear
   StripeHelper.stop
   Current.reset
-  DatabaseCleaner.clean rescue nil
+  DatabaseCleaner.clean
 
   unfreeze_time
 
