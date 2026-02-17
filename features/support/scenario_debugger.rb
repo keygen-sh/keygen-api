@@ -9,7 +9,7 @@ class ScenarioDebugger
 
   def initialize(scenario:, request:, response:)
     @scenario  = scenario
-    @exception = scenario.exception
+    @exception = request.env['action_dispatch.exception'] || scenario.exception
     @request   = ActionDispatch::Request.new(request.env)
     @response  = response
   end
