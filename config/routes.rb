@@ -425,6 +425,17 @@ Rails.application.routes.draw do
         end
       end
 
+      resources :analytics, only: [] do
+        collection do
+          scope :actions, module: 'analytics/actions' do
+            get :top_licenses_by_volume, path: 'top-licenses-by-volume', to: 'counts#top_licenses_by_volume'
+            get :top_urls_by_volume,     path: 'top-urls-by-volume',     to: 'counts#top_urls_by_volume'
+            get :top_ips_by_volume,      path: 'top-ips-by-volume',      to: 'counts#top_ips_by_volume'
+            get :count,                                                  to: 'counts#count'
+          end
+        end
+      end
+
       post :search, to: 'searches#search'
     end
 
