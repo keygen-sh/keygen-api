@@ -11,9 +11,9 @@ module Analytics
 
         def count(start_date:, end_date:, limit:)
           binds = { account_id: account.id, environment_id: environment&.id, start_date:, end_date:, limit: }.compact
-          res   = exec_sql([<<~SQL.squish, binds])
+          res   = exec_sql(<<~SQL.squish, **binds)
             SELECT
-              ip AS identifier,
+              ip       AS identifier,
               count(*) AS count
             FROM
               request_logs
@@ -31,16 +31,16 @@ module Analytics
               :limit
           SQL
 
-          res['data']
+          res.rows
         end
 
         private
 
         attr_reader :account, :environment
 
-        def exec_sql(...)
-          RequestLog::Clickhouse.connection.execute(
-            RequestLog::Clickhouse.sanitize_sql(...),
+        def exec_sql(sql, **binds)
+          RequestLog::Clickhouse.connection.exec_query(
+            RequestLog::Clickhouse.sanitize_sql([sql, binds]),
           )
         end
       end
