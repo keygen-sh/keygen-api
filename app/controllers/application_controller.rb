@@ -307,6 +307,9 @@ class ApplicationController < ActionController::API
   def render_internal_server_error(**kwargs)
     skip_verify_authorized!
 
+    # capture last exception for debugging
+    request.set_header 'action_dispatch.exception', $!
+
     respond_to do |format|
       format.any {
         render status: :internal_server_error, json: {
