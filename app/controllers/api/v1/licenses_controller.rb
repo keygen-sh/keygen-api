@@ -11,7 +11,7 @@ module Api::V1
     has_scope(:group) { |c, s, v| s.for_group(v) }
     has_scope(:status) { |c, s, v| s.with_status(v) }
     has_scope(:expires, type: :hash, only: :index) { |c, s, v|
-      s.expires(**v.symbolize_keys.slice(:within, :in, :before, :after))
+      s.expires(**v.symbolize_keys.slice(:within, :in, :before, :after, :on))
     }
     has_scope(:activity, type: :hash, only: :index) { |c, s, v|
       s.activity(**v.symbolize_keys.slice(:inside, :outside, :before, :after))
@@ -20,7 +20,7 @@ module Api::V1
     has_scope :expiring
     has_scope(:expired, type: :any, only: :index) { |c, s, v|
       if v in Hash
-        s.expired(**v.symbolize_keys.slice(:within, :in, :before, :after))
+        s.expired(**v.symbolize_keys.slice(:within, :in, :before, :after, :on))
       else
         s.expired(v)
       end
