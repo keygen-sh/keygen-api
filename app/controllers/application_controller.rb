@@ -210,17 +210,17 @@ class ApplicationController < ActionController::API
     end
   end
 
-  def render_bad_request(**kwargs)
+  def render_bad_request(*errors, **overrides)
     skip_verify_authorized!
 
     respond_to do |format|
       format.any {
         render status: :bad_request, json: {
           meta: { id: request.request_id },
-          errors: [{
+          errors: errors.presence || [{
             title: 'Bad request',
             detail: 'The request could not be completed',
-            **kwargs,
+            **overrides,
           }],
         }
       }
@@ -365,38 +365,38 @@ class ApplicationController < ActionController::API
       # some relationships are invisible, exposed as attributes.
       case error
       in source: { pointer: %r{^/data/relationships/users/(.*+)} } if resource in Account
-        error.pointer = "/data/relationships/admins/#{$1}"
+        error.source = { pointer: "/data/relationships/admins/#{$1}" }
       in source: { pointer: %r{^/data/attributes/permission_?ids$}i },
          code: /^PERMISSION_IDS_(.+)/
-        error.pointer = '/data/attributes/permissions'
-        error.code    = "PERMISSIONS_#{$1}"
+        error.source = { pointer: '/data/attributes/permissions' }
+        error.code   = "PERMISSIONS_#{$1}"
       in source: { pointer: %r{^/data/relationships/role/data/attributes/permission_?ids}i },
          code: /^ROLE_PERMISSION_IDS_(.+)/
-        error.pointer = '/data/attributes/permissions'
-        error.code    = "PERMISSIONS_#{$1}"
+        error.source = { pointer: '/data/attributes/permissions' }
+        error.code   = "PERMISSIONS_#{$1}"
       in source: { pointer: %r{^/data/relationships/permissions}i }
-        error.pointer = '/data/attributes/permissions'
+        error.source = { pointer: '/data/attributes/permissions' }
       in source: { pointer: %r{^/data/relationships/role} }
-        error.pointer = '/data/attributes/role'
+        error.source = { pointer: '/data/attributes/role' }
       in source: { pointer: %r{^/data/relationships/filetype} }
-        error.pointer = '/data/attributes/filetype'
+        error.source = { pointer: '/data/attributes/filetype' }
       in source: { pointer: %r{^/data/relationships/channel} }
-        error.pointer = '/data/attributes/channel'
+        error.source = { pointer: '/data/attributes/channel' }
       in source: { pointer: %r{^/data/relationships/platform} }
-        error.pointer = '/data/attributes/platform'
+        error.source = { pointer: '/data/attributes/platform' }
       in source: { pointer: %r{^/data/relationships/engine} }
-        error.pointer = '/data/attributes/engine'
+        error.source = { pointer: '/data/attributes/engine' }
       in source: { pointer: %r{^/data/relationships/arch} }
-        error.pointer = '/data/attributes/arch'
+        error.source = { pointer: '/data/attributes/arch' }
       in source: { pointer: %r{^/data/attributes/admins} }
-        error.pointer = '/data/relationships/admins'
+        error.source = { pointer: '/data/relationships/admins' }
       in source: { pointer: %r{^/data/attributes/backdatedTo} },
          code: /^BACKDATED_TO_(.+)/
-        error.pointer = '/data/attributes/backdated'
-        error.code    = "BACKDATED_#{$1}"
+        error.source = { pointer: '/data/attributes/backdated' }
+        error.code   = "BACKDATED_#{$1}"
       in code: /^(?:LICENSE_)?USERS?_LIMIT_EXCEEDED$/ # normalize user limit errors
-        error.pointer = '/data/relationships/users'
-        error.code    = 'USER_LIMIT_EXCEEDED'
+        error.source = { pointer: '/data/relationships/users' }
+        error.code   = 'USER_LIMIT_EXCEEDED'
       in code: /ACCOUNT_NOT_ALLOWED$/ # private error
         errors.delete(error)
       else
@@ -463,7 +463,7 @@ class ApplicationController < ActionController::API
   rescue TypedParams::UnpermittedParameterError,
          TypedParams::InvalidParameterError => e
     source = e.source == :query ? :parameter : :pointer
-    path   = e.source == :query ? e.path.to_s : e.path.to_json_pointer
+    path   = e.source == :query ? e.path.to_bracket_notation : e.path.to_json_pointer
 
     render_bad_request detail: e.message, source: { source => path }
   rescue Keygen::Error::BadRequestError,

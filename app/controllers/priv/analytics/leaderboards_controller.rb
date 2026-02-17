@@ -2,27 +2,50 @@
 
 module Priv::Analytics
   class LeaderboardsController < BaseController
+    use_clickhouse
+
     CACHE_TTL      = 10.minutes
     CACHE_RACE_TTL = 1.minute
 
-    before_action :require_clickhouse!
-
     typed_query {
-      param :start_date, type: :date, coerce: true, optional: true
-      param :end_date, type: :date, coerce: true, optional: true
       param :limit, type: :integer, coerce: true, optional: true
+      param :date, type: :hash, optional: true do
+        param :start, type: :date, coerce: true
+        param :end, type: :date, coerce: true
+      end
     }
     def show
       authorize! with: Accounts::AnalyticsPolicy
 
+      options = leaderboard_query.reduce({}) do |hash, (key, value)|
+        hash.merge(
+          case { key => value }
+          in date: { start: start_date, end: end_date }
+            { start_date:, end_date: } # flatten date
+          else
+            { key => value }
+          end
+        )
+      end
+
       leaderboard = Analytics::Leaderboard.new(
         params[:leaderboard_id],
-        **leaderboard_query,
+        **options,
       )
 
       unless leaderboard.valid?
-        render_bad_request detail: leaderboard.errors.full_messages.to_sentence,
-                           source: { parameter: leaderboard.errors.attribute_names.first }
+        render_bad_request *leaderboard.errors.as_jsonapi(
+          title: 'Bad request',
+          source: :parameter,
+          sources: {
+            # remap our attributes to params source
+            parameters: {
+              start_date: 'date[start]',
+              end_date: 'date[end]',
+            },
+          },
+        )
+
         return
       end
 

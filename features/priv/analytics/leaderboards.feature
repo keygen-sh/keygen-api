@@ -21,7 +21,7 @@ Feature: Leaderboard analytics
   # NB(ezekg) using future dates to avoid column-level TTL expiration during OPTIMIZE
   #           TABLE FINAL in tests, so dates MUST stay within clickhouse's Date type
   #           range (otherwise it overflows after 2149-06-06).
-  Scenario: Admin retrieves IPs leaderboard
+  Scenario: Admin retrieves IPs leaderboard with default date range
     Given I am an admin of account "test1"
     And the current account is "test1"
     And time is frozen at "2100-08-30T00:00:00.000Z"
@@ -35,7 +35,7 @@ Feature: Leaderboard analytics
       | 09d7a1f9-3c4a-401f-b6a9-839f4e35d493 | 172.16.0.1     | 2100-08-25T00:00:00.000Z |
       | d1e6f594-7bcb-455f-971b-1e8b3ea63fd7 | 192.168.1.1    | 2099-08-20T00:00:00.000Z |
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/leaderboards/ips?start_date=2100-08-20&end_date=2100-08-27"
+    When I send a GET request to "/accounts/test1/analytics/leaderboards/ips"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
@@ -65,7 +65,7 @@ Feature: Leaderboard analytics
       | 09d7a1f9-3c4a-401f-b6a9-839f4e35d493 | POST   | /v1/machines                      | 2100-08-25T00:00:00.000Z |
       | d1e6f594-7bcb-455f-971b-1e8b3ea63fd7 | POST   | /v1/licenses/foo/actions/validate | 2099-08-20T00:00:00.000Z |
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/leaderboards/urls?start_date=2100-08-20&end_date=2100-08-27"
+    When I send a GET request to "/accounts/test1/analytics/leaderboards/urls?date[start]=2100-08-20&date[end]=2100-08-27"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
@@ -101,7 +101,7 @@ Feature: Leaderboard analytics
       | 09d7a1f9-3c4a-401f-b6a9-839f4e35d493 | License       | 7559899f-2761-4b9c-a43e-2d919efa9b04 | 2100-08-25T00:00:00.000Z |
       | d1e6f594-7bcb-455f-971b-1e8b3ea63fd7 | License       | bf9b523f-dd65-48a2-9512-fb66ba6c3714 | 2099-08-20T00:00:00.000Z |
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/leaderboards/licenses?start_date=2100-08-20&end_date=2100-08-27"
+    When I send a GET request to "/accounts/test1/analytics/leaderboards/licenses?date[start]=2100-08-20&date[end]=2100-08-27"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
@@ -131,7 +131,7 @@ Feature: Leaderboard analytics
       | 09d7a1f9-3c4a-401f-b6a9-839f4e35d493 | Mozilla/5.0  | 2100-08-25T00:00:00.000Z |
       | d1e6f594-7bcb-455f-971b-1e8b3ea63fd7 | keygen/1.0.0 | 2099-08-20T00:00:00.000Z |
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/leaderboards/user-agents?start_date=2100-08-20&end_date=2100-08-27"
+    When I send a GET request to "/accounts/test1/analytics/leaderboards/user-agents?date[start]=2100-08-20&date[end]=2100-08-27"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
@@ -160,7 +160,7 @@ Feature: Leaderboard analytics
       | 19a9aefc-00b9-4905-b236-ff3cca788b3e | 10.0.0.1    | 2100-08-25T00:00:00.000Z |
       | 09d7a1f9-3c4a-401f-b6a9-839f4e35d493 | 172.16.0.1  | 2100-08-25T00:00:00.000Z |
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/leaderboards/ips?start_date=2100-08-20&end_date=2100-08-27&limit=2"
+    When I send a GET request to "/accounts/test1/analytics/leaderboards/ips?date[start]=2100-08-20&date[end]=2100-08-27&limit=2"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
@@ -180,12 +180,62 @@ Feature: Leaderboard analytics
     And the current account is "test1"
     And time is frozen at "2024-01-15T00:00:00.000Z"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/leaderboards/ips?start_date=2020-01-01"
+    When I send a GET request to "/accounts/test1/analytics/leaderboards/ips?date[start]=2020-01-01&date[end]=2024-01-15"
     Then the response status should be "400"
     And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
-      { "title": "Bad request", "detail": "Start date must be greater than or equal to 2023-01-15", "source": { "parameter": "start_date" } }
+      {
+        "title": "Bad request",
+        "detail": "must be greater than or equal to 2023-01-15",
+        "source": {
+          "parameter": "date[start]"
+        }
+      }
+      """
+    And sidekiq should have 0 "request-log" jobs
+    And sidekiq should have 0 "event-log" jobs
+    And time is unfrozen
+
+  Scenario: Admin retrieves leaderboard with a missing start date
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And time is frozen at "2024-01-15T00:00:00.000Z"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/analytics/leaderboards/ips?date[end]=2024-01-15"
+    Then the response status should be "400"
+    And the response body should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "is missing",
+        "source": {
+          "parameter": "date[start]"
+        }
+      }
+      """
+    And sidekiq should have 0 "request-log" jobs
+    And sidekiq should have 0 "event-log" jobs
+    And time is unfrozen
+
+  Scenario: Admin retrieves leaderboard with a missing end date
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And time is frozen at "2024-01-15T00:00:00.000Z"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/analytics/leaderboards/ips?date[start]=2020-01-01"
+    Then the response status should be "400"
+    And the response body should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "is missing",
+        "source": {
+          "parameter": "date[end]"
+        }
+      }
       """
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
@@ -196,12 +246,18 @@ Feature: Leaderboard analytics
     And the current account is "test1"
     And time is frozen at "2024-01-15T00:00:00.000Z"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/leaderboards/ips?end_date=2099-01-01"
+    When I send a GET request to "/accounts/test1/analytics/leaderboards/ips?date[start]=2024-01-01&date[end]=2099-01-01"
     Then the response status should be "400"
     And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
-      { "title": "Bad request", "detail": "End date must be less than or equal to 2024-01-15", "source": { "parameter": "end_date" } }
+      {
+        "title": "Bad request",
+        "detail": "must be less than or equal to 2024-01-15",
+        "source": {
+          "parameter": "date[end]"
+        }
+      }
       """
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
@@ -216,7 +272,13 @@ Feature: Leaderboard analytics
     And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
-      { "title": "Bad request", "detail": "Limit must be less than or equal to 100", "source": { "parameter": "limit" } }
+      {
+        "title": "Bad request",
+        "detail": "must be less than or equal to 100",
+        "source": {
+          "parameter": "limit"
+        }
+      }
       """
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs

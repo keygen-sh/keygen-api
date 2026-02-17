@@ -32,7 +32,7 @@ Feature: Activity analytics
       | 99e87418-ade4-460f-a5aa-a856a0059397 | license.validation.failed    | 2100-08-24T00:00:00.000Z |
       | d1e6f594-7bcb-455f-971b-1e8b3ea63fd7 | license.validation.succeeded | 2099-08-20T00:00:00.000Z |
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/activities/license.validation.succeeded?start_date=2100-08-20&end_date=2100-08-27"
+    When I send a GET request to "/accounts/test1/analytics/activities/license.validation.succeeded?date[start]=2100-08-20&date[end]=2100-08-27"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
@@ -60,7 +60,7 @@ Feature: Activity analytics
       | 99e87418-ade4-460f-a5aa-a856a0059397 | license.validation.failed    | 2100-08-24T00:00:00.000Z |
       | d1e6f594-7bcb-455f-971b-1e8b3ea63fd7 | license.validation.succeeded | 2099-08-20T00:00:00.000Z |
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/activities/license.validation.*?start_date=2100-08-20&end_date=2100-08-27"
+    When I send a GET request to "/accounts/test1/analytics/activities/license.validation.*?date[start]=2100-08-20&date[end]=2100-08-27"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
@@ -90,7 +90,7 @@ Feature: Activity analytics
       | 96faacd6-16e6-4661-8e16-9e8064fbeb0a | license.created | 2100-08-24T00:00:00.000Z |
       | d1e6f594-7bcb-455f-971b-1e8b3ea63fd7 | license.created | 2099-08-20T00:00:00.000Z |
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/activities/license.created?start_date=2100-08-20&end_date=2100-08-27"
+    When I send a GET request to "/accounts/test1/analytics/activities/license.created?date[start]=2100-08-20&date[end]=2100-08-27"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
@@ -115,7 +115,13 @@ Feature: Activity analytics
     And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
-      { "title": "Bad request", "detail": "Pattern is invalid", "source": { "parameter": "pattern" } }
+      {
+        "title": "Bad request",
+        "detail": "is invalid",
+        "source": {
+          "parameter": "pattern"
+        }
+      }
       """
     And sidekiq should have 0 "request-log" jobs
 
@@ -128,7 +134,13 @@ Feature: Activity analytics
     And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
-      { "title": "Bad request", "detail": "Pattern is invalid", "source": { "parameter": "pattern" } }
+      {
+        "title": "Bad request",
+        "detail": "is invalid",
+        "source": {
+          "parameter": "pattern"
+        }
+      }
       """
     And sidekiq should have 0 "request-log" jobs
 
@@ -137,12 +149,18 @@ Feature: Activity analytics
     And the current account is "test1"
     And time is frozen at "2024-01-15T00:00:00.000Z"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/activities/license.validation.succeeded?start_date=2020-01-01"
+    When I send a GET request to "/accounts/test1/analytics/activities/license.validation.succeeded?date[start]=2020-01-01&date[end]=2024-01-15"
     Then the response status should be "400"
     And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
-      { "title": "Bad request", "detail": "Start date must be greater than or equal to 2023-01-15", "source": { "parameter": "start_date" } }
+      {
+        "title": "Bad request",
+        "detail": "must be greater than or equal to 2023-01-15",
+        "source": {
+          "parameter": "date[start]"
+        }
+      }
       """
     And sidekiq should have 0 "request-log" jobs
     And time is unfrozen
@@ -152,12 +170,18 @@ Feature: Activity analytics
     And the current account is "test1"
     And time is frozen at "2024-01-15T00:00:00.000Z"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/activities/license.validation.succeeded?end_date=2099-01-01"
+    When I send a GET request to "/accounts/test1/analytics/activities/license.validation.succeeded?date[start]=2024-01-01&date[end]=2099-01-01"
     Then the response status should be "400"
     And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
-      { "title": "Bad request", "detail": "End date must be less than or equal to 2024-01-15", "source": { "parameter": "end_date" } }
+      {
+        "title": "Bad request",
+        "detail": "must be less than or equal to 2024-01-15",
+        "source": {
+          "parameter": "date[end]"
+        }
+      }
       """
     And sidekiq should have 0 "request-log" jobs
     And time is unfrozen
@@ -197,7 +221,7 @@ Feature: Activity analytics
       | 31e30cc1-d454-40dc-b4ae-93ad683ddf33 | license.validation.succeeded | License       | a499bb93-9902-4b52-8a04-76944ad7f660 | 2100-08-24T00:00:00.000Z |
       | 99e87418-ade4-460f-a5aa-a856a0059397 | license.validation.failed    | License       | bf9b523f-dd65-48a2-9512-fb66ba6c3714 | 2100-08-24T00:00:00.000Z |
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/activities/license.validation.succeeded?start_date=2100-08-20&end_date=2100-08-27&resource_type=license&resource_id=bf9b523f-dd65-48a2-9512-fb66ba6c3714"
+    When I send a GET request to "/accounts/test1/analytics/activities/license.validation.succeeded?date[start]=2100-08-20&date[end]=2100-08-27&resource[type]=license&resource[id]=bf9b523f-dd65-48a2-9512-fb66ba6c3714"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
@@ -228,7 +252,7 @@ Feature: Activity analytics
       | 31e30cc1-d454-40dc-b4ae-93ad683ddf33 | license.validation.succeeded | License       | a499bb93-9902-4b52-8a04-76944ad7f660 | 2100-08-24T00:00:00.000Z |
       | 99e87418-ade4-460f-a5aa-a856a0059397 | license.validation.failed    | License       | bf9b523f-dd65-48a2-9512-fb66ba6c3714 | 2100-08-24T00:00:00.000Z |
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/activities/license.validation.*?start_date=2100-08-20&end_date=2100-08-27&resource_type=license&resource_id=bf9b523f-dd65-48a2-9512-fb66ba6c3714"
+    When I send a GET request to "/accounts/test1/analytics/activities/license.validation.*?date[start]=2100-08-20&date[end]=2100-08-27&resource[type]=license&resource[id]=bf9b523f-dd65-48a2-9512-fb66ba6c3714"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """

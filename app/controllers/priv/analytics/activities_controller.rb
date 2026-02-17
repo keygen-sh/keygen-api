@@ -2,25 +2,56 @@
 
 module Priv::Analytics
   class ActivitiesController < BaseController
+    use_clickhouse
+
     CACHE_TTL      = 10.minutes
     CACHE_RACE_TTL = 1.minute
 
-    before_action :require_clickhouse!
-
     typed_query {
-      param :start_date, type: :date, coerce: true, optional: true
-      param :end_date, type: :date, coerce: true, optional: true
-      param :resource_type, type: :string, coerce: true, optional: true
-      param :resource_id, type: :uuid, coerce: true, optional: true
+      param :resource, type: :hash, optional: true do
+        param :type, type: :string, coerce: true
+        param :id, type: :uuid, coerce: true
+      end
+      param :date, type: :hash, optional: true do
+        param :start, type: :date, coerce: true
+        param :end, type: :date, coerce: true
+      end
     }
     def show
       authorize! with: Accounts::AnalyticsPolicy
 
-      activity = Analytics::Activity.new(params[:activity_id], **activity_query)
+      options = activity_query.reduce({}) do |hash, (key, value)|
+        hash.merge(
+          case { key => value }
+          in resource: { type: resource_type, id: resource_id }
+            { resource_type:, resource_id: }
+          in date: { start: start_date, end: end_date }
+            { start_date:, end_date: }
+          else
+            { key => value }
+          end
+        )
+      end
+
+      activity = Analytics::Activity.new(
+        params[:activity_id],
+        **options,
+      )
 
       unless activity.valid?
-        render_bad_request detail: activity.errors.full_messages.to_sentence,
-                           source: { parameter: activity.errors.attribute_names.first }
+        render_bad_request *activity.errors.as_jsonapi(
+          title: 'Bad request',
+          source: :parameter,
+          sources: {
+            parameters: {
+              resource_type: 'resource[type]',
+              resource_id: 'resource[id]',
+              start_date: 'date[start]',
+              end_date: 'date[end]',
+            },
+          },
+        )
+
         return
       end
 

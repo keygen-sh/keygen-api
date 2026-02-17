@@ -11,8 +11,11 @@ module Priv::Analytics
       stat = Analytics::Stat.new(params[:stat_id])
 
       unless stat.valid?
-        render_bad_request detail: stat.errors.full_messages.to_sentence,
-                           source: { parameter: stat.errors.attribute_names.first }
+        render_bad_request *stat.errors.as_jsonapi(
+          title: 'Bad request',
+          source: :parameter,
+        )
+
         return
       end
 
