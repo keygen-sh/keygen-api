@@ -10,35 +10,20 @@ module Analytics
         end
 
         def count(start_date:, end_date:, limit:)
-          binds = { account_id: account.id, environment_id: environment&.id, start_date:, end_date:, limit: }.compact
-          res   = exec_sql(<<~SQL.squish, **binds)
-            SELECT
-              user_agent AS identifier,
-              count(*)   AS count
-            FROM request_logs
-            WHERE account_id = :account_id
-              AND environment_id #{environment.nil? ? 'IS NULL' : '= :environment_id'}
-              AND created_date BETWEEN :start_date AND :end_date
-              AND is_deleted = 0
-              AND user_agent IS NOT NULL
-              AND user_agent != ''
-            GROUP BY user_agent
-            ORDER BY count DESC
-            LIMIT :limit
-          SQL
-
-          res.rows
+          RequestLog::Clickhouse.where(account_id: account.id)
+                                .where(environment_id: environment&.id)
+                                .where(created_date: start_date..end_date)
+                                .where(is_deleted: 0)
+                                .where.not(user_agent: [nil, ''])
+                                .group(:user_agent)
+                                .order(Arel.sql('count(*) DESC'))
+                                .limit(limit)
+                                .pluck(:user_agent, Arel.sql('count(*)'))
         end
 
         private
 
         attr_reader :account, :environment
-
-        def exec_sql(sql, **binds)
-          RequestLog::Clickhouse.connection.exec_query(
-            RequestLog::Clickhouse.sanitize_sql([sql, binds]),
-          )
-        end
       end
     end
   end
