@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class EventType < ApplicationRecord
+  CACHE_TTL = 1.day
+
   def self.cache_key(event)
     [:event_types, event, CACHE_KEY_VERSION].join ":"
   end
@@ -17,6 +19,21 @@ class EventType < ApplicationRecord
 
   def clear_cache!
     EventType.clear_cache! event
+  end
+
+  def self.by_pattern(pattern)
+    return none if
+      pattern.blank?
+
+    Rails.cache.fetch(cache_key(pattern), expires_in: CACHE_TTL) do
+      types = if pattern.end_with?('.*')
+                where('event LIKE ?', "#{pattern.delete_suffix('.*')}.%")
+              else
+                where(event: pattern)
+              end
+
+      types.order(:event).load
+    end
   end
 
   def self.lookup_id_by_event(event) = ids_by_event[event]
