@@ -30,19 +30,8 @@ module Analytics
       super(**)
     end
 
-    def event_type_ids = event_types.ids
-    def event_types    = @event_types ||= begin
-      return EventType.none if
-        pattern.blank?
-
-      types = if pattern.end_with?('.*')
-                EventType.where('event LIKE ?', "#{pattern.delete_suffix('.*')}.%")
-              else
-                EventType.where(event: pattern)
-              end
-
-      types.order(:event)
-    end
+    def event_types    = @event_types ||= EventType.by_pattern(pattern)
+    def event_type_ids = event_types.collect(&:id)
 
     def buckets = @buckets ||= begin
       counts = counter.count(event_type_ids:, start_date:, end_date:, resource_type:, resource_id:)
