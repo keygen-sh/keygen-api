@@ -9,7 +9,7 @@ module Priv::Analytics
 
     typed_query {
       param :limit, type: :integer, coerce: true, optional: true
-      param :date, type: :hash, optional: true do
+      param :date, type: :hash, optional: true, collapse: { format: :child_parent } do
         param :start, type: :date, coerce: true
         param :end, type: :date, coerce: true
       end
@@ -17,20 +17,9 @@ module Priv::Analytics
     def show
       authorize! with: Accounts::AnalyticsPolicy
 
-      options = leaderboard_query.reduce({}) do |hash, (key, value)|
-        hash.merge(
-          case { key => value }
-          in date: { start: start_date, end: end_date }
-            { start_date:, end_date: } # flatten date
-          else
-            { key => value }
-          end
-        )
-      end
-
       leaderboard = Analytics::Leaderboard.new(
         params[:leaderboard_id],
-        **options,
+        **leaderboard_query,
       )
 
       unless leaderboard.valid?
