@@ -39,7 +39,7 @@ Feature: Update key
     And the response body should be a "key" with the key "KTDCQ3RmtKaYewE2LpEtpbjrHwF6jB"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin updates a key's policy
@@ -67,7 +67,7 @@ Feature: Update key
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin updates a key but a license already exists with the same key
@@ -101,7 +101,7 @@ Feature: Update key
       """
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin updates a key but a license for another already exists with the same key
@@ -135,7 +135,7 @@ Feature: Update key
       """
     Then the response status should be "200"
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -164,7 +164,7 @@ Feature: Update key
     Then the response status should be "200"
     And the response body should be a "key" with the key "shrd_b7WEYVoRjUBcd6WkYoPoMuoN4QbCpi"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product updates a key for their product
@@ -189,7 +189,7 @@ Feature: Update key
     Then the response status should be "200"
     And the response body should be a "key" with the key "b7WEYVoRjUBcd6WkYoPoMuoN4QbCpi"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to update a key for another product
@@ -212,7 +212,7 @@ Feature: Update key
       """
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to update a key for their account
@@ -235,7 +235,7 @@ Feature: Update key
       """
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to update a key for their account
@@ -258,7 +258,7 @@ Feature: Update key
       """
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous user attempts to update a key for their account
@@ -278,7 +278,7 @@ Feature: Update key
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to update a key for another account
@@ -300,5 +300,5 @@ Feature: Update key
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job

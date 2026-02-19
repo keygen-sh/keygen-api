@@ -27,7 +27,7 @@ Feature: Delete groups
     Then the response status should be "204"
     And the current account should have 2 "groups"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin deletes a group (should nullify user groups)
@@ -77,7 +77,7 @@ Feature: Delete groups
     And the response body should be an array of 1 error
     And the current account should have 3 "groups"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Developer deletes a group
@@ -91,7 +91,7 @@ Feature: Delete groups
     Then the response status should be "204"
     And the current account should have 2 "groups"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Sales attempts to delete a group
@@ -105,7 +105,7 @@ Feature: Delete groups
     Then the response status should be "403"
     And the current account should have 3 "groups"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Support attempts to delete a group
@@ -119,7 +119,7 @@ Feature: Delete groups
     Then the response status should be "403"
     And the current account should have 3 "groups"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Read-only attempts to delete a group
@@ -133,7 +133,7 @@ Feature: Delete groups
     Then the response status should be "403"
     And the current account should have 3 "groups"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -152,7 +152,7 @@ Feature: Delete groups
     Then the response status should be "204"
     And the current account should have 1 "group"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to delete a group
@@ -166,7 +166,7 @@ Feature: Delete groups
     Then the response status should be "204"
     And the current account should have 1 "group"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to delete a group
@@ -180,7 +180,7 @@ Feature: Delete groups
     Then the response status should be "403"
     And the current account should have 2 "groups"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to delete a group
@@ -194,7 +194,7 @@ Feature: Delete groups
     Then the response status should be "403"
     And the current account should have 2 "groups"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous attempts to delete a group
@@ -205,5 +205,5 @@ Feature: Delete groups
     Then the response status should be "401"
     And the current account should have 2 "groups"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job

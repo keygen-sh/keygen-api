@@ -33,7 +33,7 @@ Feature: License checkout actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out"
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous performs a license checkout (GET)
@@ -43,7 +43,7 @@ Feature: License checkout actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/check-out"
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout with defaults (POST)
@@ -96,7 +96,7 @@ Feature: License checkout actions
       { "lastCheckOutAt": "2022-10-16T14:52:48.000Z" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -133,7 +133,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -165,7 +165,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -194,7 +194,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -226,7 +226,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -255,7 +255,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -274,7 +274,7 @@ Feature: License checkout actions
     Then the response status should be "200"
     And the response body should be a "license-file" with a certificate signed using "ed25519"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout using Ed25519 (GET)
@@ -292,7 +292,7 @@ Feature: License checkout actions
     Then the response status should be "200"
     And the response should be a "LICENSE" certificate signed using "ed25519"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout using RSA-PSS (POST)
@@ -310,7 +310,7 @@ Feature: License checkout actions
     Then the response status should be "200"
     And the response body should be a "license-file" with a certificate signed using "rsa-pss-sha256"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout using RSA-PSS (GET)
@@ -328,7 +328,7 @@ Feature: License checkout actions
     Then the response status should be "200"
     And the response should be a "LICENSE" certificate signed using "rsa-pss-sha256"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout using RSA (POST)
@@ -346,7 +346,7 @@ Feature: License checkout actions
     Then the response status should be "200"
     And the response body should be a "license-file" with a certificate signed using "rsa-sha256"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout using RSA (GET)
@@ -364,7 +364,7 @@ Feature: License checkout actions
     Then the response status should be "200"
     And the response should be a "LICENSE" certificate signed using "rsa-sha256"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout using ECDSA (POST)
@@ -382,7 +382,7 @@ Feature: License checkout actions
     Then the response status should be "200"
     And the response body should be a "license-file" with a certificate signed using "ecdsa-p256"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout using ECDSA (GET)
@@ -400,7 +400,7 @@ Feature: License checkout actions
     Then the response status should be "200"
     And the response should be a "LICENSE" certificate signed using "ecdsa-p256"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout with a custom algorithm (POST)
@@ -426,7 +426,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -454,7 +454,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -481,7 +481,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout with an invalid signing algorithm (POST)
@@ -507,7 +507,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout with a nil algorithm (POST)
@@ -532,7 +532,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout with an empty algorithm (GET)
@@ -554,7 +554,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout with a custom TTL (POST)
@@ -580,7 +580,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -604,7 +604,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -629,7 +629,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout with an empty TTL (GET)
@@ -650,7 +650,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout with a TTL that is too short (POST)
@@ -676,7 +676,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout with a TTL that is too short (GET)
@@ -699,7 +699,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout with a TTL that is very long (POST)
@@ -725,7 +725,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -749,7 +749,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -779,7 +779,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout with a user include (POST, v1.5)
@@ -829,7 +829,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout with a users include (POST)
@@ -872,7 +872,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout with a policy include (POST)
@@ -893,7 +893,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout with a policy include (POST, v1.5)
@@ -937,7 +937,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout with a policy include (POST, v1.4)
@@ -981,7 +981,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout with a policy include (POST, v1.3)
@@ -1011,7 +1011,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout with a policy include (POST, v1.1)
@@ -1040,7 +1040,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout with a policy include (GET)
@@ -1061,7 +1061,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout with a policy include (GET, v1.5)
@@ -1103,7 +1103,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout with a policy include (GET, v1.4)
@@ -1145,7 +1145,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout a product include (POST)
@@ -1170,7 +1170,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout a product include (GET)
@@ -1192,7 +1192,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout with entitlement includes (POST)
@@ -1220,7 +1220,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout with entitlement includes (GET)
@@ -1245,7 +1245,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout with a group include (POST)
@@ -1273,7 +1273,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout with a group include (GET)
@@ -1298,7 +1298,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1333,7 +1333,7 @@ Feature: License checkout actions
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1364,7 +1364,7 @@ Feature: License checkout actions
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1394,7 +1394,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1421,7 +1421,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout with encrypted includes (POST)
@@ -1453,7 +1453,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -1482,7 +1482,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout with invalid includes (POST)
@@ -1516,7 +1516,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout with invalid includes (GET)
@@ -1547,7 +1547,7 @@ Feature: License checkout actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout with empty includes (POST)
@@ -1566,7 +1566,7 @@ Feature: License checkout actions
       { "included": [] }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout with empty includes (GET)
@@ -1582,7 +1582,7 @@ Feature: License checkout actions
       { "included": [] }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
    Scenario: Admin performs a license checkout by key (POST)
@@ -1599,7 +1599,7 @@ Feature: License checkout actions
     Then the response status should be "200"
     And the response body should be a "license-file"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout by key (GET)
@@ -1616,7 +1616,7 @@ Feature: License checkout actions
     Then the response status should be "200"
     And the response should be a "LICENSE" certificate
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1653,7 +1653,7 @@ Feature: License checkout actions
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1690,7 +1690,7 @@ Feature: License checkout actions
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1730,7 +1730,7 @@ Feature: License checkout actions
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1773,7 +1773,7 @@ Feature: License checkout actions
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1799,7 +1799,7 @@ Feature: License checkout actions
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product performs a license checkout (POST)
@@ -1814,7 +1814,7 @@ Feature: License checkout actions
     Then the response status should be "200"
     And the response body should be a "license-file"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product performs a license checkout (GET)
@@ -1829,7 +1829,7 @@ Feature: License checkout actions
     Then the response status should be "200"
     And the response should be a "LICENSE" certificate
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product performs a checkout for a license of another product (POST)
@@ -1842,7 +1842,7 @@ Feature: License checkout actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product performs a checkout for a license of another product (GET)
@@ -1855,7 +1855,7 @@ Feature: License checkout actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/check-out"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License performs a license checkout (POST)
@@ -1868,7 +1868,7 @@ Feature: License checkout actions
     Then the response status should be "200"
     And the response body should be a "license-file"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License performs a license checkout (GET)
@@ -1881,7 +1881,7 @@ Feature: License checkout actions
     Then the response status should be "200"
     And the response should be a "LICENSE" certificate
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License performs a license checkout for another license (POST)
@@ -1893,7 +1893,7 @@ Feature: License checkout actions
     When I send a POST request to "/accounts/test1/licenses/$1/actions/check-out"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License performs a license checkout without checkout permission (POST)
@@ -1908,7 +1908,7 @@ Feature: License checkout actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out?include=product"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License performs a license checkout without checkout permission (GET)
@@ -1923,7 +1923,7 @@ Feature: License checkout actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out?include=policy"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License performs a license checkout without include permission (POST)
@@ -1938,7 +1938,7 @@ Feature: License checkout actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out?include=product"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License performs a license checkout without include permission (GET)
@@ -1953,7 +1953,7 @@ Feature: License checkout actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out?include=policy"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License performs a license checkout without include permission (GET)
@@ -1965,7 +1965,7 @@ Feature: License checkout actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out?include=environment"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License performs a license checkout with permission (POST)
@@ -1981,7 +1981,7 @@ Feature: License checkout actions
     Then the response status should be "200"
     And the response body should be a "license-file"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License performs a license checkout with permission (GET)
@@ -1997,7 +1997,7 @@ Feature: License checkout actions
     Then the response status should be "200"
     And the response should be a "LICENSE" certificate
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License performs a license checkout for another license (GET)
@@ -2009,7 +2009,7 @@ Feature: License checkout actions
     When I send a GET request to "/accounts/test1/licenses/$1/actions/check-out"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User performs a license checkout for their unprotected license (POST, owner)
@@ -2023,7 +2023,7 @@ Feature: License checkout actions
     Then the response status should be "200"
     And the response body should be a "license-file"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User performs a license checkout for their unprotected license (GET, owner)
@@ -2037,7 +2037,7 @@ Feature: License checkout actions
     Then the response status should be "200"
     And the response should be a "LICENSE" certificate
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User performs a license checkout for their unprotected license (POST, licensee)
@@ -2052,7 +2052,7 @@ Feature: License checkout actions
     Then the response status should be "200"
     And the response body should be a "license-file"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User performs a license checkout for their unprotected license (GET, licensee)
@@ -2067,7 +2067,7 @@ Feature: License checkout actions
     Then the response status should be "200"
     And the response should be a "LICENSE" certificate
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User performs a license checkout for their protected license (POST)
@@ -2080,7 +2080,7 @@ Feature: License checkout actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User performs a license checkout for their protected license (GET)
@@ -2093,7 +2093,7 @@ Feature: License checkout actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/check-out"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User performs a license checkout for a license they don't own (POST)
@@ -2106,7 +2106,7 @@ Feature: License checkout actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User performs a license checkout for a license they don't own (GET)
@@ -2119,5 +2119,5 @@ Feature: License checkout actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/check-out"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job

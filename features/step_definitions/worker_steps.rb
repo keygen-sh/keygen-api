@@ -22,8 +22,6 @@ end
 Then /^sidekiq should (?:have|process) (\d+) "([^\"]*)" jobs?(?: queued in ([.\d]+ \w+))?$/ do |expected_count, worker_name, queued_at|
   worker_name =
     case worker_name
-    when "metric"
-      "record_metric_worker" # We renamed this worker
     when "request-log"
       "request_log_worker2"
     when "event-log"

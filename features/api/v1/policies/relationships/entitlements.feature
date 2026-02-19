@@ -152,7 +152,7 @@ Feature: Policy entitlements relationship
     Then the response status should be "200"
     And the response body should be an array with 3 "policy-entitlements"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -181,7 +181,7 @@ Feature: Policy entitlements relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -217,7 +217,7 @@ Feature: Policy entitlements relationship
     And the current account should have 3 "policy-entitlements"
     And the current account should have 3 "entitlements"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -252,7 +252,7 @@ Feature: Policy entitlements relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attaches empty entitlements to a policy
@@ -278,7 +278,7 @@ Feature: Policy entitlements relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attaches entitlements to a policy that already exists
@@ -339,7 +339,7 @@ Feature: Policy entitlements relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to attach an entitlement to a policy for another account
@@ -359,7 +359,7 @@ Feature: Policy entitlements relationship
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -395,7 +395,7 @@ Feature: Policy entitlements relationship
     And the current account should have 3 "policy-entitlements"
     And the current account should have 3 "entitlements"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -429,7 +429,7 @@ Feature: Policy entitlements relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -465,7 +465,7 @@ Feature: Policy entitlements relationship
     And the current account should have 3 "policy-entitlements"
     And the current account should have 3 "entitlements"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -502,7 +502,7 @@ Feature: Policy entitlements relationship
     And the current account should have 3 "policy-entitlements"
     And the current account should have 3 "entitlements"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -538,7 +538,7 @@ Feature: Policy entitlements relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attaches entitlements to a policy
@@ -561,7 +561,7 @@ Feature: Policy entitlements relationship
     Then the response status should be "200"
     And the response body should be an array with 2 "policy-entitlements"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to attach entitlements to a policy it doesn't own
@@ -587,7 +587,7 @@ Feature: Policy entitlements relationship
       """
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to attach entitlements to a policy
@@ -608,7 +608,7 @@ Feature: Policy entitlements relationship
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to attach entitlements to a policy
@@ -629,7 +629,7 @@ Feature: Policy entitlements relationship
       """
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   # Detachment
@@ -653,7 +653,7 @@ Feature: Policy entitlements relationship
     And the current account should have 0 "policy-entitlements"
     And the current account should have 3 "entitlements"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -683,7 +683,7 @@ Feature: Policy entitlements relationship
     And the current account should have 0 "policy-entitlements"
     And the current account should have 2 "entitlements"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -714,7 +714,7 @@ Feature: Policy entitlements relationship
     And the current account should have 2 "policy-entitlements"
     And the current account should have 4 "entitlements"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -745,7 +745,7 @@ Feature: Policy entitlements relationship
     And the current account should have 4 "policy-entitlements"
     And the current account should have 4 "entitlements"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin detaches empty entitlements from a policy
@@ -770,7 +770,7 @@ Feature: Policy entitlements relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to detach entitlements from a policy with an invalid entitlement ID
@@ -805,7 +805,7 @@ Feature: Policy entitlements relationship
     And the current account should have 3 "policy-entitlement"
     And the current account should have 3 "entitlements"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to detach an entitlement from a policy for another account
@@ -825,7 +825,7 @@ Feature: Policy entitlements relationship
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -925,7 +925,7 @@ Feature: Policy entitlements relationship
       """
     Then the response status should be "204"
     And sidekiq should have 3 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to detach entitlements from a policy it doesn't own
@@ -951,7 +951,7 @@ Feature: Policy entitlements relationship
       """
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to detach entitlements from a policy
@@ -972,7 +972,7 @@ Feature: Policy entitlements relationship
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to detach entitlements from a policy
@@ -993,5 +993,5 @@ Feature: Policy entitlements relationship
       """
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job

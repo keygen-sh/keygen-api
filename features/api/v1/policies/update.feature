@@ -59,7 +59,7 @@ Feature: Update policy
     And the response body should be a "policy" with the maxCores "32"
     And the response body should be a "policy" with the maxUses "3"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Developer updates a policy for their account
@@ -230,7 +230,7 @@ Feature: Update policy
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to update a policy for another account
@@ -252,7 +252,7 @@ Feature: Update policy
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product updates a policy for their product
@@ -276,7 +276,7 @@ Feature: Update policy
     Then the response status should be "200"
     And the response body should be a "policy" with a nil duration
     And sidekiq should have 3 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -309,7 +309,7 @@ Feature: Update policy
       { "name": "Isolated Policy" }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to update a policy for another product
@@ -332,7 +332,7 @@ Feature: Update policy
       """
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin updates a policy's scheme attribute for their account
@@ -354,7 +354,7 @@ Feature: Update policy
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin updates a policy's encrypted attribute for their account
@@ -376,7 +376,7 @@ Feature: Update policy
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin updates a policy for their account to use a pool
@@ -398,7 +398,7 @@ Feature: Update policy
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin updates a policy to be concurrent (v1.2)
@@ -422,7 +422,7 @@ Feature: Update policy
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin updates a policy to be concurrent (v1.1)
@@ -448,7 +448,7 @@ Feature: Update policy
     And the response body should be a "policy" with an overageStrategy "NO_OVERAGE"
     And the response body should be a "policy" that is not concurrent
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin updates a policy to be concurrent (v1.0)
@@ -474,7 +474,7 @@ Feature: Update policy
     And the response body should be a "policy" with an overageStrategy "NO_OVERAGE"
     And the response body should be a "policy" that is not concurrent
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to update their policy
@@ -498,7 +498,7 @@ Feature: Update policy
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to update a policy
@@ -521,7 +521,7 @@ Feature: Update policy
       """
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to update their policy
@@ -547,7 +547,7 @@ Feature: Update policy
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to update a policy
@@ -571,7 +571,7 @@ Feature: Update policy
       """
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin updates a policy's fingerprint strategies (v1.4)
