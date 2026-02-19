@@ -8,7 +8,7 @@ module Priv::Analytics
     CACHE_RACE_TTL = 1.minute
 
     typed_query {
-      param :date, type: :hash, optional: true do
+      param :date, type: :hash, optional: true, collapse: { format: :child_parent } do
         param :start, type: :date, coerce: true
         param :end, type: :date, coerce: true
       end
@@ -16,18 +16,9 @@ module Priv::Analytics
     def show
       authorize! with: Accounts::AnalyticsPolicy
 
-      options = usage_query.reduce({}) do |hash, (key, value)|
-        hash.merge(
-          case { key => value }
-          in date: { start: start_date, end: end_date }
-            { start_date:, end_date: }
-          else
-            { key => value }
-          end
-        )
-      end
-
-      usage = Analytics::Usage.new(**options)
+      usage = Analytics::Usage.new(
+        **usage_query,
+      )
 
       unless usage.valid?
         render_bad_request *usage.errors.as_jsonapi(

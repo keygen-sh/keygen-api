@@ -8,11 +8,11 @@ module Priv::Analytics
     CACHE_RACE_TTL = 1.minute
 
     typed_query {
-      param :resource, type: :hash, optional: true do
+      param :resource, type: :hash, optional: true, collapse: { format: :parent_child } do
         param :type, type: :string, coerce: true
         param :id, type: :uuid, coerce: true
       end
-      param :date, type: :hash, optional: true do
+      param :date, type: :hash, optional: true, collapse: { format: :child_parent } do
         param :start, type: :date, coerce: true
         param :end, type: :date, coerce: true
       end
@@ -20,22 +20,9 @@ module Priv::Analytics
     def show
       authorize! with: Accounts::AnalyticsPolicy
 
-      options = activity_query.reduce({}) do |hash, (key, value)|
-        hash.merge(
-          case { key => value }
-          in resource: { type: resource_type, id: resource_id }
-            { resource_type:, resource_id: }
-          in date: { start: start_date, end: end_date }
-            { start_date:, end_date: }
-          else
-            { key => value }
-          end
-        )
-      end
-
       activity = Analytics::Activity.new(
         params[:activity_id],
-        **options,
+        **activity_query,
       )
 
       unless activity.valid?

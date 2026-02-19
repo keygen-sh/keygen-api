@@ -6,7 +6,7 @@ module Priv::Analytics
     CACHE_RACE_TTL = 1.minute
 
     typed_query {
-      param :date, type: :hash, optional: true do
+      param :date, type: :hash, optional: true, collapse: { format: :child_parent } do
         param :start, type: :date, coerce: true
         param :end, type: :date, coerce: true
       end
@@ -14,20 +14,9 @@ module Priv::Analytics
     def show
       authorize! with: Accounts::AnalyticsPolicy
 
-      options = heatmap_query.reduce({}) do |hash, (key, value)|
-        hash.merge(
-          case { key => value }
-          in date: { start: start_date, end: end_date }
-            { start_date:, end_date: }
-          else
-            { key => value }
-          end
-        )
-      end
-
       heatmap = Analytics::Heatmap.new(
         params[:heatmap_id],
-        **options,
+        **heatmap_query,
       )
 
       unless heatmap.valid?
