@@ -499,11 +499,11 @@ Rails.application.routes.draw do
   concern :priv do
     scope constraints: MimeTypeConstraint.new(:jsonapi, :json, :binary, raise_on_no_match: true), defaults: { format: :json } do
       namespace :analytics do
-        get 'activities/:event_type',    to: 'activities#show',   as: :activity,    constraints: { event_type: /.*/ }
-        get 'leaderboards/:leaderboard', to: 'leaderboards#show', as: :leaderboard
-        get 'heatmaps/:heatmap',         to: 'heatmaps#show',     as: :heatmap
-        get 'stats/:stat',               to: 'stats#show',        as: :stat
-        get 'usage',                     to: 'usage#show',        as: :usage
+        get 'events/:event_type',        to: 'events#show',        as: :event,       constraints: { event_type: /.*/ }
+        get 'leaderboards/:leaderboard', to: 'leaderboards#show',  as: :leaderboard
+        get 'heatmaps/:heatmap',         to: 'heatmaps#show',      as: :heatmap
+        get 'counts/:count',             to: 'counts#show',        as: :count
+        get 'usage',                     to: 'usage#show',         as: :usage
       end
     end
   end

@@ -16,12 +16,13 @@ module Priv::Analytics
     def show
       authorize! with: Accounts::AnalyticsPolicy
 
-      usage = Analytics::Usage.new(
+      series = Analytics::Series.new(
+        :requests,
         **usage_query,
       )
 
-      unless usage.valid?
-        render_bad_request *usage.errors.as_jsonapi(
+      unless series.valid?
+        render_bad_request *series.errors.as_jsonapi(
           title: 'Bad request',
           source: :parameter,
           sources: {
@@ -35,8 +36,8 @@ module Priv::Analytics
         return
       end
 
-      data = Rails.cache.fetch usage.cache_key, expires_in: CACHE_TTL, race_condition_ttl: CACHE_RACE_TTL do
-        usage.as_json
+      data = Rails.cache.fetch series.cache_key, expires_in: CACHE_TTL, race_condition_ttl: CACHE_RACE_TTL do
+        series.as_json
       end
 
       render json: { data: }

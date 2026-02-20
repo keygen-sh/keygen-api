@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Analytics
-  class Stat
+  class Count
     module Counters
       class ActiveLicensedUsers
         def initialize(account:, **) # environment intentionally ignored

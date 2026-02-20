@@ -1,19 +1,19 @@
 # frozen_string_literal: true
 
 module Priv::Analytics
-  class StatsController < BaseController
+  class CountsController < BaseController
     CACHE_TTL      = 10.minutes
     CACHE_RACE_TTL = 1.minute
 
     def show
       authorize! with: Accounts::AnalyticsPolicy
 
-      stat = Analytics::Stat.new(
-        params[:stat],
+      count = Analytics::Count.new(
+        params[:count],
       )
 
-      unless stat.valid?
-        render_bad_request *stat.errors.as_jsonapi(
+      unless count.valid?
+        render_bad_request *count.errors.as_jsonapi(
           title: 'Bad request',
           source: :parameter,
         )
@@ -21,12 +21,12 @@ module Priv::Analytics
         return
       end
 
-      data = Rails.cache.fetch stat.cache_key, expires_in: CACHE_TTL, race_condition_ttl: CACHE_RACE_TTL do
-        stat.as_json
+      data = Rails.cache.fetch count.cache_key, expires_in: CACHE_TTL, race_condition_ttl: CACHE_RACE_TTL do
+        count.as_json
       end
 
       render json: { data: }
-    rescue Analytics::StatNotFoundError
+    rescue Analytics::CountNotFoundError
       render_not_found
     end
   end

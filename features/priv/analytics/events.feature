@@ -1,6 +1,6 @@
 @ee @clickhouse
 @api/priv
-Feature: Activity analytics
+Feature: Event count analytics
   Background:
     Given the following "accounts" exist:
       | name    | slug  |
@@ -13,14 +13,14 @@ Feature: Activity analytics
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/activities/license.validation.succeeded"
+    When I send a GET request to "/accounts/test1/analytics/events/license.validation.succeeded"
     Then the response status should be "200"
     And sidekiq should have 0 "request-log" jobs
 
   # NB(ezekg) using future dates to avoid column-level TTL expiration during OPTIMIZE
   #           TABLE FINAL in tests, so dates MUST stay within clickhouse's Date type
   #           range (otherwise it overflows after 2149-06-06).
-  Scenario: Admin retrieves activity count for their account
+  Scenario: Admin retrieves aggregated event count for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
     And time is frozen at "2100-08-30T00:00:00.000Z"
@@ -32,23 +32,27 @@ Feature: Activity analytics
       | 99e87418-ade4-460f-a5aa-a856a0059397 | license.validation.failed    | 2100-08-24T00:00:00.000Z |
       | d1e6f594-7bcb-455f-971b-1e8b3ea63fd7 | license.validation.succeeded | 2099-08-20T00:00:00.000Z |
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/activities/license.validation.succeeded?date[start]=2100-08-20&date[end]=2100-08-27"
+    When I send a GET request to "/accounts/test1/analytics/events/license.validation.succeeded?date[start]=2100-08-20&date[end]=2100-08-27"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
       {
         "data": [
-          {
-            "event": "license.validation.succeeded",
-            "count": 3
-          }
+          { "event": "license.validation.succeeded", "date": "2100-08-20", "count": 0 },
+          { "event": "license.validation.succeeded", "date": "2100-08-21", "count": 0 },
+          { "event": "license.validation.succeeded", "date": "2100-08-22", "count": 0 },
+          { "event": "license.validation.succeeded", "date": "2100-08-23", "count": 2 },
+          { "event": "license.validation.succeeded", "date": "2100-08-24", "count": 1 },
+          { "event": "license.validation.succeeded", "date": "2100-08-25", "count": 0 },
+          { "event": "license.validation.succeeded", "date": "2100-08-26", "count": 0 },
+          { "event": "license.validation.succeeded", "date": "2100-08-27", "count": 0 }
         ]
       }
       """
     And sidekiq should have 0 "request-log" jobs
     And time is unfrozen
 
-  Scenario: Admin retrieves activity count with wildcard pattern
+  Scenario: Admin retrieves aggregated event count with wildcard pattern
     Given I am an admin of account "test1"
     And the current account is "test1"
     And time is frozen at "2100-08-30T00:00:00.000Z"
@@ -60,27 +64,35 @@ Feature: Activity analytics
       | 99e87418-ade4-460f-a5aa-a856a0059397 | license.validation.failed    | 2100-08-24T00:00:00.000Z |
       | d1e6f594-7bcb-455f-971b-1e8b3ea63fd7 | license.validation.succeeded | 2099-08-20T00:00:00.000Z |
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/activities/license.validation.*?date[start]=2100-08-20&date[end]=2100-08-27"
+    When I send a GET request to "/accounts/test1/analytics/events/license.validation.*?date[start]=2100-08-20&date[end]=2100-08-27"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
       {
         "data": [
-          {
-            "event": "license.validation.failed",
-            "count": 1
-          },
-          {
-            "event": "license.validation.succeeded",
-            "count": 3
-          }
+          { "event": "license.validation.failed", "date": "2100-08-20", "count": 0 },
+          { "event": "license.validation.failed", "date": "2100-08-21", "count": 0 },
+          { "event": "license.validation.failed", "date": "2100-08-22", "count": 0 },
+          { "event": "license.validation.failed", "date": "2100-08-23", "count": 0 },
+          { "event": "license.validation.failed", "date": "2100-08-24", "count": 1 },
+          { "event": "license.validation.failed", "date": "2100-08-25", "count": 0 },
+          { "event": "license.validation.failed", "date": "2100-08-26", "count": 0 },
+          { "event": "license.validation.failed", "date": "2100-08-27", "count": 0 },
+          { "event": "license.validation.succeeded", "date": "2100-08-20", "count": 0 },
+          { "event": "license.validation.succeeded", "date": "2100-08-21", "count": 0 },
+          { "event": "license.validation.succeeded", "date": "2100-08-22", "count": 0 },
+          { "event": "license.validation.succeeded", "date": "2100-08-23", "count": 2 },
+          { "event": "license.validation.succeeded", "date": "2100-08-24", "count": 1 },
+          { "event": "license.validation.succeeded", "date": "2100-08-25", "count": 0 },
+          { "event": "license.validation.succeeded", "date": "2100-08-26", "count": 0 },
+          { "event": "license.validation.succeeded", "date": "2100-08-27", "count": 0 }
         ]
       }
       """
     And sidekiq should have 0 "request-log" jobs
     And time is unfrozen
 
-  Scenario: Admin retrieves activity count for license.created
+  Scenario: Admin retrieves aggregated event count for license.created
     Given I am an admin of account "test1"
     And the current account is "test1"
     And time is frozen at "2100-08-30T00:00:00.000Z"
@@ -90,27 +102,31 @@ Feature: Activity analytics
       | 96faacd6-16e6-4661-8e16-9e8064fbeb0a | license.created | 2100-08-24T00:00:00.000Z |
       | d1e6f594-7bcb-455f-971b-1e8b3ea63fd7 | license.created | 2099-08-20T00:00:00.000Z |
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/activities/license.created?date[start]=2100-08-20&date[end]=2100-08-27"
+    When I send a GET request to "/accounts/test1/analytics/events/license.created?date[start]=2100-08-20&date[end]=2100-08-27"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
       {
         "data": [
-          {
-            "event": "license.created",
-            "count": 2
-          }
+          { "event": "license.created", "date": "2100-08-20", "count": 0 },
+          { "event": "license.created", "date": "2100-08-21", "count": 0 },
+          { "event": "license.created", "date": "2100-08-22", "count": 0 },
+          { "event": "license.created", "date": "2100-08-23", "count": 1 },
+          { "event": "license.created", "date": "2100-08-24", "count": 1 },
+          { "event": "license.created", "date": "2100-08-25", "count": 0 },
+          { "event": "license.created", "date": "2100-08-26", "count": 0 },
+          { "event": "license.created", "date": "2100-08-27", "count": 0 }
         ]
       }
       """
     And sidekiq should have 0 "request-log" jobs
     And time is unfrozen
 
-  Scenario: Admin retrieves activity count with invalid pattern
+  Scenario: Admin retrieves aggregated event count with invalid pattern
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/activities/invalid.event"
+    When I send a GET request to "/accounts/test1/analytics/events/invalid.event"
     Then the response status should be "400"
     And the response body should be an array of 1 error
     And the first error should have the following properties:
@@ -125,11 +141,11 @@ Feature: Activity analytics
       """
     And sidekiq should have 0 "request-log" jobs
 
-  Scenario: Admin retrieves activity count with invalid wildcard pattern
+  Scenario: Admin retrieves aggregated event count with invalid wildcard pattern
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/activities/invalid.*"
+    When I send a GET request to "/accounts/test1/analytics/events/invalid.*"
     Then the response status should be "400"
     And the response body should be an array of 1 error
     And the first error should have the following properties:
@@ -144,12 +160,12 @@ Feature: Activity analytics
       """
     And sidekiq should have 0 "request-log" jobs
 
-  Scenario: Admin retrieves activity count with start date too old
+  Scenario: Admin retrieves aggregated event count with start date too old
     Given I am an admin of account "test1"
     And the current account is "test1"
     And time is frozen at "2024-01-15T00:00:00.000Z"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/activities/license.validation.succeeded?date[start]=2020-01-01&date[end]=2024-01-15"
+    When I send a GET request to "/accounts/test1/analytics/events/license.validation.succeeded?date[start]=2020-01-01&date[end]=2024-01-15"
     Then the response status should be "400"
     And the response body should be an array of 1 error
     And the first error should have the following properties:
@@ -165,12 +181,12 @@ Feature: Activity analytics
     And sidekiq should have 0 "request-log" jobs
     And time is unfrozen
 
-  Scenario: Admin retrieves activity count with end date in future
+  Scenario: Admin retrieves aggregated event count with end date in future
     Given I am an admin of account "test1"
     And the current account is "test1"
     And time is frozen at "2024-01-15T00:00:00.000Z"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/activities/license.validation.succeeded?date[start]=2024-01-01&date[end]=2099-01-01"
+    When I send a GET request to "/accounts/test1/analytics/events/license.validation.succeeded?date[start]=2024-01-01&date[end]=2099-01-01"
     Then the response status should be "400"
     And the response body should be an array of 1 error
     And the first error should have the following properties:
@@ -186,27 +202,27 @@ Feature: Activity analytics
     And sidekiq should have 0 "request-log" jobs
     And time is unfrozen
 
-  Scenario: Product attempts to retrieve activity count for their account
+  Scenario: Product attempts to retrieve aggregated event count for their account
     Given the current account is "test1"
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/activities/license.validation.succeeded"
+    When I send a GET request to "/accounts/test1/analytics/events/license.validation.succeeded"
     Then the response status should be "403"
     And the response body should be an array of 1 error
     And sidekiq should have 0 "request-log" jobs
 
-  Scenario: User attempts to retrieve activity count for their account
+  Scenario: User attempts to retrieve aggregated event count for their account
     Given the current account is "test1"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/activities/license.validation.succeeded"
+    When I send a GET request to "/accounts/test1/analytics/events/license.validation.succeeded"
     Then the response status should be "403"
     And the response body should be an array of 1 error
     And sidekiq should have 0 "request-log" jobs
 
-  Scenario: Admin retrieves activity count for a specific resource
+  Scenario: Admin retrieves aggregated event count for a specific resource
     Given I am an admin of account "test1"
     And the current account is "test1"
     And time is frozen at "2100-08-30T00:00:00.000Z"
@@ -221,23 +237,27 @@ Feature: Activity analytics
       | 31e30cc1-d454-40dc-b4ae-93ad683ddf33 | license.validation.succeeded | License       | a499bb93-9902-4b52-8a04-76944ad7f660 | 2100-08-24T00:00:00.000Z |
       | 99e87418-ade4-460f-a5aa-a856a0059397 | license.validation.failed    | License       | bf9b523f-dd65-48a2-9512-fb66ba6c3714 | 2100-08-24T00:00:00.000Z |
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/activities/license.validation.succeeded?date[start]=2100-08-20&date[end]=2100-08-27&resource[type]=license&resource[id]=bf9b523f-dd65-48a2-9512-fb66ba6c3714"
+    When I send a GET request to "/accounts/test1/analytics/events/license.validation.succeeded?date[start]=2100-08-20&date[end]=2100-08-27&resource[type]=license&resource[id]=bf9b523f-dd65-48a2-9512-fb66ba6c3714"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
       {
         "data": [
-          {
-            "event": "license.validation.succeeded",
-            "count": 2
-          }
+          { "event": "license.validation.succeeded", "date": "2100-08-20", "count": 0 },
+          { "event": "license.validation.succeeded", "date": "2100-08-21", "count": 0 },
+          { "event": "license.validation.succeeded", "date": "2100-08-22", "count": 0 },
+          { "event": "license.validation.succeeded", "date": "2100-08-23", "count": 2 },
+          { "event": "license.validation.succeeded", "date": "2100-08-24", "count": 0 },
+          { "event": "license.validation.succeeded", "date": "2100-08-25", "count": 0 },
+          { "event": "license.validation.succeeded", "date": "2100-08-26", "count": 0 },
+          { "event": "license.validation.succeeded", "date": "2100-08-27", "count": 0 }
         ]
       }
       """
     And sidekiq should have 0 "request-log" jobs
     And time is unfrozen
 
-  Scenario: Admin retrieves activity count with wildcard for a specific resource
+  Scenario: Admin retrieves aggregated event count with wildcard for a specific resource
     Given I am an admin of account "test1"
     And the current account is "test1"
     And time is frozen at "2100-08-30T00:00:00.000Z"
@@ -252,20 +272,28 @@ Feature: Activity analytics
       | 31e30cc1-d454-40dc-b4ae-93ad683ddf33 | license.validation.succeeded | License       | a499bb93-9902-4b52-8a04-76944ad7f660 | 2100-08-24T00:00:00.000Z |
       | 99e87418-ade4-460f-a5aa-a856a0059397 | license.validation.failed    | License       | bf9b523f-dd65-48a2-9512-fb66ba6c3714 | 2100-08-24T00:00:00.000Z |
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/activities/license.validation.*?date[start]=2100-08-20&date[end]=2100-08-27&resource[type]=license&resource[id]=bf9b523f-dd65-48a2-9512-fb66ba6c3714"
+    When I send a GET request to "/accounts/test1/analytics/events/license.validation.*?date[start]=2100-08-20&date[end]=2100-08-27&resource[type]=license&resource[id]=bf9b523f-dd65-48a2-9512-fb66ba6c3714"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
       {
         "data": [
-          {
-            "event": "license.validation.failed",
-            "count": 1
-          },
-          {
-            "event": "license.validation.succeeded",
-            "count": 2
-          }
+          { "event": "license.validation.failed", "date": "2100-08-20", "count": 0 },
+          { "event": "license.validation.failed", "date": "2100-08-21", "count": 0 },
+          { "event": "license.validation.failed", "date": "2100-08-22", "count": 0 },
+          { "event": "license.validation.failed", "date": "2100-08-23", "count": 0 },
+          { "event": "license.validation.failed", "date": "2100-08-24", "count": 1 },
+          { "event": "license.validation.failed", "date": "2100-08-25", "count": 0 },
+          { "event": "license.validation.failed", "date": "2100-08-26", "count": 0 },
+          { "event": "license.validation.failed", "date": "2100-08-27", "count": 0 },
+          { "event": "license.validation.succeeded", "date": "2100-08-20", "count": 0 },
+          { "event": "license.validation.succeeded", "date": "2100-08-21", "count": 0 },
+          { "event": "license.validation.succeeded", "date": "2100-08-22", "count": 0 },
+          { "event": "license.validation.succeeded", "date": "2100-08-23", "count": 2 },
+          { "event": "license.validation.succeeded", "date": "2100-08-24", "count": 0 },
+          { "event": "license.validation.succeeded", "date": "2100-08-25", "count": 0 },
+          { "event": "license.validation.succeeded", "date": "2100-08-26", "count": 0 },
+          { "event": "license.validation.succeeded", "date": "2100-08-27", "count": 0 }
         ]
       }
       """

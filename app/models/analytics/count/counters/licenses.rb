@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Analytics
-  class Stat
+  class Count
     module Counters
       class Licenses
         def initialize(account:, environment:)
