@@ -18,7 +18,7 @@ module Priv::Analytics
       authorize! with: Accounts::AnalyticsPolicy
 
       leaderboard = Analytics::Leaderboard.new(
-        params[:leaderboard_id],
+        params[:leaderboard],
         **leaderboard_query,
       )
 

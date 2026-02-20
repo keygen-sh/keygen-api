@@ -15,7 +15,7 @@ module Priv::Analytics
       authorize! with: Accounts::AnalyticsPolicy
 
       heatmap = Analytics::Heatmap.new(
-        params[:heatmap_id],
+        params[:heatmap],
         **heatmap_query,
       )
 
