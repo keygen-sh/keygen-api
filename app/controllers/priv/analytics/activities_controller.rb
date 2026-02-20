@@ -21,7 +21,7 @@ module Priv::Analytics
       authorize! with: Accounts::AnalyticsPolicy
 
       activity = Analytics::Activity.new(
-        params[:activity_id],
+        params[:event_type],
         **activity_query,
       )
 

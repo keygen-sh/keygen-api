@@ -8,7 +8,9 @@ module Priv::Analytics
     def show
       authorize! with: Accounts::AnalyticsPolicy
 
-      stat = Analytics::Stat.new(params[:stat_id])
+      stat = Analytics::Stat.new(
+        params[:stat],
+      )
 
       unless stat.valid?
         render_bad_request *stat.errors.as_jsonapi(
