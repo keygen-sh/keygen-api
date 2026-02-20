@@ -3,52 +3,52 @@
 require 'rails_helper'
 require 'spec_helper'
 
-describe Analytics::Stat do
+describe Analytics::Count do
   let(:account) { create(:account) }
 
   describe '.new' do
-    context 'with valid stat' do
-      it 'returns stat for machines' do
+    context 'with valid count' do
+      it 'returns count for machines' do
         create_list(:machine, 3, account:)
 
-        stat = described_class.new(:machines, account:)
+        count = described_class.new(:machines, account:)
 
-        expect(stat).to be_a(Analytics::Stat)
-        expect(stat).to be_valid
-        expect(stat.count).to eq(3)
+        expect(count).to be_a(Analytics::Count)
+        expect(count).to be_valid
+        expect(count.count).to eq(3)
       end
 
-      it 'returns stat for users' do
+      it 'returns count for users' do
         create_list(:user, 2, account:)
 
-        stat = described_class.new(:users, account:)
+        count = described_class.new(:users, account:)
 
-        expect(stat).to be_a(Analytics::Stat)
-        expect(stat).to be_valid
-        expect(stat.count).to eq(2)
+        expect(count).to be_a(Analytics::Count)
+        expect(count).to be_valid
+        expect(count.count).to eq(2)
       end
 
-      it 'returns stat for licenses' do
+      it 'returns count for licenses' do
         create_list(:license, 4, account:)
 
-        stat = described_class.new(:licenses, account:)
+        count = described_class.new(:licenses, account:)
 
-        expect(stat).to be_a(Analytics::Stat)
-        expect(stat).to be_valid
-        expect(stat.count).to eq(4)
+        expect(count).to be_a(Analytics::Count)
+        expect(count).to be_valid
+        expect(count.count).to eq(4)
       end
 
       it 'accepts string names' do
-        stat = described_class.new('machines', account:)
+        count = described_class.new('machines', account:)
 
-        expect(stat).to be_a(Analytics::Stat)
-        expect(stat).to be_valid
+        expect(count).to be_a(Analytics::Count)
+        expect(count).to be_valid
       end
     end
 
-    context 'with invalid stat' do
+    context 'with invalid count' do
       it 'raises error' do
-        expect { described_class.new(:invalid, account:) }.to raise_error(Analytics::StatNotFoundError)
+        expect { described_class.new(:invalid, account:) }.to raise_error(Analytics::CountNotFoundError)
       end
     end
 
@@ -61,17 +61,17 @@ describe Analytics::Stat do
       end
 
       it 'scopes to environment' do
-        stat = described_class.new(:machines, account:, environment:)
+        count = described_class.new(:machines, account:, environment:)
 
-        expect(stat).to be_valid
-        expect(stat.count).to eq(2)
+        expect(count).to be_valid
+        expect(count.count).to eq(2)
       end
 
       it 'returns global count when no environment' do
-        stat = described_class.new(:machines, account:)
+        count = described_class.new(:machines, account:)
 
-        expect(stat).to be_valid
-        expect(stat.count).to eq(3)
+        expect(count).to be_valid
+        expect(count.count).to eq(3)
       end
     end
   end
@@ -79,9 +79,9 @@ describe Analytics::Stat do
   describe 'machines' do
     context 'with no machines' do
       it 'returns zero' do
-        stat = described_class.new(:machines, account:)
+        count = described_class.new(:machines, account:)
 
-        expect(stat.count).to eq(0)
+        expect(count.count).to eq(0)
       end
     end
 
@@ -91,9 +91,9 @@ describe Analytics::Stat do
       end
 
       it 'returns correct count' do
-        stat = described_class.new(:machines, account:)
+        count = described_class.new(:machines, account:)
 
-        expect(stat.count).to eq(3)
+        expect(count.count).to eq(3)
       end
     end
 
@@ -106,15 +106,15 @@ describe Analytics::Stat do
       end
 
       it 'returns only environment-scoped machines' do
-        stat = described_class.new(:machines, account:, environment:)
+        count = described_class.new(:machines, account:, environment:)
 
-        expect(stat.count).to eq(2)
+        expect(count.count).to eq(2)
       end
 
       it 'returns only global machines when no environment' do
-        stat = described_class.new(:machines, account:)
+        count = described_class.new(:machines, account:)
 
-        expect(stat.count).to eq(3)
+        expect(count.count).to eq(3)
       end
     end
   end
@@ -122,9 +122,9 @@ describe Analytics::Stat do
   describe 'licenses' do
     context 'with no licenses' do
       it 'returns zero' do
-        stat = described_class.new(:licenses, account:)
+        count = described_class.new(:licenses, account:)
 
-        expect(stat.count).to eq(0)
+        expect(count.count).to eq(0)
       end
     end
 
@@ -134,9 +134,9 @@ describe Analytics::Stat do
       end
 
       it 'returns correct count' do
-        stat = described_class.new(:licenses, account:)
+        count = described_class.new(:licenses, account:)
 
-        expect(stat.count).to eq(3)
+        expect(count.count).to eq(3)
       end
     end
 
@@ -149,15 +149,15 @@ describe Analytics::Stat do
       end
 
       it 'returns only environment-scoped licenses' do
-        stat = described_class.new(:licenses, account:, environment:)
+        count = described_class.new(:licenses, account:, environment:)
 
-        expect(stat.count).to eq(2)
+        expect(count.count).to eq(2)
       end
 
       it 'returns only global licenses when no environment' do
-        stat = described_class.new(:licenses, account:)
+        count = described_class.new(:licenses, account:)
 
-        expect(stat.count).to eq(3)
+        expect(count.count).to eq(3)
       end
     end
   end
@@ -165,9 +165,9 @@ describe Analytics::Stat do
   describe 'users' do
     context 'with no users' do
       it 'returns zero' do
-        stat = described_class.new(:users, account:)
+        count = described_class.new(:users, account:)
 
-        expect(stat.count).to eq(0)
+        expect(count.count).to eq(0)
       end
     end
 
@@ -177,9 +177,9 @@ describe Analytics::Stat do
       end
 
       it 'returns correct count' do
-        stat = described_class.new(:users, account:)
+        count = described_class.new(:users, account:)
 
-        expect(stat.count).to eq(3)
+        expect(count.count).to eq(3)
       end
     end
 
@@ -190,9 +190,9 @@ describe Analytics::Stat do
       end
 
       it 'excludes admins from count' do
-        stat = described_class.new(:users, account:)
+        count = described_class.new(:users, account:)
 
-        expect(stat.count).to eq(2)
+        expect(count.count).to eq(2)
       end
     end
 
@@ -205,15 +205,15 @@ describe Analytics::Stat do
       end
 
       it 'returns only environment-scoped users' do
-        stat = described_class.new(:users, account:, environment:)
+        count = described_class.new(:users, account:, environment:)
 
-        expect(stat.count).to eq(2)
+        expect(count.count).to eq(2)
       end
 
       it 'returns only global users when no environment' do
-        stat = described_class.new(:users, account:)
+        count = described_class.new(:users, account:)
 
-        expect(stat.count).to eq(3)
+        expect(count.count).to eq(3)
       end
     end
   end
@@ -221,9 +221,9 @@ describe Analytics::Stat do
   describe 'active_licensed_users' do
     context 'with no active licensed users' do
       it 'returns zero' do
-        stat = described_class.new(:active_licensed_users, account:)
+        count = described_class.new(:active_licensed_users, account:)
 
-        expect(stat.count).to eq(0)
+        expect(count.count).to eq(0)
       end
     end
 
@@ -233,9 +233,9 @@ describe Analytics::Stat do
       end
 
       it 'returns zero' do
-        stat = described_class.new(:active_licensed_users, account:)
+        count = described_class.new(:active_licensed_users, account:)
 
-        expect(stat.count).to eq(0)
+        expect(count.count).to eq(0)
       end
     end
 
@@ -248,9 +248,9 @@ describe Analytics::Stat do
       end
 
       it 'returns correct count' do
-        stat = described_class.new(:active_licensed_users, account:)
+        count = described_class.new(:active_licensed_users, account:)
 
-        expect(stat.count).to eq(3)
+        expect(count.count).to eq(3)
       end
     end
 
@@ -263,9 +263,9 @@ describe Analytics::Stat do
       end
 
       it 'counts users with expired but recently active licenses' do
-        stat = described_class.new(:active_licensed_users, account:)
+        count = described_class.new(:active_licensed_users, account:)
 
-        expect(stat.count).to eq(2)
+        expect(count.count).to eq(2)
       end
     end
 
@@ -275,9 +275,9 @@ describe Analytics::Stat do
       end
 
       it 'counts each unassigned license as one licensed user' do
-        stat = described_class.new(:active_licensed_users, account:)
+        count = described_class.new(:active_licensed_users, account:)
 
-        expect(stat.count).to eq(3)
+        expect(count.count).to eq(3)
       end
     end
 
@@ -290,9 +290,9 @@ describe Analytics::Stat do
       end
 
       it 'ignores environment scoping' do
-        stat = described_class.new(:active_licensed_users, account:, environment:)
+        count = described_class.new(:active_licensed_users, account:, environment:)
 
-        expect(stat.count).to eq(1)
+        expect(count.count).to eq(1)
       end
     end
   end
@@ -302,9 +302,9 @@ describe Analytics::Stat do
       users = create_list(:user, 2, account:)
       users.each { create(:license, account:, owner: it) }
 
-      stat = described_class.new(:alus, account:)
+      count = described_class.new(:alus, account:)
 
-      expect(stat.count).to eq(2)
+      expect(count.count).to eq(2)
     end
   end
 end

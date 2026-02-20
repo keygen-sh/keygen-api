@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Priv::Analytics
-  class ActivitiesController < BaseController
+  class EventsController < BaseController
     use_clickhouse
 
     CACHE_TTL      = 10.minutes
@@ -20,13 +20,14 @@ module Priv::Analytics
     def show
       authorize! with: Accounts::AnalyticsPolicy
 
-      activity = Analytics::Activity.new(
-        params[:event_type],
-        **activity_query,
+      series = Analytics::Series.new(
+        :events,
+        pattern: params[:event_type],
+        **event_query,
       )
 
-      unless activity.valid?
-        render_bad_request *activity.errors.as_jsonapi(
+      unless series.valid?
+        render_bad_request *series.errors.as_jsonapi(
           title: 'Bad request',
           source: :parameter,
           sources: {
@@ -42,8 +43,8 @@ module Priv::Analytics
         return
       end
 
-      data = Rails.cache.fetch activity.cache_key, expires_in: CACHE_TTL, race_condition_ttl: CACHE_RACE_TTL do
-        activity.as_json
+      data = Rails.cache.fetch series.cache_key, expires_in: CACHE_TTL, race_condition_ttl: CACHE_RACE_TTL do
+        series.as_json
       end
 
       render json: { data: }
