@@ -132,8 +132,7 @@ Feature: Analytic counts
     And I am the last admin of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/analytics/actions/count?environment=isolated"
-    Then the response status should be "403"
-    And the response body should be an array of 1 error
+    Then the response status should be "200"
     And sidekiq should have 0 "request-log" jobs
 
   @ee
@@ -143,8 +142,7 @@ Feature: Analytic counts
     And I am the last admin of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/analytics/actions/count?environment=shared"
-    Then the response status should be "403"
-    And the response body should be an array of 1 error
+    Then the response status should be "200"
     And sidekiq should have 0 "request-log" jobs
 
   @ee

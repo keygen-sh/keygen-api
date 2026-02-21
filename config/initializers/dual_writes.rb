@@ -3,5 +3,5 @@
 require_dependency Rails.root / 'lib' / 'dual_writes'
 
 DualWrites.configure do |config|
-  config.retry_attempts = 10
+  config.retry_attempts = Rails.env.test? ? 0 : 10 # disable retries in test
 end

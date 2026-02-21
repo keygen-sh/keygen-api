@@ -496,6 +496,18 @@ Rails.application.routes.draw do
     end
   end
 
+  concern :priv do
+    scope constraints: MimeTypeConstraint.new(:jsonapi, :json, :binary, raise_on_no_match: true), defaults: { format: :json } do
+      namespace :analytics do
+        get 'events/:event',             to: 'events#show',        as: :event,       constraints: { event: /.*/ }
+        get 'leaderboards/:leaderboard', to: 'leaderboards#show',  as: :leaderboard
+        get 'heatmaps/:heatmap',         to: 'heatmaps#show',      as: :heatmap
+        get 'gauges/:gauge',             to: 'gauges#show',        as: :gauge
+        get 'usage',                     to: 'usage#show',         as: :usage
+      end
+    end
+  end
+
   if Keygen.cloud?
     # Simplified short URLs for artifact distribution
     scope module: :bin, constraints: { domain: Keygen::DOMAIN, subdomain: %w[bin get], format: :jsonapi } do
@@ -670,6 +682,15 @@ Rails.application.routes.draw do
     scope module: :auth do
       concerns :sso
     end
+  end
+
+  # internal endpoints e.g. analytics
+  namespace :priv, path: '-' do
+    scope 'accounts/:account_id', as: :account do
+      concerns :priv
+    end
+
+    concerns :priv
   end
 
   # route helpers for redirecting to Portal

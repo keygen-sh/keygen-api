@@ -288,6 +288,27 @@ describe DualWrites do
       end
     end
 
+    describe 'with extension' do
+      temporary_table :dual_write_record_with_exts do |t|
+        t.string :name
+        t.text :data
+        t.integer :is_deleted, default: 0, null: false
+        t.timestamps
+      end
+
+      temporary_model :dual_write_record_with_ext do
+        include DualWrites::Model
+
+        dual_writes to: %i[clickhouse], strategy: :clickhouse do
+          def ok? = true
+        end
+      end
+
+      it 'should apply extensions to database class' do
+        expect(DualWriteRecordWithExt::Clickhouse.instance_methods).to include :ok?
+      end
+    end
+
     describe 'strategy_config' do
       temporary_table :expiring_records do |t|
         t.string :name

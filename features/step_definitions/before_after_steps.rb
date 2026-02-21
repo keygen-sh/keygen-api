@@ -14,6 +14,10 @@ RequestMigrations.supported_versions.each do |version|
   end
 end
 
+Before '@api/priv' do
+  @api_version = '-' # private api prefix
+end
+
 # FIXME(ezekg) This is super hacky but there's no easy way to disable
 #              bullet outside of adding controller filters
 Before("@skip/bullet") { Bullet.instance_variable_set :@enable, false }
@@ -23,6 +27,27 @@ After("@skip/bullet")  { Bullet.instance_variable_set :@enable, true }
 BeforeAll do
   DatabaseCleaner.clean_with :truncation, except: %w[event_types permissions]
   Rails.cache.clear
+end
+
+# run subset of active jobs inline so data is immediately available
+ACTIVE_JOBS_TO_RUN_INLINE = [
+  ActiveRecord::DestroyAssociationAsyncJob,
+  DualWrites::BulkReplicationJob,
+  DualWrites::ReplicationJob,
+  AsyncDestroyable::DestroyAsyncJob,
+  AsyncCreatable::CreateAsyncJob,
+  AsyncUpdatable::UpdateAsyncJob,
+  AsyncTouchable::TouchAsyncJob,
+]
+
+Around do |_, scenario|
+  adapter_was, ActiveJob::Base.queue_adapter = ActiveJob::Base.queue_adapter, :test
+
+  perform_enqueued_jobs only: ACTIVE_JOBS_TO_RUN_INLINE do
+    scenario.call
+  end
+ensure
+  ActiveJob::Base.queue_adapter = adapter_was
 end
 
 Before do |scenario|
@@ -38,11 +63,13 @@ Before do |scenario|
     Keygen.singleplayer? && scenario.tags.any? { it.name == '@mp' } ||
     Keygen.multiplayer? && scenario.tags.any? { it.name == '@sp' }
 
+  # skip clickhouse-specific scenarios if disabled
+  return skip_this_scenario if
+    !Keygen.database.clickhouse_enabled? && scenario.tags.any? { it.name == '@clickhouse' }
+
   # And of course, skip if we need to skip.
   return skip_this_scenario if
     scenario.tags.any? { it.name == '@skip' }
-
-  Bullet.start_request if Bullet.enable?
 
   ActionMailer::Base.deliveries.clear
   Sidekiq::Worker.clear_all
@@ -56,11 +83,6 @@ Before do |scenario|
 end
 
 After do |scenario|
-  Bullet.perform_out_of_channel_notifications if Bullet.enable? && Bullet.notification?
-  Bullet.end_request if Bullet.enable?
-
-  unfreeze_time
-
   if scenario.failed?
     # print additional information about the failed scenario to stderr when debug mode is enabled
     if ENV.true?('DEBUG')
@@ -72,6 +94,8 @@ After do |scenario|
   StripeHelper.stop
   Current.reset
   DatabaseCleaner.clean
+
+  unfreeze_time
 
   @account = nil
   @bearer  = nil

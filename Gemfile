@@ -23,7 +23,7 @@ gem 'redis', '~> 4.7.1'
 gem 'request_migrations', '~> 1.1.2'
 
 # API params
-gem 'typed_params', '~> 1.4.1'
+gem 'typed_params', '~> 1.5'
 
 # Serializers
 gem 'json', '~> 2.3.0'
@@ -119,7 +119,7 @@ group :development, :test do
   gem 'byebug', platform: :mri
   gem 'dotenv-rails'
   gem 'timecop', '~> 0.9.5'
-  gem 'bullet', '~> 8'
+  gem 'bullet', '~> 8.1'
   gem 'parallel_tests', '~> 5.5'
   gem 'cuke_modeler', '~> 3.19' # for running `parallel_test --group-by scenarios`
   gem 'faker', '~> 2.20.0'

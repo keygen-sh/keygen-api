@@ -34,7 +34,25 @@ Rails.application.configure do
     config.logger    = Logger.new(nil)
     config.log_level = :fatal
   else
-    config.log_file_size = nil
+    config.log_file_size = nil # no log file limit since we clear every run
+
+    # add test number to all logs so that things are easier to debug
+    config.logger = case config.logger
+                    in ActiveSupport::TaggedLogging
+                      config.logger # already a tagged logger
+                    in nil
+                      ActiveSupport::TaggedLogging.new(
+                        ActiveSupport::Logger.new(Rails.root / "log" / "#{Rails.env}.log"),
+                      )
+                    in ActiveSupport::Logger | Logger
+                      ActiveSupport::TaggedLogging.new(
+                        config.logger,
+                      )
+                    end
+
+    config.logger.push_tags(
+      "parallel_tests:#{ENV['TEST_ENV_NUMBER']}",
+    )
   end
 
   # Enable/disable caching with redis.
@@ -108,6 +126,13 @@ Rails.application.configure do
     # FIXME(ezekg) For some reason, we're seeing failures even though
     #              we're not eager loading anything.
     Bullet.unused_eager_loading_enable = false
+  end
+
+  # FIXME(ezekg) make sure log subscribers use the same tagged logger
+  config.after_initialize do
+    ActiveSupport::LogSubscriber.logger =
+    ActiveRecord::Base.logger           =
+    ActionController::Base.logger       = Rails.logger
   end
 end
 

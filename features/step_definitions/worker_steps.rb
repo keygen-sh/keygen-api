@@ -2,23 +2,6 @@
 
 World Rack::Test::Methods
 
-def drain_async_jobs
-  require 'sidekiq/testing'
-
-  # FIXME(ezekg) there doesn't seem to be an easier way to drain a subset of wrapped jobs
-  active_job = ActiveJob::QueueAdapters::SidekiqAdapter::JobWrapper
-  active_job.jobs.each do |job|
-    case job['wrapped']
-    when AsyncCreatable::CreateAsyncJob.name, AsyncUpdatable::UpdateAsyncJob.name,
-         AsyncTouchable::TouchAsyncJob.name, AsyncDestroyable::DestroyAsyncJob.name,
-         ActiveRecord::DestroyAssociationAsyncJob.name
-      active_job.process_job(job)
-    end
-  end
-
-  YankArtifactWorker.drain
-end
-
 Then /^sidekiq should (?:have|process) (\d+) "([^\"]*)" jobs?(?: queued in ([.\d]+ \w+))?$/ do |expected_count, worker_name, queued_at|
   worker_name =
     case worker_name
@@ -88,15 +71,15 @@ Then /^sidekiq should (?:have|process) (\d+) "([^\"]*)" jobs?(?: queued in ([.\d
 end
 
 Then /^the (?:account|user) should receive an? "([^\"]*)" email$/ do |mailer|
-  received_any = Sidekiq::Queues["mailers"].any? do |job|
-    job["args"].first["arguments"].include? mailer.underscore.parameterize(separator: "_")
+  received_any = enqueued_jobs_with(queue: 'mailers').any? do |job|
+    job['arguments'].include? mailer.underscore.parameterize(separator: '_')
   end
   expect(received_any).to be true
 end
 
 Then /^the (?:account|user) should not receive an? "([^\"]*)" email$/ do |mailer|
-  received_any = Sidekiq::Queues["mailers"].any? do |job|
-    job["args"].first["arguments"].include? mailer.underscore.parameterize(separator: "_")
+  received_any = enqueued_jobs_with(queue: 'mailers').any? do |job|
+    job['arguments'].include? mailer.underscore.parameterize(separator: '_')
   end
   expect(received_any).to be false
 end

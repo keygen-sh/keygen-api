@@ -33,6 +33,9 @@ begin
       # See: https://github.com/grosser/parallel_tests/issues/505
       ENV['TEST_ENV_NUMBER'] ||= '1'
 
+      # Ensure we always have enough database connections.
+      ENV['DATABASE_CONNECTION_POOL'] ||= '1024'
+
       # Ensure we're always in the test environment.
       ENV['RAILS_ENV'] = Rails.env = 'test'
     end

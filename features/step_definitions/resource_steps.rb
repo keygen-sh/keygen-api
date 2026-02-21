@@ -247,6 +247,15 @@ Given /^the current account has the following "([^\"]*)" rows:$/ do |resource, r
         account: @account,
         **hash,
       )
+    when :event_log
+      if event = hash.delete(:event)
+        hash[:event_type_id] = EventType.lookup_id_by_event(event)
+      end
+
+      create(:event_log,
+        account: @account,
+        **hash,
+      )
     else
       create(factory,
         account: @account,

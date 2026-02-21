@@ -98,11 +98,11 @@ class ApplicationController < ActionController::API
     render status: :no_content
   end
 
-  def render_forbidden(**kwargs)
+  def render_forbidden(*errors, **error)
     skip_verify_authorized!
 
     # expire session cookie on certain terminal authz error codes
-    if kwargs in code: 'SESSION_NOT_ALLOWED' | 'USER_BANNED'
+    if error in code: 'SESSION_NOT_ALLOWED' | 'USER_BANNED'
       reset_session_id_cookie
     end
 
@@ -110,10 +110,10 @@ class ApplicationController < ActionController::API
       format.any {
         render status: :forbidden, json: {
           meta: { id: request.request_id },
-          errors: [{
+          errors: errors.presence || [{
             title: 'Access denied',
             detail: 'You do not have permission to complete the request',
-            **kwargs,
+            **error,
           }],
         }
       }
@@ -126,7 +126,7 @@ class ApplicationController < ActionController::API
     end
   end
 
-  def render_unauthorized(**kwargs)
+  def render_unauthorized(*errors, **error)
     skip_verify_authorized!
 
     # FIXME(ezekg) docker wants to do a jwt token dance unless we stick to a basic
@@ -147,10 +147,10 @@ class ApplicationController < ActionController::API
       format.any {
         render status: :unauthorized, json: {
           meta: { id: request.request_id },
-          errors: [{
+          errors: errors.presence || [{
             title: 'Unauthorized',
             detail: 'You must be authenticated to complete the request',
-            **kwargs,
+            **error,
           }],
         }
       }
@@ -163,17 +163,17 @@ class ApplicationController < ActionController::API
     end
   end
 
-  def render_unprocessable_entity(**kwargs)
+  def render_unprocessable_entity(*errors, **error)
     skip_verify_authorized!
 
     respond_to do |format|
       format.any {
         render status: :unprocessable_entity, json: {
           meta: { id: request.request_id },
-          errors: [{
+          errors: errors.presence || [{
             title: 'Unprocessable entity',
             detail: 'The request could not be completed',
-            **kwargs,
+            **error,
           }],
         }
       }
@@ -186,18 +186,18 @@ class ApplicationController < ActionController::API
     end
   end
 
-  def render_not_found(**kwargs)
+  def render_not_found(*errors, **error)
     skip_verify_authorized!
 
     respond_to do |format|
       format.any {
         render status: :not_found, json: {
           meta: { id: request.request_id },
-          errors: [{
+          errors: errors.presence || [{
             title: 'Not found',
             detail: 'The requested endpoint was not found (check your HTTP method, Accept header, and URL path)',
             code: 'NOT_FOUND',
-            **kwargs,
+            **error,
           }],
         }
       }
@@ -210,17 +210,17 @@ class ApplicationController < ActionController::API
     end
   end
 
-  def render_bad_request(**kwargs)
+  def render_bad_request(*errors, **error)
     skip_verify_authorized!
 
     respond_to do |format|
       format.any {
         render status: :bad_request, json: {
           meta: { id: request.request_id },
-          errors: [{
+          errors: errors.presence || [{
             title: 'Bad request',
             detail: 'The request could not be completed',
-            **kwargs,
+            **error,
           }],
         }
       }
@@ -233,17 +233,17 @@ class ApplicationController < ActionController::API
     end
   end
 
-  def render_conflict(**kwargs)
+  def render_conflict(*errors, **error)
     skip_verify_authorized!
 
     respond_to do |format|
       format.any {
         render status: :conflict, json: {
           meta: { id: request.request_id },
-          errors: [{
+          errors: errors.presence || [{
             title: 'Conflict',
             detail: 'The request could not be completed because of a conflict',
-            **kwargs,
+            **error,
           }],
         }
       }
@@ -256,17 +256,17 @@ class ApplicationController < ActionController::API
     end
   end
 
-  def render_payment_required(**kwargs)
+  def render_payment_required(*errors, **error)
     skip_verify_authorized!
 
     respond_to do |format|
       format.any {
         render status: :payment_required, json: {
           meta: { id: request.request_id },
-          errors: [{
+          errors: errors.presence || [{
             title: 'Payment required',
             detail: 'The request could not be completed',
-            **kwargs,
+            **error,
           }],
         }
       }
@@ -279,17 +279,45 @@ class ApplicationController < ActionController::API
     end
   end
 
-  def render_internal_server_error(**kwargs)
+  def render_not_supported(*errors, **error)
     skip_verify_authorized!
+
+    response.headers['Allow'] = '' # we support nothing
+
+    respond_to do |format|
+      format.any {
+        render status: :method_not_allowed, json: {
+          meta: { id: request.request_id },
+          errors: errors.presence || [{
+            title: 'Not supported',
+            detail: 'The request could not be completed',
+            **error,
+          }],
+        }
+      }
+      format.html {
+        render html: 'Not Supported', status: :method_not_allowed
+      }
+      format.text {
+        head :method_not_allowed
+      }
+    end
+  end
+
+  def render_internal_server_error(*errors, **error)
+    skip_verify_authorized!
+
+    # capture last exception for debugging
+    request.set_header 'action_dispatch.exception', $!
 
     respond_to do |format|
       format.any {
         render status: :internal_server_error, json: {
           meta: { id: request.request_id },
-          errors: [{
+          errors: errors.presence || [{
             title: 'Internal server error',
             detail: 'Looks like something went wrong! Our engineers have been notified. If you continue to have problems, please contact support@keygen.sh.',
-            **kwargs,
+            **error,
           }],
         }
       }
@@ -302,17 +330,17 @@ class ApplicationController < ActionController::API
     end
   end
 
-  def render_service_unavailable(**kwargs)
+  def render_service_unavailable(*errors, **error)
     skip_verify_authorized!
 
     respond_to do |format|
       format.any {
         render status: :service_unavailable, json: {
           meta: { id: request.request_id },
-          errors: [{
+          errors: errors.presence || [{
             title: 'Service unavailable',
             detail: 'Our services are currently unavailable. Please see https://status.keygen.sh for our uptime status and contact support@keygen.sh with any questions.',
-            **kwargs,
+            **error,
           }],
         }
       }
@@ -337,38 +365,38 @@ class ApplicationController < ActionController::API
       # some relationships are invisible, exposed as attributes.
       case error
       in source: { pointer: %r{^/data/relationships/users/(.*+)} } if resource in Account
-        error.pointer = "/data/relationships/admins/#{$1}"
+        error.source = { pointer: "/data/relationships/admins/#{$1}" }
       in source: { pointer: %r{^/data/attributes/permission_?ids$}i },
          code: /^PERMISSION_IDS_(.+)/
-        error.pointer = '/data/attributes/permissions'
-        error.code    = "PERMISSIONS_#{$1}"
+        error.source = { pointer: '/data/attributes/permissions' }
+        error.code   = "PERMISSIONS_#{$1}"
       in source: { pointer: %r{^/data/relationships/role/data/attributes/permission_?ids}i },
          code: /^ROLE_PERMISSION_IDS_(.+)/
-        error.pointer = '/data/attributes/permissions'
-        error.code    = "PERMISSIONS_#{$1}"
+        error.source = { pointer: '/data/attributes/permissions' }
+        error.code   = "PERMISSIONS_#{$1}"
       in source: { pointer: %r{^/data/relationships/permissions}i }
-        error.pointer = '/data/attributes/permissions'
+        error.source = { pointer: '/data/attributes/permissions' }
       in source: { pointer: %r{^/data/relationships/role} }
-        error.pointer = '/data/attributes/role'
+        error.source = { pointer: '/data/attributes/role' }
       in source: { pointer: %r{^/data/relationships/filetype} }
-        error.pointer = '/data/attributes/filetype'
+        error.source = { pointer: '/data/attributes/filetype' }
       in source: { pointer: %r{^/data/relationships/channel} }
-        error.pointer = '/data/attributes/channel'
+        error.source = { pointer: '/data/attributes/channel' }
       in source: { pointer: %r{^/data/relationships/platform} }
-        error.pointer = '/data/attributes/platform'
+        error.source = { pointer: '/data/attributes/platform' }
       in source: { pointer: %r{^/data/relationships/engine} }
-        error.pointer = '/data/attributes/engine'
+        error.source = { pointer: '/data/attributes/engine' }
       in source: { pointer: %r{^/data/relationships/arch} }
-        error.pointer = '/data/attributes/arch'
+        error.source = { pointer: '/data/attributes/arch' }
       in source: { pointer: %r{^/data/attributes/admins} }
-        error.pointer = '/data/relationships/admins'
+        error.source = { pointer: '/data/relationships/admins' }
       in source: { pointer: %r{^/data/attributes/backdatedTo} },
          code: /^BACKDATED_TO_(.+)/
-        error.pointer = '/data/attributes/backdated'
-        error.code    = "BACKDATED_#{$1}"
+        error.source = { pointer: '/data/attributes/backdated' }
+        error.code   = "BACKDATED_#{$1}"
       in code: /^(?:LICENSE_)?USERS?_LIMIT_EXCEEDED$/ # normalize user limit errors
-        error.pointer = '/data/relationships/users'
-        error.code    = 'USER_LIMIT_EXCEEDED'
+        error.source = { pointer: '/data/relationships/users' }
+        error.code   = 'USER_LIMIT_EXCEEDED'
       in code: /ACCOUNT_NOT_ALLOWED$/ # private error
         errors.delete(error)
       else
@@ -435,7 +463,7 @@ class ApplicationController < ActionController::API
   rescue TypedParams::UnpermittedParameterError,
          TypedParams::InvalidParameterError => e
     source = e.source == :query ? :parameter : :pointer
-    path   = e.source == :query ? e.path.to_s : e.path.to_json_pointer
+    path   = e.source == :query ? e.path.to_bracket_notation : e.path.to_json_pointer
 
     render_bad_request detail: e.message, source: { source => path }
   rescue Keygen::Error::BadRequestError,
