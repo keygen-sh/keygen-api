@@ -3,52 +3,52 @@
 require 'rails_helper'
 require 'spec_helper'
 
-describe Analytics::Count do
+describe Analytics::Gauge do
   let(:account) { create(:account) }
 
   describe '.new' do
-    context 'with valid count' do
-      it 'returns count for machines' do
+    context 'with valid gauge' do
+      it 'returns gauge for machines' do
         create_list(:machine, 3, account:)
 
-        count = described_class.new(:machines, account:)
+        gauge = described_class.new(:machines, account:)
 
-        expect(count).to be_a(Analytics::Count)
-        expect(count).to be_valid
-        expect(count.count).to eq(3)
+        expect(gauge).to be_a(Analytics::Gauge)
+        expect(gauge).to be_valid
+        expect(gauge.count).to eq(3)
       end
 
-      it 'returns count for users' do
+      it 'returns gauge for users' do
         create_list(:user, 2, account:)
 
-        count = described_class.new(:users, account:)
+        gauge = described_class.new(:users, account:)
 
-        expect(count).to be_a(Analytics::Count)
-        expect(count).to be_valid
-        expect(count.count).to eq(2)
+        expect(gauge).to be_a(Analytics::Gauge)
+        expect(gauge).to be_valid
+        expect(gauge.count).to eq(2)
       end
 
-      it 'returns count for licenses' do
+      it 'returns gauge for licenses' do
         create_list(:license, 4, account:)
 
-        count = described_class.new(:licenses, account:)
+        gauge = described_class.new(:licenses, account:)
 
-        expect(count).to be_a(Analytics::Count)
-        expect(count).to be_valid
-        expect(count.count).to eq(4)
+        expect(gauge).to be_a(Analytics::Gauge)
+        expect(gauge).to be_valid
+        expect(gauge.count).to eq(4)
       end
 
       it 'accepts string names' do
-        count = described_class.new('machines', account:)
+        gauge = described_class.new('machines', account:)
 
-        expect(count).to be_a(Analytics::Count)
-        expect(count).to be_valid
+        expect(gauge).to be_a(Analytics::Gauge)
+        expect(gauge).to be_valid
       end
     end
 
-    context 'with invalid count' do
+    context 'with invalid gauge' do
       it 'raises error' do
-        expect { described_class.new(:invalid, account:) }.to raise_error(Analytics::CountNotFoundError)
+        expect { described_class.new(:invalid, account:) }.to raise_error(Analytics::GaugeNotFoundError)
       end
     end
 
@@ -61,17 +61,17 @@ describe Analytics::Count do
       end
 
       it 'scopes to environment' do
-        count = described_class.new(:machines, account:, environment:)
+        gauge = described_class.new(:machines, account:, environment:)
 
-        expect(count).to be_valid
-        expect(count.count).to eq(2)
+        expect(gauge).to be_valid
+        expect(gauge.count).to eq(2)
       end
 
       it 'returns global count when no environment' do
-        count = described_class.new(:machines, account:)
+        gauge = described_class.new(:machines, account:)
 
-        expect(count).to be_valid
-        expect(count.count).to eq(3)
+        expect(gauge).to be_valid
+        expect(gauge.count).to eq(3)
       end
     end
   end
@@ -79,9 +79,9 @@ describe Analytics::Count do
   describe 'machines' do
     context 'with no machines' do
       it 'returns zero' do
-        count = described_class.new(:machines, account:)
+        gauge = described_class.new(:machines, account:)
 
-        expect(count.count).to eq(0)
+        expect(gauge.count).to eq(0)
       end
     end
 
@@ -91,9 +91,9 @@ describe Analytics::Count do
       end
 
       it 'returns correct count' do
-        count = described_class.new(:machines, account:)
+        gauge = described_class.new(:machines, account:)
 
-        expect(count.count).to eq(3)
+        expect(gauge.count).to eq(3)
       end
     end
 
@@ -106,15 +106,15 @@ describe Analytics::Count do
       end
 
       it 'returns only environment-scoped machines' do
-        count = described_class.new(:machines, account:, environment:)
+        gauge = described_class.new(:machines, account:, environment:)
 
-        expect(count.count).to eq(2)
+        expect(gauge.count).to eq(2)
       end
 
       it 'returns only global machines when no environment' do
-        count = described_class.new(:machines, account:)
+        gauge = described_class.new(:machines, account:)
 
-        expect(count.count).to eq(3)
+        expect(gauge.count).to eq(3)
       end
     end
   end
@@ -122,9 +122,9 @@ describe Analytics::Count do
   describe 'licenses' do
     context 'with no licenses' do
       it 'returns zero' do
-        count = described_class.new(:licenses, account:)
+        gauge = described_class.new(:licenses, account:)
 
-        expect(count.count).to eq(0)
+        expect(gauge.count).to eq(0)
       end
     end
 
@@ -134,9 +134,9 @@ describe Analytics::Count do
       end
 
       it 'returns correct count' do
-        count = described_class.new(:licenses, account:)
+        gauge = described_class.new(:licenses, account:)
 
-        expect(count.count).to eq(3)
+        expect(gauge.count).to eq(3)
       end
     end
 
@@ -149,15 +149,15 @@ describe Analytics::Count do
       end
 
       it 'returns only environment-scoped licenses' do
-        count = described_class.new(:licenses, account:, environment:)
+        gauge = described_class.new(:licenses, account:, environment:)
 
-        expect(count.count).to eq(2)
+        expect(gauge.count).to eq(2)
       end
 
       it 'returns only global licenses when no environment' do
-        count = described_class.new(:licenses, account:)
+        gauge = described_class.new(:licenses, account:)
 
-        expect(count.count).to eq(3)
+        expect(gauge.count).to eq(3)
       end
     end
   end
@@ -165,9 +165,9 @@ describe Analytics::Count do
   describe 'users' do
     context 'with no users' do
       it 'returns zero' do
-        count = described_class.new(:users, account:)
+        gauge = described_class.new(:users, account:)
 
-        expect(count.count).to eq(0)
+        expect(gauge.count).to eq(0)
       end
     end
 
@@ -177,9 +177,9 @@ describe Analytics::Count do
       end
 
       it 'returns correct count' do
-        count = described_class.new(:users, account:)
+        gauge = described_class.new(:users, account:)
 
-        expect(count.count).to eq(3)
+        expect(gauge.count).to eq(3)
       end
     end
 
@@ -190,9 +190,9 @@ describe Analytics::Count do
       end
 
       it 'excludes admins from count' do
-        count = described_class.new(:users, account:)
+        gauge = described_class.new(:users, account:)
 
-        expect(count.count).to eq(2)
+        expect(gauge.count).to eq(2)
       end
     end
 
@@ -205,15 +205,15 @@ describe Analytics::Count do
       end
 
       it 'returns only environment-scoped users' do
-        count = described_class.new(:users, account:, environment:)
+        gauge = described_class.new(:users, account:, environment:)
 
-        expect(count.count).to eq(2)
+        expect(gauge.count).to eq(2)
       end
 
       it 'returns only global users when no environment' do
-        count = described_class.new(:users, account:)
+        gauge = described_class.new(:users, account:)
 
-        expect(count.count).to eq(3)
+        expect(gauge.count).to eq(3)
       end
     end
   end
@@ -221,9 +221,9 @@ describe Analytics::Count do
   describe 'active_licensed_users' do
     context 'with no active licensed users' do
       it 'returns zero' do
-        count = described_class.new(:active_licensed_users, account:)
+        gauge = described_class.new(:active_licensed_users, account:)
 
-        expect(count.count).to eq(0)
+        expect(gauge.count).to eq(0)
       end
     end
 
@@ -233,9 +233,9 @@ describe Analytics::Count do
       end
 
       it 'returns zero' do
-        count = described_class.new(:active_licensed_users, account:)
+        gauge = described_class.new(:active_licensed_users, account:)
 
-        expect(count.count).to eq(0)
+        expect(gauge.count).to eq(0)
       end
     end
 
@@ -248,9 +248,9 @@ describe Analytics::Count do
       end
 
       it 'returns correct count' do
-        count = described_class.new(:active_licensed_users, account:)
+        gauge = described_class.new(:active_licensed_users, account:)
 
-        expect(count.count).to eq(3)
+        expect(gauge.count).to eq(3)
       end
     end
 
@@ -263,9 +263,9 @@ describe Analytics::Count do
       end
 
       it 'counts users with expired but recently active licenses' do
-        count = described_class.new(:active_licensed_users, account:)
+        gauge = described_class.new(:active_licensed_users, account:)
 
-        expect(count.count).to eq(2)
+        expect(gauge.count).to eq(2)
       end
     end
 
@@ -275,9 +275,9 @@ describe Analytics::Count do
       end
 
       it 'counts each unassigned license as one licensed user' do
-        count = described_class.new(:active_licensed_users, account:)
+        gauge = described_class.new(:active_licensed_users, account:)
 
-        expect(count.count).to eq(3)
+        expect(gauge.count).to eq(3)
       end
     end
 
@@ -290,9 +290,9 @@ describe Analytics::Count do
       end
 
       it 'ignores environment scoping' do
-        count = described_class.new(:active_licensed_users, account:, environment:)
+        gauge = described_class.new(:active_licensed_users, account:, environment:)
 
-        expect(count.count).to eq(1)
+        expect(gauge.count).to eq(1)
       end
     end
   end
@@ -302,9 +302,9 @@ describe Analytics::Count do
       users = create_list(:user, 2, account:)
       users.each { create(:license, account:, owner: it) }
 
-      count = described_class.new(:alus, account:)
+      gauge = described_class.new(:alus, account:)
 
-      expect(count.count).to eq(2)
+      expect(gauge.count).to eq(2)
     end
   end
 end

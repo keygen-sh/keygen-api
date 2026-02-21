@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
 module Analytics
-  class Count
-    class Machines
+  class Gauge
+    class Licenses
       def initialize(account:, environment:)
         @account     = account
         @environment = environment
       end
 
       def count
-        account.machines.for_environment(environment).count
+        account.licenses.for_environment(environment).count
       end
 
       private
