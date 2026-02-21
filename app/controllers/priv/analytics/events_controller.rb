@@ -32,6 +32,7 @@ module Priv::Analytics
           source: :parameter,
           sources: {
             parameters: {
+              metrics: 'pattern',
               resource_type: 'resource[type]',
               resource_id: 'resource[id]',
               start_date: 'date[start]',
