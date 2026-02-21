@@ -8,11 +8,11 @@ module Analytics
     include ActiveModel::Attributes
 
     COUNTERS = {
-      active_licensed_users: Counters::ActiveLicensedUsers,
-      machines: Counters::Machines,
-      licenses: Counters::Licenses,
-      users: Counters::Users,
-      alus: Counters::ActiveLicensedUsers, # alias
+      active_licensed_users: ActiveLicensedUsers,
+      machines: Machines,
+      licenses: Licenses,
+      users: Users,
+      alus: ActiveLicensedUsers, # alias
     }
 
     attribute :account, default: -> { Current.account }
