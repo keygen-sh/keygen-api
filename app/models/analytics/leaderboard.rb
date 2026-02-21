@@ -11,10 +11,10 @@ module Analytics
 
     MAX_LIMIT = 100
     COUNTERS  = {
-      user_agents: Counters::UserAgents,
-      licenses: Counters::Licenses,
-      urls: Counters::Urls,
-      ips: Counters::Ips,
+      user_agents: UserAgents,
+      licenses: Licenses,
+      urls: Urls,
+      ips: Ips,
     }
 
     attribute :account, default: -> { Current.account }
