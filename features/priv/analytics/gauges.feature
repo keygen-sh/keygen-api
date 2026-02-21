@@ -1,5 +1,5 @@
 @api/priv
-Feature: Count analytics
+Feature: Gauge analytics
   Background:
     Given the following "accounts" exist:
       | name    | slug  |
@@ -12,17 +12,17 @@ Feature: Count analytics
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/counts/machines"
+    When I send a GET request to "/accounts/test1/analytics/gauges/machines"
     Then the response status should be "200"
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
 
-  Scenario: Admin retrieves machines count for their account
+  Scenario: Admin retrieves machines gauge for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 5 "machines"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/counts/machines"
+    When I send a GET request to "/accounts/test1/analytics/gauges/machines"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
@@ -35,12 +35,12 @@ Feature: Count analytics
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
 
-  Scenario: Admin retrieves users count for their account
+  Scenario: Admin retrieves users gauge for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "users"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/counts/users"
+    When I send a GET request to "/accounts/test1/analytics/gauges/users"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
@@ -53,12 +53,12 @@ Feature: Count analytics
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
 
-  Scenario: Admin retrieves licenses count for their account
+  Scenario: Admin retrieves licenses gauge for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 4 "licenses"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/counts/licenses"
+    When I send a GET request to "/accounts/test1/analytics/gauges/licenses"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
@@ -134,7 +134,7 @@ Feature: Count analytics
       | 25515b44-6921-4b14-9f89-7e1510beb5bd | 5796eb0e-cae8-43b7-9fdc-d5a6bf6597de | d2f63b6f664a45339d484b2f2b30f5b0 |
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/counts/alus"
+    When I send a GET request to "/accounts/test1/analytics/gauges/alus"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
@@ -148,17 +148,17 @@ Feature: Count analytics
     And sidekiq should have 0 "event-log" jobs
     And time is unfrozen
 
-  Scenario: Admin retrieves invalid count
+  Scenario: Admin retrieves invalid gauge
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/counts/invalid"
+    When I send a GET request to "/accounts/test1/analytics/gauges/invalid"
     Then the response status should be "404"
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
 
   @ee
-  Scenario: Admin retrieves machines count for isolated environment
+  Scenario: Admin retrieves machines gauge for isolated environment
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
     And the current account has 3 isolated "machines"
@@ -170,7 +170,7 @@ Feature: Count analytics
       """
       { "Keygen-Environment": "isolated" }
       """
-    When I send a GET request to "/accounts/test1/analytics/counts/machines"
+    When I send a GET request to "/accounts/test1/analytics/gauges/machines"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
@@ -184,7 +184,7 @@ Feature: Count analytics
     And sidekiq should have 0 "event-log" jobs
 
   @ee
-  Scenario: Admin retrieves machines count for shared environment
+  Scenario: Admin retrieves machines gauge for shared environment
     Given the current account is "test1"
     And the current account has 1 shared "environment"
     And the current account has 3 shared "machines"
@@ -196,7 +196,7 @@ Feature: Count analytics
       """
       { "Keygen-Environment": "shared" }
       """
-    When I send a GET request to "/accounts/test1/analytics/counts/machines"
+    When I send a GET request to "/accounts/test1/analytics/gauges/machines"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
@@ -210,14 +210,14 @@ Feature: Count analytics
     And sidekiq should have 0 "event-log" jobs
 
   @ee
-  Scenario: Admin retrieves machines count for global environment
+  Scenario: Admin retrieves machines gauge for global environment
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
     And the current account has 3 isolated "machines"
     And the current account has 2 global "machines"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/counts/machines"
+    When I send a GET request to "/accounts/test1/analytics/gauges/machines"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
@@ -230,34 +230,34 @@ Feature: Count analytics
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
 
-  Scenario: Product attempts to retrieve count for their account
+  Scenario: Product attempts to retrieve gauge for their account
     Given the current account is "test1"
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/counts/machines"
+    When I send a GET request to "/accounts/test1/analytics/gauges/machines"
     Then the response status should be "403"
     And the response body should be an array of 1 error
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
 
-  Scenario: User attempts to retrieve count for their account
+  Scenario: User attempts to retrieve gauge for their account
     Given the current account is "test1"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/counts/machines"
+    When I send a GET request to "/accounts/test1/analytics/gauges/machines"
     Then the response status should be "403"
     And the response body should be an array of 1 error
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
 
-  Scenario: License attempts to retrieve count for their account
+  Scenario: License attempts to retrieve gauge for their account
     Given the current account is "test1"
     And the current account has 1 "license"
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/counts/machines"
+    When I send a GET request to "/accounts/test1/analytics/gauges/machines"
     Then the response status should be "403"
     And the response body should be an array of 1 error
     And sidekiq should have 0 "request-log" jobs

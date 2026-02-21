@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 module Analytics
-  class CountNotFoundError < StandardError; end
+  class GaugeNotFoundError < StandardError; end
 
-  class Count
+  class Gauge
     include ActiveModel::Model
     include ActiveModel::Attributes
 
@@ -23,7 +23,7 @@ module Analytics
     def initialize(counter_name, **)
       @counter_name = counter_name = counter_name.to_s.underscore.to_sym
 
-      raise CountNotFoundError, "invalid count: #{counter_name.inspect}" unless
+      raise GaugeNotFoundError, "invalid gauge: #{counter_name.inspect}" unless
         COUNTERS.key?(counter_name)
 
       super(**)
@@ -38,7 +38,7 @@ module Analytics
     def cache_key
       digest = Digest::SHA2.hexdigest("#{counter_name}")
 
-      "analytics:counts:#{account.id}:#{environment&.id}:#{digest}:#{CACHE_KEY_VERSION}"
+      "analytics:gauges:#{account.id}:#{environment&.id}:#{digest}:#{CACHE_KEY_VERSION}"
     end
 
     private
