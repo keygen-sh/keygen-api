@@ -13,7 +13,7 @@ describe Analytics::Series do
     it 'returns event count timeseries' do
       series = described_class.new(
         :events,
-        pattern: 'license.validation.succeeded',
+        event_pattern: 'license.validation.succeeded',
         account:,
         start_date: 7.days.ago.to_date,
         end_date: Date.current,
@@ -29,7 +29,7 @@ describe Analytics::Series do
     it 'supports wildcard patterns' do
       series = described_class.new(
         :events,
-        pattern: 'license.*',
+        event_pattern: 'license.*',
         account:,
         start_date: 7.days.ago.to_date,
         end_date: Date.current,
@@ -50,7 +50,7 @@ describe Analytics::Series do
 
       series = described_class.new(
         :events,
-        pattern: 'license.validation.succeeded',
+        event_pattern: 'license.validation.succeeded',
         account:,
         resource_type: 'License',
         resource_id: license1.id,
@@ -67,14 +67,14 @@ describe Analytics::Series do
 
     context 'with invalid pattern' do
       it 'is invalid for unknown event' do
-        series = described_class.new(:events, pattern: 'invalid.event', account:)
+        series = described_class.new(:events, event_pattern: 'invalid.event', account:)
 
         expect(series).not_to be_valid
         expect(series.errors[:metrics]).to include('is invalid')
       end
 
       it 'is invalid for unknown wildcard' do
-        series = described_class.new(:events, pattern: 'invalid.*', account:)
+        series = described_class.new(:events, event_pattern: 'invalid.*', account:)
 
         expect(series).not_to be_valid
         expect(series.errors[:metrics]).to include('is invalid')
@@ -101,8 +101,8 @@ describe Analytics::Series do
       expect(series.buckets).to satisfy do |buckets|
         buckets in [
           *,
-          Analytics::Series::Bucket(metric: 'usage', date: ^two_days_ago, count: 3),
-          Analytics::Series::Bucket(metric: 'usage', date: ^one_day_ago, count: 2),
+          Analytics::Series::Bucket(metric: 'requests', date: ^two_days_ago, count: 3),
+          Analytics::Series::Bucket(metric: 'requests', date: ^one_day_ago, count: 2),
           *
         ]
       end
@@ -124,8 +124,8 @@ describe Analytics::Series do
       expect(series).to be_valid
       expect(series.buckets).to satisfy do |buckets|
         buckets in [
-          Analytics::Series::Bucket(metric: 'usage', date: ^three_days_ago, count: 1),
-          Analytics::Series::Bucket(metric: 'usage', date: ^two_days_ago, count: 0),
+          Analytics::Series::Bucket(metric: 'requests', date: ^three_days_ago, count: 1),
+          Analytics::Series::Bucket(metric: 'requests', date: ^two_days_ago, count: 0),
           *
         ]
       end

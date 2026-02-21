@@ -7,11 +7,10 @@ module Analytics
         def initialize(account:, environment:, **)
           @account     = account
           @environment = environment
+          @metric      = 'requests'
         end
 
-        METRIC = 'usage'
-
-        def metrics = [METRIC]
+        def metrics = [metric]
 
         def count(start_date:, end_date:)
           counts = RequestLog::Clickhouse.where(account_id: account.id, environment_id: environment&.id)
@@ -20,12 +19,15 @@ module Analytics
                                          .group(:created_date)
                                          .count
 
-          counts.transform_keys { [METRIC, _1] }
+          # series expects [metric, date] => count
+          counts.transform_keys { [metric, it] }
         end
 
         private
 
-        attr_reader :account, :environment
+        attr_reader :account,
+                    :environment,
+                    :metric
       end
     end
   end

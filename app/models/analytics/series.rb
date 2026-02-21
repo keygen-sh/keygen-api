@@ -7,8 +7,8 @@ module Analytics
     Bucket = Data.define(:metric, :date, :count)
 
     COUNTERS = {
-      events: Counters::Events,
       requests: Counters::Requests,
+      events: Counters::Events,
     }
 
     include ActiveModel::Model
@@ -25,24 +25,31 @@ module Analytics
     validates :end_date, comparison: { less_than_or_equal_to: -> { Date.current } }
 
     validate do
-      errors.add(:metrics, 'is invalid') if counter.metrics.empty?
+      errors.add(:metrics, 'is invalid') if metrics.empty?
     end
 
     def initialize(counter_name, **options)
-      @counter_name = counter_name.to_s.underscore.to_sym
+      @counter_name = counter_name = counter_name.to_s.underscore.to_sym
 
-      raise SeriesNotFoundError, "invalid series: #{@counter_name.inspect}" unless
-        COUNTERS.key?(@counter_name)
+      raise SeriesNotFoundError, "invalid series: #{counter_name.inspect}" unless
+        COUNTERS.key?(counter_name)
 
-      @counter_options = options.except(:account, :environment, :start_date, :end_date)
+      # split ours vs theirs (doing it this way to keep optionals w/ defaults sane)
+      options, @counter_options = options.split(
+        :account,
+        :environment,
+        :start_date,
+        :end_date,
+      )
 
-      super(**options.slice(:account, :environment, :start_date, :end_date))
+      super(**options)
     end
 
+    def metrics = @metrics ||= counter.metrics
     def buckets = @buckets ||= begin
       counts = counter.count(start_date:, end_date:)
 
-      counter.metrics.flat_map do |metric|
+      metrics.flat_map do |metric|
         (start_date..end_date).map do |date|
           Bucket.new(metric:, date:, count: counts[[metric, date]].to_i)
         end
@@ -53,16 +60,17 @@ module Analytics
       to: :buckets
 
     def cache_key
-      digest = Digest::SHA2.hexdigest("#{counter_name}:#{@counter_options.sort}:#{start_date}:#{end_date}")
+      digest = Digest::SHA2.hexdigest("#{counter_name}:#{counter_options.sort.as_json}:#{start_date}:#{end_date}")
 
       "analytics:series:#{account.id}:#{environment&.id}:#{digest}:#{CACHE_KEY_VERSION}"
     end
 
     private
 
-    attr_reader :counter_name
+    attr_reader :counter_name,
+                :counter_options
 
     def counter_class = COUNTERS[counter_name]
-    def counter       = @counter ||= counter_class.new(account:, environment:, **@counter_options)
+    def counter       = @counter ||= counter_class.new(account:, environment:, **counter_options)
   end
 end
