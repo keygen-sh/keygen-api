@@ -10,7 +10,7 @@ module Analytics
     include ActiveModel::Attributes
 
     COUNTERS = {
-      expirations: Counters::Expirations,
+      expirations: Expirations,
     }
 
     attribute :account, default: -> { Current.account }
