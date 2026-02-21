@@ -4,10 +4,10 @@ module Analytics
   class Series
     module Counters
       class Events
-        def initialize(account:, environment:, pattern: nil, resource_type: nil, resource_id: nil)
+        def initialize(account:, environment:, event_pattern: nil, resource_type: nil, resource_id: nil)
           @account       = account
           @environment   = environment
-          @pattern       = pattern
+          @event_pattern = event_pattern
           @resource_type = resource_type
           @resource_id   = resource_id
         end
@@ -31,16 +31,21 @@ module Analytics
                         .order(:created_date)
                         .count
 
-          counts.each_with_object({}) do |((event_type_id, date), cnt), hash|
-            hash[[event_type_map[event_type_id], date]] = cnt
+          # series expects [metric, date] => count
+          counts.each_with_object({}) do |((event_type_id, date), count), hash|
+            hash[[event_type_map[event_type_id], date]] = count
           end
         end
 
         private
 
-        attr_reader :account, :environment, :pattern, :resource_type, :resource_id
+        attr_reader :account,
+                    :environment,
+                    :event_pattern,
+                    :resource_type,
+                    :resource_id
 
-        def event_types    = @event_types ||= EventType.by_pattern(pattern)
+        def event_types    = @event_types ||= EventType.by_pattern(event_pattern)
         def event_type_ids = event_types.collect(&:id)
         def event_type_map = @event_type_map ||= event_types.to_h { [_1.id, _1.event] }
       end

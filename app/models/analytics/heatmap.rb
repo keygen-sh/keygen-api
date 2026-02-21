@@ -24,10 +24,10 @@ module Analytics
     validates :end_date, comparison: { less_than_or_equal_to: -> { 1.year.from_now.to_date } }
 
     def initialize(counter_name, **)
-      @counter_name = counter_name.to_s.underscore.to_sym
+      @counter_name = counter_name = counter_name.to_s.underscore.to_sym
 
-      raise HeatmapNotFoundError, "invalid heatmap: #{@counter_name.inspect}" unless
-        COUNTERS.key?(@counter_name)
+      raise HeatmapNotFoundError, "invalid heatmap: #{counter_name.inspect}" unless
+        COUNTERS.key?(counter_name)
 
       super(**)
     end
@@ -67,6 +67,6 @@ module Analytics
     attr_reader :counter_name
 
     def counter_class = COUNTERS[counter_name]
-    def counter       = counter_class.new(account:, environment:)
+    def counter       = @counter ||= counter_class.new(account:, environment:)
   end
 end

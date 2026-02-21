@@ -22,7 +22,7 @@ module Priv::Analytics
 
       series = Analytics::Series.new(
         :events,
-        pattern: params[:event_type],
+        event_pattern: params[:event],
         **event_query,
       )
 
@@ -32,11 +32,11 @@ module Priv::Analytics
           source: :parameter,
           sources: {
             parameters: {
-              metrics: 'pattern',
               resource_type: 'resource[type]',
               resource_id: 'resource[id]',
               start_date: 'date[start]',
               end_date: 'date[end]',
+              metrics: 'event',
             },
           },
         )

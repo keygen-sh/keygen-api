@@ -30,10 +30,10 @@ module Analytics
     validates :limit, numericality: { less_than_or_equal_to: MAX_LIMIT }
 
     def initialize(counter_name, **)
-      @counter_name = counter_name.to_s.underscore.to_sym
+      @counter_name = counter_name = counter_name.to_s.underscore.to_sym
 
-      raise LeaderboardNotFoundError, "invalid leaderboard: #{@counter_name.inspect}" unless
-        COUNTERS.key?(@counter_name)
+      raise LeaderboardNotFoundError, "invalid leaderboard: #{counter_name.inspect}" unless
+        COUNTERS.key?(counter_name)
 
       super(**)
     end
@@ -60,6 +60,6 @@ module Analytics
     attr_reader :counter_name
 
     def counter_class = COUNTERS[counter_name]
-    def counter       = counter_class.new(account:, environment:)
+    def counter       = @counter ||= counter_class.new(account:, environment:)
   end
 end

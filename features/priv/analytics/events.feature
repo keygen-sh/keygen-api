@@ -52,7 +52,7 @@ Feature: Event count analytics
     And sidekiq should have 0 "request-log" jobs
     And time is unfrozen
 
-  Scenario: Admin retrieves aggregated event count with wildcard pattern
+  Scenario: Admin retrieves aggregated event count with wildcard event pattern
     Given I am an admin of account "test1"
     And the current account is "test1"
     And time is frozen at "2100-08-30T00:00:00.000Z"
@@ -122,7 +122,7 @@ Feature: Event count analytics
     And sidekiq should have 0 "request-log" jobs
     And time is unfrozen
 
-  Scenario: Admin retrieves aggregated event count with invalid pattern
+  Scenario: Admin retrieves aggregated event count with invalid event pattern
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
@@ -135,13 +135,13 @@ Feature: Event count analytics
         "title": "Bad request",
         "detail": "is invalid",
         "source": {
-          "parameter": "pattern"
+          "parameter": "event"
         }
       }
       """
     And sidekiq should have 0 "request-log" jobs
 
-  Scenario: Admin retrieves aggregated event count with invalid wildcard pattern
+  Scenario: Admin retrieves aggregated event count with invalid wildcard event pattern
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
@@ -154,7 +154,7 @@ Feature: Event count analytics
         "title": "Bad request",
         "detail": "is invalid",
         "source": {
-          "parameter": "pattern"
+          "parameter": "event"
         }
       }
       """
