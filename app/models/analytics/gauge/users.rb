@@ -1,15 +1,17 @@
 # frozen_string_literal: true
 
 module Analytics
-  class Count
-    class Licenses
+  class Gauge
+    class Users
       def initialize(account:, environment:)
         @account     = account
         @environment = environment
       end
 
       def count
-        account.licenses.for_environment(environment).count
+        account.users.for_environment(environment)
+                     .with_roles(:user)
+                     .count
       end
 
       private
