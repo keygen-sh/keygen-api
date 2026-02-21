@@ -4,6 +4,8 @@ module Analytics
   class SeriesNotFoundError < StandardError; end
 
   class Series
+    Bucket = Data.define(:metric, :date, :count)
+
     COUNTERS = {
       events: Counters::Events,
       requests: Counters::Requests,
@@ -23,7 +25,7 @@ module Analytics
     validates :end_date, comparison: { less_than_or_equal_to: -> { Date.current } }
 
     validate do
-      counter.validate(errors)
+      errors.add(:metrics, 'is invalid') if counter.metrics.empty?
     end
 
     def initialize(counter_name, **options)
@@ -40,11 +42,9 @@ module Analytics
     def buckets = @buckets ||= begin
       counts = counter.count(start_date:, end_date:)
 
-      counter.groups.flat_map do |group|
+      counter.metrics.flat_map do |metric|
         (start_date..end_date).map do |date|
-          count = counts[counter.count_key(group:, date:)].to_i
-
-          counter.bucket(group:, date:, count:)
+          Bucket.new(metric:, date:, count: counts[[metric, date]].to_i)
         end
       end
     end
@@ -53,7 +53,7 @@ module Analytics
       to: :buckets
 
     def cache_key
-      digest = Digest::SHA2.hexdigest("#{counter_name}:#{counter.cache_key}:#{start_date}:#{end_date}")
+      digest = Digest::SHA2.hexdigest("#{counter_name}:#{@counter_options.sort}:#{start_date}:#{end_date}")
 
       "analytics:series:#{account.id}:#{environment&.id}:#{digest}:#{CACHE_KEY_VERSION}"
     end

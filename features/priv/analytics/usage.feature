@@ -40,9 +40,9 @@ Feature: Usage analytics
       """
       {
         "data": [
-          { "date": "2100-08-23", "count": 2 },
-          { "date": "2100-08-24", "count": 3 },
-          { "date": "2100-08-25", "count": 1 }
+          { "metric": "usage", "date": "2100-08-23", "count": 2 },
+          { "metric": "usage", "date": "2100-08-24", "count": 3 },
+          { "metric": "usage", "date": "2100-08-25", "count": 1 }
         ]
       }
       """
@@ -64,9 +64,9 @@ Feature: Usage analytics
       """
       {
         "data": [
-          { "date": "2100-08-23", "count": 1 },
-          { "date": "2100-08-24", "count": 0 },
-          { "date": "2100-08-25", "count": 1 }
+          { "metric": "usage", "date": "2100-08-23", "count": 1 },
+          { "metric": "usage", "date": "2100-08-24", "count": 0 },
+          { "metric": "usage", "date": "2100-08-25", "count": 1 }
         ]
       }
       """

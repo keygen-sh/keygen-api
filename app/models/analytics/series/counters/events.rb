@@ -4,9 +4,6 @@ module Analytics
   class Series
     module Counters
       class Events
-        Bucket = Data.define(:event, :date, :count)
-        Group  = Data.define(:key, :label)
-
         def initialize(account:, environment:, pattern: nil, resource_type: nil, resource_id: nil)
           @account       = account
           @environment   = environment
@@ -15,7 +12,7 @@ module Analytics
           @resource_id   = resource_id
         end
 
-        def groups = @groups ||= event_types.map { Group.new(key: _1.id, label: _1.event) }
+        def metrics = @metrics ||= event_types.map(&:event)
 
         def count(start_date:, end_date:)
           scope = EventLog::Clickhouse.where(account_id: account.id, environment_id: environment&.id)
@@ -30,19 +27,13 @@ module Analytics
             )
           end
 
-          scope.group(:event_type_id, :created_date)
-               .order(:created_date)
-               .count
-        end
+          counts = scope.group(:event_type_id, :created_date)
+                        .order(:created_date)
+                        .count
 
-        def count_key(group:, date:) = [group.key, date]
-        def bucket(group:, date:, count:) = Bucket.new(event: group.label, date:, count:)
-
-        def cache_key = "#{pattern}:#{resource_type}:#{resource_id}"
-
-        def validate(errors)
-          errors.add(:pattern, :blank, message: "can't be blank") if pattern.blank?
-          errors.add(:pattern, :invalid, message: 'is invalid') if pattern.present? && event_types.empty?
+          counts.each_with_object({}) do |((event_type_id, date), cnt), hash|
+            hash[[event_type_map[event_type_id], date]] = cnt
+          end
         end
 
         private
@@ -51,6 +42,7 @@ module Analytics
 
         def event_types    = @event_types ||= EventType.by_pattern(pattern)
         def event_type_ids = event_types.collect(&:id)
+        def event_type_map = @event_type_map ||= event_types.to_h { [_1.id, _1.event] }
       end
     end
   end

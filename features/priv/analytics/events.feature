@@ -38,14 +38,14 @@ Feature: Event count analytics
       """
       {
         "data": [
-          { "event": "license.validation.succeeded", "date": "2100-08-20", "count": 0 },
-          { "event": "license.validation.succeeded", "date": "2100-08-21", "count": 0 },
-          { "event": "license.validation.succeeded", "date": "2100-08-22", "count": 0 },
-          { "event": "license.validation.succeeded", "date": "2100-08-23", "count": 2 },
-          { "event": "license.validation.succeeded", "date": "2100-08-24", "count": 1 },
-          { "event": "license.validation.succeeded", "date": "2100-08-25", "count": 0 },
-          { "event": "license.validation.succeeded", "date": "2100-08-26", "count": 0 },
-          { "event": "license.validation.succeeded", "date": "2100-08-27", "count": 0 }
+          { "metric": "license.validation.succeeded", "date": "2100-08-20", "count": 0 },
+          { "metric": "license.validation.succeeded", "date": "2100-08-21", "count": 0 },
+          { "metric": "license.validation.succeeded", "date": "2100-08-22", "count": 0 },
+          { "metric": "license.validation.succeeded", "date": "2100-08-23", "count": 2 },
+          { "metric": "license.validation.succeeded", "date": "2100-08-24", "count": 1 },
+          { "metric": "license.validation.succeeded", "date": "2100-08-25", "count": 0 },
+          { "metric": "license.validation.succeeded", "date": "2100-08-26", "count": 0 },
+          { "metric": "license.validation.succeeded", "date": "2100-08-27", "count": 0 }
         ]
       }
       """
@@ -70,22 +70,22 @@ Feature: Event count analytics
       """
       {
         "data": [
-          { "event": "license.validation.failed", "date": "2100-08-20", "count": 0 },
-          { "event": "license.validation.failed", "date": "2100-08-21", "count": 0 },
-          { "event": "license.validation.failed", "date": "2100-08-22", "count": 0 },
-          { "event": "license.validation.failed", "date": "2100-08-23", "count": 0 },
-          { "event": "license.validation.failed", "date": "2100-08-24", "count": 1 },
-          { "event": "license.validation.failed", "date": "2100-08-25", "count": 0 },
-          { "event": "license.validation.failed", "date": "2100-08-26", "count": 0 },
-          { "event": "license.validation.failed", "date": "2100-08-27", "count": 0 },
-          { "event": "license.validation.succeeded", "date": "2100-08-20", "count": 0 },
-          { "event": "license.validation.succeeded", "date": "2100-08-21", "count": 0 },
-          { "event": "license.validation.succeeded", "date": "2100-08-22", "count": 0 },
-          { "event": "license.validation.succeeded", "date": "2100-08-23", "count": 2 },
-          { "event": "license.validation.succeeded", "date": "2100-08-24", "count": 1 },
-          { "event": "license.validation.succeeded", "date": "2100-08-25", "count": 0 },
-          { "event": "license.validation.succeeded", "date": "2100-08-26", "count": 0 },
-          { "event": "license.validation.succeeded", "date": "2100-08-27", "count": 0 }
+          { "metric": "license.validation.failed", "date": "2100-08-20", "count": 0 },
+          { "metric": "license.validation.failed", "date": "2100-08-21", "count": 0 },
+          { "metric": "license.validation.failed", "date": "2100-08-22", "count": 0 },
+          { "metric": "license.validation.failed", "date": "2100-08-23", "count": 0 },
+          { "metric": "license.validation.failed", "date": "2100-08-24", "count": 1 },
+          { "metric": "license.validation.failed", "date": "2100-08-25", "count": 0 },
+          { "metric": "license.validation.failed", "date": "2100-08-26", "count": 0 },
+          { "metric": "license.validation.failed", "date": "2100-08-27", "count": 0 },
+          { "metric": "license.validation.succeeded", "date": "2100-08-20", "count": 0 },
+          { "metric": "license.validation.succeeded", "date": "2100-08-21", "count": 0 },
+          { "metric": "license.validation.succeeded", "date": "2100-08-22", "count": 0 },
+          { "metric": "license.validation.succeeded", "date": "2100-08-23", "count": 2 },
+          { "metric": "license.validation.succeeded", "date": "2100-08-24", "count": 1 },
+          { "metric": "license.validation.succeeded", "date": "2100-08-25", "count": 0 },
+          { "metric": "license.validation.succeeded", "date": "2100-08-26", "count": 0 },
+          { "metric": "license.validation.succeeded", "date": "2100-08-27", "count": 0 }
         ]
       }
       """
@@ -108,14 +108,14 @@ Feature: Event count analytics
       """
       {
         "data": [
-          { "event": "license.created", "date": "2100-08-20", "count": 0 },
-          { "event": "license.created", "date": "2100-08-21", "count": 0 },
-          { "event": "license.created", "date": "2100-08-22", "count": 0 },
-          { "event": "license.created", "date": "2100-08-23", "count": 1 },
-          { "event": "license.created", "date": "2100-08-24", "count": 1 },
-          { "event": "license.created", "date": "2100-08-25", "count": 0 },
-          { "event": "license.created", "date": "2100-08-26", "count": 0 },
-          { "event": "license.created", "date": "2100-08-27", "count": 0 }
+          { "metric": "license.created", "date": "2100-08-20", "count": 0 },
+          { "metric": "license.created", "date": "2100-08-21", "count": 0 },
+          { "metric": "license.created", "date": "2100-08-22", "count": 0 },
+          { "metric": "license.created", "date": "2100-08-23", "count": 1 },
+          { "metric": "license.created", "date": "2100-08-24", "count": 1 },
+          { "metric": "license.created", "date": "2100-08-25", "count": 0 },
+          { "metric": "license.created", "date": "2100-08-26", "count": 0 },
+          { "metric": "license.created", "date": "2100-08-27", "count": 0 }
         ]
       }
       """
@@ -243,14 +243,14 @@ Feature: Event count analytics
       """
       {
         "data": [
-          { "event": "license.validation.succeeded", "date": "2100-08-20", "count": 0 },
-          { "event": "license.validation.succeeded", "date": "2100-08-21", "count": 0 },
-          { "event": "license.validation.succeeded", "date": "2100-08-22", "count": 0 },
-          { "event": "license.validation.succeeded", "date": "2100-08-23", "count": 2 },
-          { "event": "license.validation.succeeded", "date": "2100-08-24", "count": 0 },
-          { "event": "license.validation.succeeded", "date": "2100-08-25", "count": 0 },
-          { "event": "license.validation.succeeded", "date": "2100-08-26", "count": 0 },
-          { "event": "license.validation.succeeded", "date": "2100-08-27", "count": 0 }
+          { "metric": "license.validation.succeeded", "date": "2100-08-20", "count": 0 },
+          { "metric": "license.validation.succeeded", "date": "2100-08-21", "count": 0 },
+          { "metric": "license.validation.succeeded", "date": "2100-08-22", "count": 0 },
+          { "metric": "license.validation.succeeded", "date": "2100-08-23", "count": 2 },
+          { "metric": "license.validation.succeeded", "date": "2100-08-24", "count": 0 },
+          { "metric": "license.validation.succeeded", "date": "2100-08-25", "count": 0 },
+          { "metric": "license.validation.succeeded", "date": "2100-08-26", "count": 0 },
+          { "metric": "license.validation.succeeded", "date": "2100-08-27", "count": 0 }
         ]
       }
       """
@@ -278,22 +278,22 @@ Feature: Event count analytics
       """
       {
         "data": [
-          { "event": "license.validation.failed", "date": "2100-08-20", "count": 0 },
-          { "event": "license.validation.failed", "date": "2100-08-21", "count": 0 },
-          { "event": "license.validation.failed", "date": "2100-08-22", "count": 0 },
-          { "event": "license.validation.failed", "date": "2100-08-23", "count": 0 },
-          { "event": "license.validation.failed", "date": "2100-08-24", "count": 1 },
-          { "event": "license.validation.failed", "date": "2100-08-25", "count": 0 },
-          { "event": "license.validation.failed", "date": "2100-08-26", "count": 0 },
-          { "event": "license.validation.failed", "date": "2100-08-27", "count": 0 },
-          { "event": "license.validation.succeeded", "date": "2100-08-20", "count": 0 },
-          { "event": "license.validation.succeeded", "date": "2100-08-21", "count": 0 },
-          { "event": "license.validation.succeeded", "date": "2100-08-22", "count": 0 },
-          { "event": "license.validation.succeeded", "date": "2100-08-23", "count": 2 },
-          { "event": "license.validation.succeeded", "date": "2100-08-24", "count": 0 },
-          { "event": "license.validation.succeeded", "date": "2100-08-25", "count": 0 },
-          { "event": "license.validation.succeeded", "date": "2100-08-26", "count": 0 },
-          { "event": "license.validation.succeeded", "date": "2100-08-27", "count": 0 }
+          { "metric": "license.validation.failed", "date": "2100-08-20", "count": 0 },
+          { "metric": "license.validation.failed", "date": "2100-08-21", "count": 0 },
+          { "metric": "license.validation.failed", "date": "2100-08-22", "count": 0 },
+          { "metric": "license.validation.failed", "date": "2100-08-23", "count": 0 },
+          { "metric": "license.validation.failed", "date": "2100-08-24", "count": 1 },
+          { "metric": "license.validation.failed", "date": "2100-08-25", "count": 0 },
+          { "metric": "license.validation.failed", "date": "2100-08-26", "count": 0 },
+          { "metric": "license.validation.failed", "date": "2100-08-27", "count": 0 },
+          { "metric": "license.validation.succeeded", "date": "2100-08-20", "count": 0 },
+          { "metric": "license.validation.succeeded", "date": "2100-08-21", "count": 0 },
+          { "metric": "license.validation.succeeded", "date": "2100-08-22", "count": 0 },
+          { "metric": "license.validation.succeeded", "date": "2100-08-23", "count": 2 },
+          { "metric": "license.validation.succeeded", "date": "2100-08-24", "count": 0 },
+          { "metric": "license.validation.succeeded", "date": "2100-08-25", "count": 0 },
+          { "metric": "license.validation.succeeded", "date": "2100-08-26", "count": 0 },
+          { "metric": "license.validation.succeeded", "date": "2100-08-27", "count": 0 }
         ]
       }
       """
