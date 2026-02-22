@@ -83,50 +83,81 @@ describe Analytics::Series do
   end
 
   describe ':requests', :only_clickhouse do
-    it 'returns request counts by date' do
-      create_list(:request_log, 3, account:, created_at: 2.days.ago)
-      create_list(:request_log, 2, account:, created_at: 1.day.ago)
+    it 'returns request counts grouped by status bucket' do
+      create_list(:request_log, 3, account:, status: '200', created_at: 2.days.ago)
+      create_list(:request_log, 2, account:, status: '404', created_at: 2.days.ago)
+      create_list(:request_log, 1, account:, status: '301', created_at: 1.day.ago)
+      create_list(:request_log, 2, account:, status: '500', created_at: 1.day.ago)
 
-      two_days_ago = 2.days.ago.to_date
-      one_day_ago  = 1.day.ago.to_date
+      three_days_ago = 3.days.ago.to_date
+      two_days_ago   = 2.days.ago.to_date
+      one_day_ago    = 1.day.ago.to_date
+      today          = Date.current
 
       series = described_class.new(
         :requests,
         account:,
-        start_date: 3.days.ago.to_date,
-        end_date: Date.current,
+        start_date: three_days_ago,
+        end_date: today,
       )
 
       expect(series).to be_valid
       expect(series.buckets).to satisfy do |buckets|
         buckets in [
-          *,
-          Analytics::Series::Bucket(metric: 'requests', date: ^two_days_ago, count: 3),
-          Analytics::Series::Bucket(metric: 'requests', date: ^one_day_ago, count: 2),
-          *
+          Analytics::Series::Bucket(metric: 'requests.2xx', date: ^three_days_ago, count: 0),
+          Analytics::Series::Bucket(metric: 'requests.2xx', date: ^two_days_ago, count: 3),
+          Analytics::Series::Bucket(metric: 'requests.2xx', date: ^one_day_ago, count: 0),
+          Analytics::Series::Bucket(metric: 'requests.2xx', date: ^today, count: 0),
+          Analytics::Series::Bucket(metric: 'requests.3xx', date: ^three_days_ago, count: 0),
+          Analytics::Series::Bucket(metric: 'requests.3xx', date: ^two_days_ago, count: 0),
+          Analytics::Series::Bucket(metric: 'requests.3xx', date: ^one_day_ago, count: 1),
+          Analytics::Series::Bucket(metric: 'requests.3xx', date: ^today, count: 0),
+          Analytics::Series::Bucket(metric: 'requests.4xx', date: ^three_days_ago, count: 0),
+          Analytics::Series::Bucket(metric: 'requests.4xx', date: ^two_days_ago, count: 2),
+          Analytics::Series::Bucket(metric: 'requests.4xx', date: ^one_day_ago, count: 0),
+          Analytics::Series::Bucket(metric: 'requests.4xx', date: ^today, count: 0),
+          Analytics::Series::Bucket(metric: 'requests.5xx', date: ^three_days_ago, count: 0),
+          Analytics::Series::Bucket(metric: 'requests.5xx', date: ^two_days_ago, count: 0),
+          Analytics::Series::Bucket(metric: 'requests.5xx', date: ^one_day_ago, count: 2),
+          Analytics::Series::Bucket(metric: 'requests.5xx', date: ^today, count: 0),
         ]
       end
     end
 
     it 'includes zero counts for days with no requests' do
-      create(:request_log, account:, created_at: 3.days.ago)
+      create(:request_log, account:, status: '200', created_at: 3.days.ago)
 
       three_days_ago = 3.days.ago.to_date
       two_days_ago   = 2.days.ago.to_date
+      one_day_ago    = 1.day.ago.to_date
+      today          = Date.current
 
       series = described_class.new(
         :requests,
         account:,
-        start_date: 3.days.ago.to_date,
-        end_date: Date.current,
+        start_date: three_days_ago,
+        end_date: today,
       )
 
       expect(series).to be_valid
       expect(series.buckets).to satisfy do |buckets|
         buckets in [
-          Analytics::Series::Bucket(metric: 'requests', date: ^three_days_ago, count: 1),
-          Analytics::Series::Bucket(metric: 'requests', date: ^two_days_ago, count: 0),
-          *
+          Analytics::Series::Bucket(metric: 'requests.2xx', date: ^three_days_ago, count: 1),
+          Analytics::Series::Bucket(metric: 'requests.2xx', date: ^two_days_ago, count: 0),
+          Analytics::Series::Bucket(metric: 'requests.2xx', date: ^one_day_ago, count: 0),
+          Analytics::Series::Bucket(metric: 'requests.2xx', date: ^today, count: 0),
+          Analytics::Series::Bucket(metric: 'requests.3xx', date: ^three_days_ago, count: 0),
+          Analytics::Series::Bucket(metric: 'requests.3xx', date: ^two_days_ago, count: 0),
+          Analytics::Series::Bucket(metric: 'requests.3xx', date: ^one_day_ago, count: 0),
+          Analytics::Series::Bucket(metric: 'requests.3xx', date: ^today, count: 0),
+          Analytics::Series::Bucket(metric: 'requests.4xx', date: ^three_days_ago, count: 0),
+          Analytics::Series::Bucket(metric: 'requests.4xx', date: ^two_days_ago, count: 0),
+          Analytics::Series::Bucket(metric: 'requests.4xx', date: ^one_day_ago, count: 0),
+          Analytics::Series::Bucket(metric: 'requests.4xx', date: ^today, count: 0),
+          Analytics::Series::Bucket(metric: 'requests.5xx', date: ^three_days_ago, count: 0),
+          Analytics::Series::Bucket(metric: 'requests.5xx', date: ^two_days_ago, count: 0),
+          Analytics::Series::Bucket(metric: 'requests.5xx', date: ^one_day_ago, count: 0),
+          Analytics::Series::Bucket(metric: 'requests.5xx', date: ^today, count: 0),
         ]
       end
     end
