@@ -25,7 +25,7 @@ module Analytics
     validates :end_date, comparison: { less_than_or_equal_to: -> { Date.current } }
 
     validate do
-      errors.add(:metrics, 'is invalid') if metrics.empty?
+      errors.add :metrics, 'is invalid' if metrics.empty?
     end
 
     def initialize(counter_name, **options)
