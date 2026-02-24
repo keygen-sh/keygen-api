@@ -18,11 +18,11 @@ module Analytics
                                      .order(:created_date)
                                      .group(:created_date)
                                      .pluck(
-                                       Arel.sql('created_date'),
-                                       Arel.sql("countIf(startsWith(status, '2'))"),
-                                       Arel.sql("countIf(startsWith(status, '3'))"),
-                                       Arel.sql("countIf(startsWith(status, '4'))"),
-                                       Arel.sql("countIf(startsWith(status, '5'))"),
+                                       :created_date,
+                                       Arel.sql(%{countIf(status IN ('200', '201', '202', '204')) AS "2xx"}),
+                                       Arel.sql(%{countIf(status IN ('301', '302', '303', '304', '307', '308')) AS "3xx"}),
+                                       Arel.sql(%{countIf(status IN ('400', '401', '402', '403', '404', '405', '406', '409', '410', '413', '422', '429')) AS "4xx"}),
+                                       Arel.sql(%{countIf(status IN ('500', '501', '502', '503', '504')) AS "5xx"}),
                                      )
 
         # series expects [metric, date] => count
