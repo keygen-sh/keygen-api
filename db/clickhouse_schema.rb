@@ -33,6 +33,8 @@ ActiveRecord::Schema[8.1].define(version: 1767378080) do
     t.integer "ttl", default: 2592000, null: false
 
     t.index "event_type_id", name: "idx_event_type", type: "bloom_filter", granularity: 4
+    t.index "(resource_type, resource_id)", name: "idx_resource", type: "bloom_filter", granularity: 4
+    t.index "(whodunnit_type, whodunnit_id)", name: "idx_whodunnit", type: "bloom_filter", granularity: 4
     t.index "request_log_id", name: "idx_request_log", type: "bloom_filter", granularity: 4
     t.index "environment_id", name: "idx_environment", type: "bloom_filter", granularity: 4
     t.index "idempotency_key", name: "idx_idempotency", type: "bloom_filter", granularity: 4
@@ -69,6 +71,8 @@ ActiveRecord::Schema[8.1].define(version: 1767378080) do
 
     t.index "status", name: "idx_status", type: "set(100)", granularity: 4
     t.index "method", name: "idx_method", type: "set(20)", granularity: 4
+    t.index "(requestor_type, requestor_id)", name: "idx_requestor", type: "bloom_filter", granularity: 4
+    t.index "(resource_type, resource_id)", name: "idx_resource", type: "bloom_filter", granularity: 4
     t.index "ip", name: "idx_ip", type: "bloom_filter", granularity: 4
     t.index "environment_id", name: "idx_environment", type: "bloom_filter", granularity: 4
   end
