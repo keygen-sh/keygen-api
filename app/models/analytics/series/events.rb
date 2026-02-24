@@ -27,7 +27,6 @@ module Analytics
         end
 
         counts = scope.group(:event_type_id, :created_date)
-                      .order(:created_date)
                       .count
 
         # series expects [metric, date] => count
