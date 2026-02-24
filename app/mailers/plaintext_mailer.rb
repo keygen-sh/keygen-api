@@ -103,8 +103,6 @@ class PlaintextMailer < ApplicationMailer
 
         --
         Zeke, Founder <https://keygen.sh>
-
-        p.s. We also have a pretty cool affiliate program: https://keygen.sh/affiliates/ :)
       TXT
     )
   end
@@ -134,8 +132,6 @@ class PlaintextMailer < ApplicationMailer
 
         --
         Zeke, Founder <https://keygen.sh>
-
-        p.s. We also have a pretty cool affiliate program: https://keygen.sh/affiliates/ :)
       TXT
     )
   end
