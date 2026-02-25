@@ -12,13 +12,15 @@
 
 ActiveRecord::Schema[8.1].define(version: 2026_02_25_054911) do
   # TABLE: active_licensed_user_sparks
-  # SQL: CREATE TABLE active_licensed_user_sparks ( `account_id` UUID, `environment_id` Nullable(UUID), `count` UInt64 DEFAULT 0, `created_date` Date, `created_at` DateTime64(3) ) ENGINE = MergeTree PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date, environment_id) SETTINGS allow_nullable_key = 1, index_granularity = 8192
-  create_table "active_licensed_user_sparks", id: false, options: "MergeTree PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date, environment_id) SETTINGS allow_nullable_key = 1, index_granularity = 8192", force: :cascade do |t|
+  # SQL: CREATE TABLE active_licensed_user_sparks ( `account_id` UUID, `environment_id` Nullable(UUID), `count` UInt64 DEFAULT 0, `created_date` Date, `created_at` DateTime64(3), INDEX idx_environment environment_id TYPE bloom_filter GRANULARITY 4 ) ENGINE = MergeTree PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date) SETTINGS index_granularity = 8192
+  create_table "active_licensed_user_sparks", id: false, options: "MergeTree PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date) SETTINGS index_granularity = 8192", force: :cascade do |t|
     t.uuid "account_id", null: false
     t.uuid "environment_id"
     t.integer "count", limit: 8, default: 0, null: false
     t.date "created_date", null: false
     t.datetime "created_at", precision: 3, null: false
+
+    t.index "environment_id", name: "idx_environment", type: "bloom_filter", granularity: 4
   end
 
   # TABLE: event_logs
@@ -52,23 +54,27 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_25_054911) do
   end
 
   # TABLE: license_sparks
-  # SQL: CREATE TABLE license_sparks ( `account_id` UUID, `environment_id` Nullable(UUID), `count` UInt64 DEFAULT 0, `created_date` Date, `created_at` DateTime64(3) ) ENGINE = MergeTree PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date, environment_id) SETTINGS allow_nullable_key = 1, index_granularity = 8192
-  create_table "license_sparks", id: false, options: "MergeTree PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date, environment_id) SETTINGS allow_nullable_key = 1, index_granularity = 8192", force: :cascade do |t|
+  # SQL: CREATE TABLE license_sparks ( `account_id` UUID, `environment_id` Nullable(UUID), `count` UInt64 DEFAULT 0, `created_date` Date, `created_at` DateTime64(3), INDEX idx_environment environment_id TYPE bloom_filter GRANULARITY 4 ) ENGINE = MergeTree PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date) SETTINGS index_granularity = 8192
+  create_table "license_sparks", id: false, options: "MergeTree PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date) SETTINGS index_granularity = 8192", force: :cascade do |t|
     t.uuid "account_id", null: false
     t.uuid "environment_id"
     t.integer "count", limit: 8, default: 0, null: false
     t.date "created_date", null: false
     t.datetime "created_at", precision: 3, null: false
+
+    t.index "environment_id", name: "idx_environment", type: "bloom_filter", granularity: 4
   end
 
   # TABLE: machine_sparks
-  # SQL: CREATE TABLE machine_sparks ( `account_id` UUID, `environment_id` Nullable(UUID), `count` UInt64 DEFAULT 0, `created_date` Date, `created_at` DateTime64(3) ) ENGINE = MergeTree PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date, environment_id) SETTINGS allow_nullable_key = 1, index_granularity = 8192
-  create_table "machine_sparks", id: false, options: "MergeTree PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date, environment_id) SETTINGS allow_nullable_key = 1, index_granularity = 8192", force: :cascade do |t|
+  # SQL: CREATE TABLE machine_sparks ( `account_id` UUID, `environment_id` Nullable(UUID), `count` UInt64 DEFAULT 0, `created_date` Date, `created_at` DateTime64(3), INDEX idx_environment environment_id TYPE bloom_filter GRANULARITY 4 ) ENGINE = MergeTree PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date) SETTINGS index_granularity = 8192
+  create_table "machine_sparks", id: false, options: "MergeTree PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date) SETTINGS index_granularity = 8192", force: :cascade do |t|
     t.uuid "account_id", null: false
     t.uuid "environment_id"
     t.integer "count", limit: 8, default: 0, null: false
     t.date "created_date", null: false
     t.datetime "created_at", precision: 3, null: false
+
+    t.index "environment_id", name: "idx_environment", type: "bloom_filter", granularity: 4
   end
 
   # TABLE: request_logs
@@ -110,13 +116,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_25_054911) do
   end
 
   # TABLE: user_sparks
-  # SQL: CREATE TABLE user_sparks ( `account_id` UUID, `environment_id` Nullable(UUID), `count` UInt64 DEFAULT 0, `created_date` Date, `created_at` DateTime64(3) ) ENGINE = MergeTree PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date, environment_id) SETTINGS allow_nullable_key = 1, index_granularity = 8192
-  create_table "user_sparks", id: false, options: "MergeTree PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date, environment_id) SETTINGS allow_nullable_key = 1, index_granularity = 8192", force: :cascade do |t|
+  # SQL: CREATE TABLE user_sparks ( `account_id` UUID, `environment_id` Nullable(UUID), `count` UInt64 DEFAULT 0, `created_date` Date, `created_at` DateTime64(3), INDEX idx_environment environment_id TYPE bloom_filter GRANULARITY 4 ) ENGINE = MergeTree PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date) SETTINGS index_granularity = 8192
+  create_table "user_sparks", id: false, options: "MergeTree PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date) SETTINGS index_granularity = 8192", force: :cascade do |t|
     t.uuid "account_id", null: false
     t.uuid "environment_id"
     t.integer "count", limit: 8, default: 0, null: false
     t.date "created_date", null: false
     t.datetime "created_at", precision: 3, null: false
+
+    t.index "environment_id", name: "idx_environment", type: "bloom_filter", granularity: 4
   end
 
 end
