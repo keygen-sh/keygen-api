@@ -5,7 +5,7 @@ class RecordMachineSparksWorker < BaseWorker
                   cronitor_enabled: true
 
   def perform
-    Account.unordered.subscribed.find_each do |account|
+    Account.unordered.active.find_each do |account|
       jitter = rand(0..30.minutes)
 
       RecordMachineSparkWorker.perform_in(jitter, account.id)

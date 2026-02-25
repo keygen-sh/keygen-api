@@ -166,6 +166,7 @@ class Account < ApplicationRecord
 
     new_accounts.or(with_activity)
   }
+
   scope :paid, -> { joins(:plan, :billing).where(plan: Plan.paid, billings: { state: 'subscribed' }) }
   scope :free, -> { joins(:plan, :billing).where(plan: Plan.free, billings: { state: 'subscribed' }) }
   scope :ent,  -> { joins(:plan, :billing).where(plan: Plan.ent, billings: { state: 'subscribed' }) }
