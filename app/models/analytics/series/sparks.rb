@@ -32,7 +32,7 @@ module Analytics
                      .group(:created_date)
                      .pluck(
                        :created_date,
-                       Arel.sql('max(count)'),
+                       Arel.sql('argMax(count, created_at)'),
                      )
 
         counts = rows.each_with_object({}) do |(date, count), hash|

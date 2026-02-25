@@ -23,11 +23,13 @@ Feature: Spark series analytics
     And the current account is "test1"
     And time is frozen at "2100-08-30T00:00:00.000Z"
     And the current account has the following "license_spark" rows:
-      | count | created_date |
-      | 9     | 2100-08-22   |
-      | 10    | 2100-08-23   |
-      | 12    | 2100-08-24   |
-      | 14    | 2100-08-25   |
+      | count | created_date | created_at           |
+      | 9     | 2100-08-22   | 2100-08-22T00:00:00Z |
+      | 9     | 2100-08-23   | 2100-08-23T00:00:00Z |
+      | 11    | 2100-08-23   | 2100-08-23T00:00:10Z |
+      | 10    | 2100-08-23   | 2100-08-23T00:00:11Z |
+      | 12    | 2100-08-24   | 2100-08-24T00:00:00Z |
+      | 14    | 2100-08-25   | 2100-08-25T00:00:00Z |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/analytics/sparks/licenses?date[start]=2100-08-23&date[end]=2100-08-24"
     Then the response status should be "200"
