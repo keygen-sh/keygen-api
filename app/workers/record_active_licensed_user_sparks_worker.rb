@@ -6,7 +6,9 @@ class RecordActiveLicensedUserSparksWorker < BaseWorker
 
   def perform
     Account.unordered.subscribed.find_each do |account|
-      RecordActiveLicensedUserSparkWorker.perform_async(account.id)
+      jitter = rand(0..30.minutes) # prevent a thundering herd effect
+
+      RecordActiveLicensedUserSparkWorker.perform_in(jitter, account.id)
     end
   end
 end

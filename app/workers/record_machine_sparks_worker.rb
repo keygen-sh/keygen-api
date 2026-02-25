@@ -6,7 +6,9 @@ class RecordMachineSparksWorker < BaseWorker
 
   def perform
     Account.unordered.subscribed.find_each do |account|
-      RecordMachineSparkWorker.perform_async(account.id)
+      jitter = rand(0..30.minutes)
+
+      RecordMachineSparkWorker.perform_in(jitter, account.id)
     end
   end
 end
