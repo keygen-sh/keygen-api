@@ -29,11 +29,11 @@ module Analytics
     validates :end_date, comparison: { less_than_or_equal_to: -> { Date.current } }
     validates :limit, numericality: { less_than_or_equal_to: MAX_LIMIT }
 
-    def initialize(counter_name, **)
-      @counter_name = counter_name = counter_name.to_s.underscore.to_sym
+    def initialize(metric, **)
+      @counter_name = metric = metric.to_s.underscore.to_sym
 
-      raise LeaderboardNotFoundError, "invalid leaderboard: #{counter_name.inspect}" unless
-        COUNTERS.key?(counter_name)
+      raise LeaderboardNotFoundError, "invalid metric: #{metric.inspect}" unless
+        COUNTERS.key?(metric)
 
       super(**)
     end

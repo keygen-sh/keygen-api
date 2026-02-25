@@ -138,8 +138,16 @@ class Account < ApplicationRecord
       clean_slug =~ UUID_RE
   end
 
+  scope :subscribed, -> (with_trialing: true, with_pending: true) {
+    state = %i[subscribed]
+    state << :trialing if with_trialing
+    state << :pending  if with_pending
+
+    joins(:billing).where(billings: { state: })
+  }
+
   scope :active, -> (with_activity_from: 90.days.ago) {
-    base = joins(:billing).where(billings: { state: %i[subscribed trialing pending] })
+    base = subscribed
 
     new_accounts  = base.where('accounts.created_at > ?', with_activity_from)
     with_activity = base.where(<<~SQL.squish, with_activity_from)

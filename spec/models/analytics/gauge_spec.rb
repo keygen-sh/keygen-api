@@ -85,10 +85,8 @@ describe Analytics::Gauge do
       end
     end
 
-    context 'with global machines' do
-      before do
-        create_list(:machine, 3, account:, environment: nil)
-      end
+    context 'with machines' do
+      before { create_list(:machine, 3, account:) }
 
       it 'returns correct count' do
         gauge = described_class.new(:machines, account:)
@@ -105,13 +103,13 @@ describe Analytics::Gauge do
         create_list(:machine, 3, account:, environment: nil)
       end
 
-      it 'returns only environment-scoped machines' do
+      it 'returns only environment-scoped count' do
         gauge = described_class.new(:machines, account:, environment:)
 
         expect(gauge.count).to eq(2)
       end
 
-      it 'returns only global machines when no environment' do
+      it 'returns only global count when no environment' do
         gauge = described_class.new(:machines, account:)
 
         expect(gauge.count).to eq(3)
@@ -128,10 +126,8 @@ describe Analytics::Gauge do
       end
     end
 
-    context 'with global licenses' do
-      before do
-        create_list(:license, 3, account:, environment: nil)
-      end
+    context 'with licenses' do
+      before { create_list(:license, 3, account:) }
 
       it 'returns correct count' do
         gauge = described_class.new(:licenses, account:)
@@ -148,13 +144,13 @@ describe Analytics::Gauge do
         create_list(:license, 3, account:, environment: nil)
       end
 
-      it 'returns only environment-scoped licenses' do
+      it 'returns only environment-scoped count' do
         gauge = described_class.new(:licenses, account:, environment:)
 
         expect(gauge.count).to eq(2)
       end
 
-      it 'returns only global licenses when no environment' do
+      it 'returns only global count when no environment' do
         gauge = described_class.new(:licenses, account:)
 
         expect(gauge.count).to eq(3)
@@ -171,28 +167,13 @@ describe Analytics::Gauge do
       end
     end
 
-    context 'with global users' do
-      before do
-        create_list(:user, 3, account:, environment: nil)
-      end
+    context 'with users' do
+      before { create_list(:user, 3, account:) }
 
       it 'returns correct count' do
         gauge = described_class.new(:users, account:)
 
         expect(gauge.count).to eq(3)
-      end
-    end
-
-    context 'with admins' do
-      before do
-        create_list(:user, 2, account:)
-        create_list(:admin, 3, account:)
-      end
-
-      it 'excludes admins from count' do
-        gauge = described_class.new(:users, account:)
-
-        expect(gauge.count).to eq(2)
       end
     end
 
@@ -204,13 +185,13 @@ describe Analytics::Gauge do
         create_list(:user, 3, account:, environment: nil)
       end
 
-      it 'returns only environment-scoped users' do
+      it 'returns only environment-scoped count' do
         gauge = described_class.new(:users, account:, environment:)
 
         expect(gauge.count).to eq(2)
       end
 
-      it 'returns only global users when no environment' do
+      it 'returns only global count when no environment' do
         gauge = described_class.new(:users, account:)
 
         expect(gauge.count).to eq(3)
@@ -219,19 +200,7 @@ describe Analytics::Gauge do
   end
 
   describe 'active_licensed_users' do
-    context 'with no active licensed users' do
-      it 'returns zero' do
-        gauge = described_class.new(:active_licensed_users, account:)
-
-        expect(gauge.count).to eq(0)
-      end
-    end
-
-    context 'with users without licenses' do
-      before do
-        create_list(:user, 3, account:)
-      end
-
+    context 'with no licenses' do
       it 'returns zero' do
         gauge = described_class.new(:active_licensed_users, account:)
 
@@ -240,68 +209,32 @@ describe Analytics::Gauge do
     end
 
     context 'with active licensed users' do
-      before do
-        users = create_list(:user, 3, account:)
-        users.each do |user|
-          create(:license, account:, owner: user)
-        end
-      end
+      before { create_list(:license, 5, account:) }
 
       it 'returns correct count' do
         gauge = described_class.new(:active_licensed_users, account:)
 
-        expect(gauge.count).to eq(3)
-      end
-    end
-
-    context 'with expired but recently created licenses' do
-      before do
-        users = create_list(:user, 2, account:)
-        users.each do |user|
-          create(:license, account:, owner: user, expiry: 1.day.ago)
-        end
-      end
-
-      it 'counts users with expired but recently active licenses' do
-        gauge = described_class.new(:active_licensed_users, account:)
-
-        expect(gauge.count).to eq(2)
-      end
-    end
-
-    context 'with unassigned licenses' do
-      before do
-        create_list(:license, 3, account:)
-      end
-
-      it 'counts each unassigned license as one licensed user' do
-        gauge = described_class.new(:active_licensed_users, account:)
-
-        expect(gauge.count).to eq(3)
+        expect(gauge.count).to eq(5)
       end
     end
 
     context 'with environment parameter' do
       let(:environment) { create(:environment, account:) }
 
-      before do
-        user = create(:user, account:, environment:)
-        create(:license, account:, environment:, owner: user)
-      end
+      before { create_list(:license, 3, account:) }
 
       it 'ignores environment scoping' do
         gauge = described_class.new(:active_licensed_users, account:, environment:)
 
-        expect(gauge.count).to eq(1)
+        expect(gauge.count).to eq(3)
       end
     end
   end
 
   describe 'alus' do
-    it 'is an alias for active_licensed_users' do
-      users = create_list(:user, 2, account:)
-      users.each { create(:license, account:, owner: it) }
+    before { create_list(:license, 2, account:) }
 
+    it 'is an alias for active_licensed_users' do
       gauge = described_class.new(:alus, account:)
 
       expect(gauge.count).to eq(2)

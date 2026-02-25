@@ -10,7 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_24_184042) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_25_054911) do
+  # TABLE: active_licensed_user_sparks
+  # SQL: CREATE TABLE active_licensed_user_sparks ( `account_id` UUID, `environment_id` Nullable(UUID), `count` UInt64 DEFAULT 0, `created_date` Date, `created_at` DateTime64(3) ) ENGINE = MergeTree PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date, environment_id) SETTINGS allow_nullable_key = 1, index_granularity = 8192
+  create_table "active_licensed_user_sparks", id: false, options: "MergeTree PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date, environment_id) SETTINGS allow_nullable_key = 1, index_granularity = 8192", force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.uuid "environment_id"
+    t.integer "count", limit: 8, default: 0, null: false
+    t.date "created_date", null: false
+    t.datetime "created_at", precision: 3, null: false
+  end
+
   # TABLE: event_logs
   # SQL: CREATE TABLE event_logs ( `id` UUID, `account_id` UUID, `environment_id` Nullable(UUID), `event_type_id` UUID, `request_log_id` Nullable(UUID), `created_at` DateTime64(3), `updated_at` DateTime64(3), `created_date` Date, `resource_type` LowCardinality(String), `resource_id` UUID, `whodunnit_type` LowCardinality(Nullable(String)), `whodunnit_id` Nullable(UUID), `idempotency_key` Nullable(String), `metadata` Nullable(JSON) TTL created_at + toIntervalDay(30), `is_deleted` UInt8 DEFAULT 0, `ver` DateTime64(3) DEFAULT now(), `ttl` UInt32 DEFAULT 2592000, INDEX idx_event_type event_type_id TYPE bloom_filter GRANULARITY 4, INDEX idx_resource (resource_type, resource_id) TYPE bloom_filter GRANULARITY 4, INDEX idx_whodunnit (whodunnit_type, whodunnit_id) TYPE bloom_filter GRANULARITY 4, INDEX idx_request_log request_log_id TYPE bloom_filter GRANULARITY 4, INDEX idx_environment environment_id TYPE bloom_filter GRANULARITY 4, INDEX idx_idempotency idempotency_key TYPE bloom_filter GRANULARITY 4, INDEX idx_id id TYPE bloom_filter GRANULARITY 4 ) ENGINE = ReplacingMergeTree(ver, is_deleted) PARTITION BY toYYYYMMDD(created_date) ORDER BY (account_id, created_date, id) TTL created_at + toIntervalSecond(ttl) SETTINGS index_granularity = 8192
   create_table "event_logs", id: :uuid, options: "ReplacingMergeTree(ver, is_deleted) PARTITION BY toYYYYMMDD(created_date) ORDER BY (account_id, created_date, id) TTL created_at + toIntervalSecond(ttl) SETTINGS index_granularity = 8192", force: :cascade do |t|
@@ -39,6 +49,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_24_184042) do
     t.index "environment_id", name: "idx_environment", type: "bloom_filter", granularity: 4
     t.index "idempotency_key", name: "idx_idempotency", type: "bloom_filter", granularity: 4
     t.index "id", name: "idx_id", type: "bloom_filter", granularity: 4
+  end
+
+  # TABLE: license_sparks
+  # SQL: CREATE TABLE license_sparks ( `account_id` UUID, `environment_id` Nullable(UUID), `count` UInt64 DEFAULT 0, `created_date` Date, `created_at` DateTime64(3) ) ENGINE = MergeTree PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date, environment_id) SETTINGS allow_nullable_key = 1, index_granularity = 8192
+  create_table "license_sparks", id: false, options: "MergeTree PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date, environment_id) SETTINGS allow_nullable_key = 1, index_granularity = 8192", force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.uuid "environment_id"
+    t.integer "count", limit: 8, default: 0, null: false
+    t.date "created_date", null: false
+    t.datetime "created_at", precision: 3, null: false
+  end
+
+  # TABLE: machine_sparks
+  # SQL: CREATE TABLE machine_sparks ( `account_id` UUID, `environment_id` Nullable(UUID), `count` UInt64 DEFAULT 0, `created_date` Date, `created_at` DateTime64(3) ) ENGINE = MergeTree PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date, environment_id) SETTINGS allow_nullable_key = 1, index_granularity = 8192
+  create_table "machine_sparks", id: false, options: "MergeTree PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date, environment_id) SETTINGS allow_nullable_key = 1, index_granularity = 8192", force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.uuid "environment_id"
+    t.integer "count", limit: 8, default: 0, null: false
+    t.date "created_date", null: false
+    t.datetime "created_at", precision: 3, null: false
   end
 
   # TABLE: request_logs
@@ -77,6 +107,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_24_184042) do
     t.index "ip", name: "idx_ip", type: "bloom_filter", granularity: 4
     t.index "environment_id", name: "idx_environment", type: "bloom_filter", granularity: 4
     t.index "id", name: "idx_id", type: "bloom_filter", granularity: 4
+  end
+
+  # TABLE: user_sparks
+  # SQL: CREATE TABLE user_sparks ( `account_id` UUID, `environment_id` Nullable(UUID), `count` UInt64 DEFAULT 0, `created_date` Date, `created_at` DateTime64(3) ) ENGINE = MergeTree PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date, environment_id) SETTINGS allow_nullable_key = 1, index_granularity = 8192
+  create_table "user_sparks", id: false, options: "MergeTree PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date, environment_id) SETTINGS allow_nullable_key = 1, index_granularity = 8192", force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.uuid "environment_id"
+    t.integer "count", limit: 8, default: 0, null: false
+    t.date "created_date", null: false
+    t.datetime "created_at", precision: 3, null: false
   end
 
 end

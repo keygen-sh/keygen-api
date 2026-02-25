@@ -9,6 +9,7 @@ module Analytics
     COUNTERS = {
       requests: Requests,
       events: Events,
+      sparks: Sparks,
     }
 
     include ActiveModel::Model
@@ -28,11 +29,11 @@ module Analytics
       errors.add :metrics, 'is invalid' if metrics.empty?
     end
 
-    def initialize(counter_name, **options)
-      @counter_name = counter_name = counter_name.to_s.underscore.to_sym
+    def initialize(metric, **options)
+      @counter_name = metric = metric.to_s.underscore.to_sym
 
-      raise SeriesNotFoundError, "invalid series: #{counter_name.inspect}" unless
-        COUNTERS.key?(counter_name)
+      raise SeriesNotFoundError, "invalid metric: #{metric.inspect}" unless
+        COUNTERS.key?(metric)
 
       # split ours vs theirs (doing it this way to keep optionals w/ defaults sane)
       options, @counter_options = options.split(

@@ -23,11 +23,11 @@ module Analytics
     validates :start_date, comparison: { greater_than_or_equal_to: -> { 1.month.ago.to_date } }
     validates :end_date, comparison: { less_than_or_equal_to: -> { 1.year.from_now.to_date } }
 
-    def initialize(counter_name, **)
-      @counter_name = counter_name = counter_name.to_s.underscore.to_sym
+    def initialize(metric, **)
+      @counter_name = metric = metric.to_s.underscore.to_sym
 
-      raise HeatmapNotFoundError, "invalid heatmap: #{counter_name.inspect}" unless
-        COUNTERS.key?(counter_name)
+      raise HeatmapNotFoundError, "invalid metric: #{metric.inspect}" unless
+        COUNTERS.key?(metric)
 
       super(**)
     end

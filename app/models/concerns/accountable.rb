@@ -13,6 +13,26 @@ module Accountable
         all
       end
     }
+
+    ##
+    # for_account scopes the current resource to an account
+    scope :for_account, -> account {
+      account = case account
+                in String => slug unless slug in UUID_RE
+                  return none # we don't support filtering via slug yet
+                in UUID_RE => id
+                  return none unless
+                    acct = Account.find_by(id:)
+
+                  acct
+                in Account => acct
+                  acct
+                else
+                  return none
+                end
+
+      where(account:)
+    }
   end
 
   class_methods do

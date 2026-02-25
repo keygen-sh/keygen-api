@@ -9,7 +9,7 @@ module Priv::Analytics
       authorize! with: Accounts::AnalyticsPolicy
 
       gauge = Analytics::Gauge.new(
-        params[:gauge],
+        params[:metric],
       )
 
       unless gauge.valid?
