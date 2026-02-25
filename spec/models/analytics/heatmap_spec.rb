@@ -13,9 +13,6 @@ describe Analytics::Heatmap do
 
         expect(heatmap).to be_a(Analytics::Heatmap)
         expect(heatmap).to be_valid
-        expect(heatmap.cells).to satisfy do |cells|
-          cells.all? { it in Analytics::Heatmap::Cell(date: Date, x: Integer, y: Integer, temperature: Float, count: Integer) }
-        end
       end
 
       it 'accepts string names' do
@@ -23,15 +20,11 @@ describe Analytics::Heatmap do
 
         expect(heatmap).to be_a(Analytics::Heatmap)
         expect(heatmap).to be_valid
-        expect(heatmap.cells).to satisfy do |cells|
-          cells.all? { it in Analytics::Heatmap::Cell(date: Date, x: Integer, y: Integer, temperature: Float, count: Integer) }
-        end
       end
 
       it 'accepts date range' do
         start_date = Date.current
         end_date   = 30.days.from_now.to_date
-        date_range = start_date..end_date
 
         heatmap = described_class.new(
           :expirations,
@@ -42,14 +35,6 @@ describe Analytics::Heatmap do
 
         expect(heatmap).to be_a(Analytics::Heatmap)
         expect(heatmap).to be_valid
-        expect(heatmap.cells.size).to eq(date_range.to_a.size)
-        expect(heatmap.cells).to satisfy do
-          it in [
-            Analytics::Heatmap::Cell(date: ^start_date, x: Integer, y: Integer, temperature: Float, count: Integer),
-            *,
-            Analytics::Heatmap::Cell(date: ^end_date, x: Integer, y: Integer, temperature: Float, count: Integer)
-          ]
-        end
       end
     end
 
@@ -62,50 +47,42 @@ describe Analytics::Heatmap do
 
   describe 'expirations' do
     context 'with no expiring licenses' do
-      it 'returns cells with zeroed temperatures and counts' do
-        start_date = Date.current
-        end_date   = 7.days.from_now.to_date
+      it 'returns no cells' do
+        heatmap = described_class.new(
+          :expirations,
+          account:,
+          start_date: Date.current,
+          end_date: 7.days.from_now.to_date,
+        )
 
-        heatmap = described_class.new(:expirations, account:, start_date:, end_date:)
-
-        expect(heatmap.cells.length).to eq(8)
-        expect(heatmap.cells).to satisfy do
-          it in [
-            Analytics::Heatmap::Cell(date: ^start_date, temperature: 0.0, count: 0),
-            *,
-            Analytics::Heatmap::Cell(date: ^end_date, temperature: 0.0, count: 0)
-          ]
-        end
+        expect(heatmap.cells).to be_empty
       end
     end
 
     context 'with expiring licenses' do
       before do
+        create(:license, account:, expiry: 1.day.ago)
         create(:license, account:, expiry: 3.days.from_now)
         create(:license, account:, expiry: 3.days.from_now)
         create(:license, account:, expiry: 5.days.from_now)
+        create(:license, account:, expiry: 7.days.from_now)
       end
 
       it 'returns cells with correct counts' do
-        start_date           = Date.current
-        date_1_day_from_now  = 1.day.from_now.to_date
-        date_2_days_from_now = 2.days.from_now.to_date
-        date_3_days_from_now = 3.days.from_now.to_date
-        date_4_days_from_now = 4.days.from_now.to_date
-        date_5_days_from_now = 5.days.from_now.to_date
-        end_date             = 6.days.from_now.to_date
+        three_days_from_now = 3.days.from_now.to_date
+        five_days_from_now  = 5.days.from_now.to_date
 
-        heatmap = described_class.new(:expirations, account:, start_date:, end_date:)
+        heatmap = described_class.new(
+          :expirations,
+          account:,
+          start_date: Date.current,
+          end_date: 6.days.from_now.to_date,
+        )
 
         expect(heatmap.cells).to satisfy do
           it in [
-            Analytics::Heatmap::Cell(date: ^start_date, count: 0),
-            Analytics::Heatmap::Cell(date: ^date_1_day_from_now, count: 0),
-            Analytics::Heatmap::Cell(date: ^date_2_days_from_now, count: 0),
-            Analytics::Heatmap::Cell(date: ^date_3_days_from_now, count: 2),
-            Analytics::Heatmap::Cell(date: ^date_4_days_from_now, count: 0),
-            Analytics::Heatmap::Cell(date: ^date_5_days_from_now, count: 1),
-            Analytics::Heatmap::Cell(date: ^end_date, count: 0)
+            Analytics::Heatmap::Cell(date: ^three_days_from_now, count: 2),
+            Analytics::Heatmap::Cell(date: ^five_days_from_now, count: 1),
           ]
         end
       end
@@ -131,6 +108,11 @@ describe Analytics::Heatmap do
     end
 
     context 'with default date range' do
+      before do
+        create(:license, account:, expiry: Time.current)
+        create(:license, account:, expiry: 364.days.from_now)
+      end
+
       it 'returns heatmap for the next year inclusive of today' do
         start_date = Date.current
         end_date   = 364.days.from_now.to_date

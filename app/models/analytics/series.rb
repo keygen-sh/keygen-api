@@ -51,8 +51,11 @@ module Analytics
       counts = counter.count(start_date:, end_date:)
 
       metrics.flat_map do |metric|
-        (start_date..end_date).map do |date|
-          Bucket.new(metric:, date:, count: counts[[metric, date]].to_i)
+        (start_date..end_date).filter_map do |date|
+          count = counts[[metric, date]].to_i
+          next if count.zero?
+
+          Bucket.new(metric:, date:, count:)
         end
       end
     end

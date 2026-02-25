@@ -24,8 +24,10 @@ Feature: Spark series analytics
     And time is frozen at "2100-08-30T00:00:00.000Z"
     And the current account has the following "license_spark" rows:
       | count | created_date |
+      | 9     | 2100-08-22   |
       | 10    | 2100-08-23   |
       | 12    | 2100-08-24   |
+      | 14    | 2100-08-25   |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/analytics/sparks/licenses?date[start]=2100-08-23&date[end]=2100-08-24"
     Then the response status should be "200"
@@ -48,15 +50,25 @@ Feature: Spark series analytics
     And time is frozen at "2100-08-30T00:00:00.000Z"
     And the current account has the following "machine_spark" rows:
       | count | created_date |
+      | 0     | 2100-08-18   |
+      | 1     | 2100-08-19   |
+      | 2     | 2100-08-20   |
+      | 3     | 2100-08-21   |
+      | 4     | 2100-08-22   |
       | 5     | 2100-08-23   |
       | 6     | 2100-08-24   |
+      | 7     | 2100-08-25   |
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/analytics/sparks/machines?date[start]=2100-08-23&date[end]=2100-08-24"
+    When I send a GET request to "/accounts/test1/analytics/sparks/machines?date[start]=2100-08-01&date[end]=2100-08-24"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
       {
         "data": [
+          { "metric": "machines", "date": "2100-08-19", "count": 1 },
+          { "metric": "machines", "date": "2100-08-20", "count": 2 },
+          { "metric": "machines", "date": "2100-08-21", "count": 3 },
+          { "metric": "machines", "date": "2100-08-22", "count": 4 },
           { "metric": "machines", "date": "2100-08-23", "count": 5 },
           { "metric": "machines", "date": "2100-08-24", "count": 6 }
         ]
