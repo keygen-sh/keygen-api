@@ -37,9 +37,11 @@ module Analytics
       counts     = counter.count(start_date:, end_date:)
       max_count  = counts.values.max || 1
 
-      (start_date..end_date).map do |date|
+      (start_date..end_date).filter_map do |date|
+        count = counts[date].to_i
+        next if count.zero?
+
         offset = (date - grid_start).to_i
-        count  = counts[date] || 0
         temp   = (count.to_f / max_count).round(1)
 
         Cell.new(

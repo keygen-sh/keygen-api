@@ -16,7 +16,7 @@ class RequestLimitsReportWorker < BaseWorker
       admin = account.admins.last
       plan  = account.plan
 
-      request_count = account.request_logs.where(created_at: (start_date..end_date)).count
+      request_count = account.request_logs.where(created_at: start_date..end_date).count
       request_limit = plan.max_reqs
 
       admin_count = account.users.with_roles(:admin, :developer, :read_only, :sales_agent, :support_agent).count

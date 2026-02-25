@@ -26,13 +26,15 @@ Feature: Usage analytics
     And time is frozen at "2100-08-30T00:00:00.000Z"
     And the current account has the following "request_log" rows:
       | id                                   | status | created_at               |
+      | d1e6f594-7bcb-455f-971b-1e8b3ea63fd7 | 200    | 2099-08-20T00:00:00.000Z |
       | d00998f9-d224-4ee7-ac4e-f1e5fe318ff7 | 200    | 2100-08-23T00:00:00.000Z |
       | 96faacd6-16e6-4661-8e16-9e8064fbeb0a | 200    | 2100-08-23T00:00:00.000Z |
       | 31e30cc1-d454-40dc-b4ae-93ad683ddf33 | 301    | 2100-08-24T00:00:00.000Z |
       | 99e87418-ade4-460f-a5aa-a856a0059397 | 404    | 2100-08-24T00:00:00.000Z |
       | 19a9aefc-00b9-4905-b236-ff3cca788b3e | 500    | 2100-08-24T00:00:00.000Z |
+      | ae18899e-e0bb-46ce-8b47-2330c5be0215 | 200    | 2100-08-24T00:00:00.000Z |
       | 09d7a1f9-3c4a-401f-b6a9-839f4e35d493 | 200    | 2100-08-25T00:00:00.000Z |
-      | d1e6f594-7bcb-455f-971b-1e8b3ea63fd7 | 200    | 2099-08-20T00:00:00.000Z |
+      | 5f7be932-57b1-4c3c-a05f-c88e6e94284c | 200    | 2100-08-30T00:00:00.000Z |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/analytics/usage?date[start]=2100-08-23&date[end]=2100-08-25"
     Then the response status should be "200"
@@ -41,17 +43,11 @@ Feature: Usage analytics
       {
         "data": [
           { "metric": "requests.2xx", "date": "2100-08-23", "count": 2 },
-          { "metric": "requests.2xx", "date": "2100-08-24", "count": 0 },
+          { "metric": "requests.2xx", "date": "2100-08-24", "count": 1 },
           { "metric": "requests.2xx", "date": "2100-08-25", "count": 1 },
-          { "metric": "requests.3xx", "date": "2100-08-23", "count": 0 },
           { "metric": "requests.3xx", "date": "2100-08-24", "count": 1 },
-          { "metric": "requests.3xx", "date": "2100-08-25", "count": 0 },
-          { "metric": "requests.4xx", "date": "2100-08-23", "count": 0 },
           { "metric": "requests.4xx", "date": "2100-08-24", "count": 1 },
-          { "metric": "requests.4xx", "date": "2100-08-25", "count": 0 },
-          { "metric": "requests.5xx", "date": "2100-08-23", "count": 0 },
-          { "metric": "requests.5xx", "date": "2100-08-24", "count": 1 },
-          { "metric": "requests.5xx", "date": "2100-08-25", "count": 0 }
+          { "metric": "requests.5xx", "date": "2100-08-24", "count": 1 }
         ]
       }
       """
@@ -74,17 +70,7 @@ Feature: Usage analytics
       {
         "data": [
           { "metric": "requests.2xx", "date": "2100-08-23", "count": 1 },
-          { "metric": "requests.2xx", "date": "2100-08-24", "count": 0 },
-          { "metric": "requests.2xx", "date": "2100-08-25", "count": 0 },
-          { "metric": "requests.3xx", "date": "2100-08-23", "count": 0 },
-          { "metric": "requests.3xx", "date": "2100-08-24", "count": 0 },
-          { "metric": "requests.3xx", "date": "2100-08-25", "count": 0 },
-          { "metric": "requests.4xx", "date": "2100-08-23", "count": 0 },
-          { "metric": "requests.4xx", "date": "2100-08-24", "count": 0 },
-          { "metric": "requests.4xx", "date": "2100-08-25", "count": 1 },
-          { "metric": "requests.5xx", "date": "2100-08-23", "count": 0 },
-          { "metric": "requests.5xx", "date": "2100-08-24", "count": 0 },
-          { "metric": "requests.5xx", "date": "2100-08-25", "count": 0 }
+          { "metric": "requests.4xx", "date": "2100-08-25", "count": 1 }
         ]
       }
       """

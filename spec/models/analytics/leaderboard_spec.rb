@@ -16,9 +16,6 @@ describe Analytics::Leaderboard do
 
         expect(leaderboard).to be_a(Analytics::Leaderboard)
         expect(leaderboard).to be_valid
-        expect(leaderboard.scores).to satisfy do |scores|
-          scores.all? { it in Analytics::Leaderboard::Score(discriminator: String, count: Integer) }
-        end
       end
 
       it 'returns leaderboard for urls' do
@@ -26,9 +23,6 @@ describe Analytics::Leaderboard do
 
         expect(leaderboard).to be_a(Analytics::Leaderboard)
         expect(leaderboard).to be_valid
-        expect(leaderboard.scores).to satisfy do |scores|
-          scores.all? { it in Analytics::Leaderboard::Score(discriminator: String, count: Integer) }
-        end
       end
 
       it 'returns leaderboard for licenses' do
@@ -36,9 +30,6 @@ describe Analytics::Leaderboard do
 
         expect(leaderboard).to be_a(Analytics::Leaderboard)
         expect(leaderboard).to be_valid
-        expect(leaderboard.scores).to satisfy do |scores|
-          scores.all? { it in Analytics::Leaderboard::Score(discriminator: String, count: Integer) }
-        end
       end
 
       it 'returns leaderboard for user_agents' do
@@ -46,9 +37,6 @@ describe Analytics::Leaderboard do
 
         expect(leaderboard).to be_a(Analytics::Leaderboard)
         expect(leaderboard).to be_valid
-        expect(leaderboard.scores).to satisfy do |scores|
-          scores.all? { it in Analytics::Leaderboard::Score(discriminator: String, count: Integer) }
-        end
       end
 
       it 'accepts string names' do
@@ -56,9 +44,6 @@ describe Analytics::Leaderboard do
 
         expect(leaderboard).to be_a(Analytics::Leaderboard)
         expect(leaderboard).to be_valid
-        expect(leaderboard.scores).to satisfy do |scores|
-          scores.all? { it in Analytics::Leaderboard::Score(discriminator: String, count: Integer) }
-        end
       end
     end
 

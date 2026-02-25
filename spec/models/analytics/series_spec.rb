@@ -3,13 +3,13 @@
 require 'rails_helper'
 require 'spec_helper'
 
-describe Analytics::Series do
+describe Analytics::Series, :only_clickhouse do
   let(:account) { create(:account) }
 
   before { Sidekiq::Testing.inline! }
   after  { Sidekiq::Testing.fake! }
 
-  describe ':events', :only_clickhouse do
+  describe ':events' do
     it 'returns event count timeseries' do
       series = described_class.new(
         :events,
@@ -23,7 +23,6 @@ describe Analytics::Series do
       expect(series.buckets).to all(
         satisfy { it in Analytics::Series::Bucket(metric: 'license.validation.succeeded', date: Date, count: Integer) }
       )
-      expect(series.buckets.size).to eq(8)
     end
 
     it 'supports wildcard patterns' do
@@ -82,7 +81,7 @@ describe Analytics::Series do
     end
   end
 
-  describe ':requests', :only_clickhouse do
+  describe ':requests' do
     it 'returns request counts grouped by status bucket' do
       create_list(:request_log, 3, account:, status: '200', created_at: 2.days.ago)
       create_list(:request_log, 2, account:, status: '404', created_at: 2.days.ago)
@@ -104,66 +103,36 @@ describe Analytics::Series do
       expect(series).to be_valid
       expect(series.buckets).to satisfy do |buckets|
         buckets in [
-          Analytics::Series::Bucket(metric: 'requests.2xx', date: ^three_days_ago, count: 0),
           Analytics::Series::Bucket(metric: 'requests.2xx', date: ^two_days_ago, count: 3),
-          Analytics::Series::Bucket(metric: 'requests.2xx', date: ^one_day_ago, count: 0),
-          Analytics::Series::Bucket(metric: 'requests.2xx', date: ^today, count: 0),
-          Analytics::Series::Bucket(metric: 'requests.3xx', date: ^three_days_ago, count: 0),
-          Analytics::Series::Bucket(metric: 'requests.3xx', date: ^two_days_ago, count: 0),
           Analytics::Series::Bucket(metric: 'requests.3xx', date: ^one_day_ago, count: 1),
-          Analytics::Series::Bucket(metric: 'requests.3xx', date: ^today, count: 0),
-          Analytics::Series::Bucket(metric: 'requests.4xx', date: ^three_days_ago, count: 0),
           Analytics::Series::Bucket(metric: 'requests.4xx', date: ^two_days_ago, count: 2),
-          Analytics::Series::Bucket(metric: 'requests.4xx', date: ^one_day_ago, count: 0),
-          Analytics::Series::Bucket(metric: 'requests.4xx', date: ^today, count: 0),
-          Analytics::Series::Bucket(metric: 'requests.5xx', date: ^three_days_ago, count: 0),
-          Analytics::Series::Bucket(metric: 'requests.5xx', date: ^two_days_ago, count: 0),
           Analytics::Series::Bucket(metric: 'requests.5xx', date: ^one_day_ago, count: 2),
-          Analytics::Series::Bucket(metric: 'requests.5xx', date: ^today, count: 0),
         ]
       end
     end
 
-    it 'includes zero counts for days with no requests' do
+    it 'omits zero counts for days with no requests' do
       create(:request_log, account:, status: '200', created_at: 3.days.ago)
 
       three_days_ago = 3.days.ago.to_date
-      two_days_ago   = 2.days.ago.to_date
-      one_day_ago    = 1.day.ago.to_date
-      today          = Date.current
 
       series = described_class.new(
         :requests,
         account:,
         start_date: three_days_ago,
-        end_date: today,
+        end_date: Date.current,
       )
 
       expect(series).to be_valid
       expect(series.buckets).to satisfy do |buckets|
         buckets in [
           Analytics::Series::Bucket(metric: 'requests.2xx', date: ^three_days_ago, count: 1),
-          Analytics::Series::Bucket(metric: 'requests.2xx', date: ^two_days_ago, count: 0),
-          Analytics::Series::Bucket(metric: 'requests.2xx', date: ^one_day_ago, count: 0),
-          Analytics::Series::Bucket(metric: 'requests.2xx', date: ^today, count: 0),
-          Analytics::Series::Bucket(metric: 'requests.3xx', date: ^three_days_ago, count: 0),
-          Analytics::Series::Bucket(metric: 'requests.3xx', date: ^two_days_ago, count: 0),
-          Analytics::Series::Bucket(metric: 'requests.3xx', date: ^one_day_ago, count: 0),
-          Analytics::Series::Bucket(metric: 'requests.3xx', date: ^today, count: 0),
-          Analytics::Series::Bucket(metric: 'requests.4xx', date: ^three_days_ago, count: 0),
-          Analytics::Series::Bucket(metric: 'requests.4xx', date: ^two_days_ago, count: 0),
-          Analytics::Series::Bucket(metric: 'requests.4xx', date: ^one_day_ago, count: 0),
-          Analytics::Series::Bucket(metric: 'requests.4xx', date: ^today, count: 0),
-          Analytics::Series::Bucket(metric: 'requests.5xx', date: ^three_days_ago, count: 0),
-          Analytics::Series::Bucket(metric: 'requests.5xx', date: ^two_days_ago, count: 0),
-          Analytics::Series::Bucket(metric: 'requests.5xx', date: ^one_day_ago, count: 0),
-          Analytics::Series::Bucket(metric: 'requests.5xx', date: ^today, count: 0),
         ]
       end
     end
   end
 
-  describe ':sparks', :only_clickhouse do
+  describe ':sparks' do
     it 'returns a spark timeseries with realtime count for today' do
       three_days_ago = 3.days.ago.to_date
       two_days_ago   = 2.days.ago.to_date
@@ -189,7 +158,6 @@ describe Analytics::Series do
       expect(series).to be_valid
       expect(series.buckets).to satisfy do |buckets|
         buckets in [
-          Analytics::Series::Bucket(metric: :licenses, date: ^three_days_ago, count: 0),
           Analytics::Series::Bucket(metric: :licenses, date: ^two_days_ago, count: 10),
           Analytics::Series::Bucket(metric: :licenses, date: ^one_day_ago, count: 12),
           Analytics::Series::Bucket(metric: :licenses, date: ^today, count: 15),
@@ -198,10 +166,9 @@ describe Analytics::Series do
     end
 
     it 'returns a spark timeseries without realtime count for today' do
-      three_days_ago = 3.days.ago.to_date
-      two_days_ago   = 2.days.ago.to_date
-      one_day_ago    = 1.day.ago.to_date
-      today          = Date.current
+      two_days_ago = 2.days.ago.to_date
+      one_day_ago  = 1.day.ago.to_date
+      today        = Date.current
 
       LicenseSpark.insert_all!([
         { account_id: account.id, environment_id: nil, count: 10, created_date: two_days_ago, created_at: Time.current },
@@ -215,7 +182,7 @@ describe Analytics::Series do
         :sparks,
         metric: 'licenses',
         account:,
-        start_date: three_days_ago,
+        start_date: 3.days.ago.to_date,
         end_date: today,
         realtime: false,
       )
@@ -223,7 +190,6 @@ describe Analytics::Series do
       expect(series).to be_valid
       expect(series.buckets).to satisfy do |buckets|
         buckets in [
-          Analytics::Series::Bucket(metric: :licenses, date: ^three_days_ago, count: 0),
           Analytics::Series::Bucket(metric: :licenses, date: ^two_days_ago, count: 10),
           Analytics::Series::Bucket(metric: :licenses, date: ^one_day_ago, count: 12),
           Analytics::Series::Bucket(metric: :licenses, date: ^today, count: 12),
@@ -251,7 +217,6 @@ describe Analytics::Series do
       expect(series.buckets).to satisfy do |buckets|
         buckets in [
           Analytics::Series::Bucket(metric: :machines, date: ^one_day_ago, count: 5),
-          Analytics::Series::Bucket(metric: :machines, date: ^today, count: 0),
         ]
       end
     end
@@ -304,7 +269,6 @@ describe Analytics::Series do
       expect(series.buckets).to satisfy do |buckets|
         buckets in [
           Analytics::Series::Bucket(metric: :licenses, date: ^three_days_ago, count: 10),
-          Analytics::Series::Bucket(metric: :licenses, date: Date, count: 0),
           Analytics::Series::Bucket(metric: :licenses, date: ^one_day_ago, count: 12),
         ]
       end

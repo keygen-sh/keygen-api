@@ -23,31 +23,26 @@ Feature: Heatmaps analytics
     And time is frozen at "2024-03-01T00:00:00.000Z"
     And the current account has the following "license" rows:
       | id                                   | expiry                   |
+      | e4cc62e9-b9cc-404d-a0f9-beb3a0061d2e | 2024-02-28T00:00:00.000Z |
+      | e1891c9b-57cb-455e-95cc-be47c2797c01 | 2024-03-01T00:00:00.000Z |
       | d00998f9-d224-4ee7-ac4e-f1e5fe318ff7 | 2024-03-05T00:00:00.000Z |
       | 96faacd6-16e6-4661-8e16-9e8064fbeb0a | 2024-03-05T00:00:00.000Z |
       | 31e30cc1-d454-40dc-b4ae-93ad683ddf33 | 2024-03-10T00:00:00.000Z |
+      | eba8fbdb-90d3-49d6-84a0-c12a532539a1 | 2024-03-14T00:00:00.000Z |
+      | f24a9d67-dd63-4f86-b2a9-d46e79471e35 | 2024-03-15T00:00:00.000Z |
+      | f9adf623-298f-4461-afbf-40c21abd8581 | 2024-03-15T00:00:00.000Z |
+      | 9bd974e1-c9d7-48a4-865d-9c50e36642d0 | 2024-03-20T00:00:00.000Z |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/analytics/heatmaps/expirations?date[start]=2024-03-01&date[end]=2024-03-14"
     Then the response status should be "200"
-    And the response body should be a "data" array with 14 items
     And the response body should be a JSON document with the following content:
       """
       {
         "data": [
-          { "date": "2024-03-01", "x": 0, "y": 5, "temperature": 0.0, "count": 0 },
-          { "date": "2024-03-02", "x": 0, "y": 6, "temperature": 0.0, "count": 0 },
-          { "date": "2024-03-03", "x": 1, "y": 0, "temperature": 0.0, "count": 0 },
-          { "date": "2024-03-04", "x": 1, "y": 1, "temperature": 0.0, "count": 0 },
+          { "date": "2024-03-01", "x": 0, "y": 5, "temperature": 0.5, "count": 1 },
           { "date": "2024-03-05", "x": 1, "y": 2, "temperature": 1.0, "count": 2 },
-          { "date": "2024-03-06", "x": 1, "y": 3, "temperature": 0.0, "count": 0 },
-          { "date": "2024-03-07", "x": 1, "y": 4, "temperature": 0.0, "count": 0 },
-          { "date": "2024-03-08", "x": 1, "y": 5, "temperature": 0.0, "count": 0 },
-          { "date": "2024-03-09", "x": 1, "y": 6, "temperature": 0.0, "count": 0 },
           { "date": "2024-03-10", "x": 2, "y": 0, "temperature": 0.5, "count": 1 },
-          { "date": "2024-03-11", "x": 2, "y": 1, "temperature": 0.0, "count": 0 },
-          { "date": "2024-03-12", "x": 2, "y": 2, "temperature": 0.0, "count": 0 },
-          { "date": "2024-03-13", "x": 2, "y": 3, "temperature": 0.0, "count": 0 },
-          { "date": "2024-03-14", "x": 2, "y": 4, "temperature": 0.0, "count": 0 }
+          { "date": "2024-03-14", "x": 2, "y": 4, "temperature": 0.5, "count": 1 }
         ]
       }
       """
@@ -61,7 +56,7 @@ Feature: Heatmaps analytics
     And I use an authentication token
     When I send a GET request to "/accounts/test1/analytics/heatmaps/expirations"
     Then the response status should be "200"
-    And the response body should be a "data" array with 365 items
+    And the response body should be a "data" array with 0 items
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
 
@@ -131,16 +126,11 @@ Feature: Heatmaps analytics
       """
     When I send a GET request to "/accounts/test1/analytics/heatmaps/expirations?date[start]=2026-03-05&date[end]=2026-03-10"
     Then the response status should be "200"
-    And the response body should be a "data" array with 6 items
     And the response body should be a JSON document with the following content:
       """
       {
         "data": [
           { "date": "2026-03-05", "x": 0, "y": 4, "temperature": 1.0, "count": 3 },
-          { "date": "2026-03-06", "x": 0, "y": 5, "temperature": 0.0, "count": 0 },
-          { "date": "2026-03-07", "x": 0, "y": 6, "temperature": 0.0, "count": 0 },
-          { "date": "2026-03-08", "x": 1, "y": 0, "temperature": 0.0, "count": 0 },
-          { "date": "2026-03-09", "x": 1, "y": 1, "temperature": 0.0, "count": 0 },
           { "date": "2026-03-10", "x": 1, "y": 2, "temperature": 0.3, "count": 1 }
         ]
       }
@@ -182,15 +172,10 @@ Feature: Heatmaps analytics
       """
     When I send a GET request to "/accounts/test1/analytics/heatmaps/expirations?date[start]=2026-03-05&date[end]=2026-03-10"
     Then the response status should be "200"
-    And the response body should be a "data" array with 6 items
     And the response body should be a JSON document with the following content:
       """
       {
         "data": [
-          { "date": "2026-03-05", "x": 0, "y": 4, "temperature": 0.0, "count": 0 },
-          { "date": "2026-03-06", "x": 0, "y": 5, "temperature": 0.0, "count": 0 },
-          { "date": "2026-03-07", "x": 0, "y": 6, "temperature": 0.0, "count": 0 },
-          { "date": "2026-03-08", "x": 1, "y": 0, "temperature": 0.0, "count": 0 },
           { "date": "2026-03-09", "x": 1, "y": 1, "temperature": 0.5, "count": 1 },
           { "date": "2026-03-10", "x": 1, "y": 2, "temperature": 1.0, "count": 2 }
         ]
