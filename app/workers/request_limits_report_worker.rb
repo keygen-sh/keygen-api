@@ -7,11 +7,10 @@ class RequestLimitsReportWorker < BaseWorker
   def perform
     date = Date.yesterday
 
-    active_states = %w[subscribed trialing pending]
     start_date = date.beginning_of_day
     end_date = date.end_of_day
 
-    Account.includes(:billing, :plan).where(billings: { state: active_states }).unordered.find_each do |account|
+    Account.includes(:billing, :plan).unordered.subscribed.find_each do |account|
       Keygen.logger.info "[workers.request-limits-report] Generating report: account_id=#{account.id}"
 
       admin = account.admins.last

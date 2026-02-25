@@ -502,7 +502,8 @@ Rails.application.routes.draw do
         get 'events/:event',             to: 'events#show',        as: :event,       constraints: { event: /.*/ }
         get 'leaderboards/:leaderboard', to: 'leaderboards#show',  as: :leaderboard
         get 'heatmaps/:heatmap',         to: 'heatmaps#show',      as: :heatmap
-        get 'gauges/:gauge',             to: 'gauges#show',        as: :gauge
+        get 'gauges/:metric',            to: 'gauges#show',        as: :gauge
+        get 'sparks/:metric',            to: 'sparks#show',        as: :spark
         get 'usage',                     to: 'usage#show',         as: :usage
       end
     end

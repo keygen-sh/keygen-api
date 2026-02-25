@@ -20,11 +20,11 @@ module Analytics
 
     validates :account, presence: true
 
-    def initialize(counter_name, **)
-      @counter_name = counter_name = counter_name.to_s.underscore.to_sym
+    def initialize(metric, **)
+      @counter_name = metric = metric.to_s.underscore.to_sym
 
-      raise GaugeNotFoundError, "invalid gauge: #{counter_name.inspect}" unless
-        COUNTERS.key?(counter_name)
+      raise GaugeNotFoundError, "invalid metric: #{metric.inspect}" unless
+        COUNTERS.key?(metric)
 
       super(**)
     end

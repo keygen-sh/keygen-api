@@ -13,7 +13,7 @@ describe Analytics::Series do
     it 'returns event count timeseries' do
       series = described_class.new(
         :events,
-        event_pattern: 'license.validation.succeeded',
+        event: 'license.validation.succeeded',
         account:,
         start_date: 7.days.ago.to_date,
         end_date: Date.current,
@@ -29,7 +29,7 @@ describe Analytics::Series do
     it 'supports wildcard patterns' do
       series = described_class.new(
         :events,
-        event_pattern: 'license.*',
+        event: 'license.*',
         account:,
         start_date: 7.days.ago.to_date,
         end_date: Date.current,
@@ -50,7 +50,7 @@ describe Analytics::Series do
 
       series = described_class.new(
         :events,
-        event_pattern: 'license.validation.succeeded',
+        event: 'license.validation.succeeded',
         account:,
         resource_type: 'License',
         resource_id: license1.id,
@@ -67,14 +67,14 @@ describe Analytics::Series do
 
     context 'with invalid pattern' do
       it 'is invalid for unknown event' do
-        series = described_class.new(:events, event_pattern: 'invalid.event', account:)
+        series = described_class.new(:events, event: 'invalid.event', account:)
 
         expect(series).not_to be_valid
         expect(series.errors[:metrics]).to include('is invalid')
       end
 
       it 'is invalid for unknown wildcard' do
-        series = described_class.new(:events, event_pattern: 'invalid.*', account:)
+        series = described_class.new(:events, event: 'invalid.*', account:)
 
         expect(series).not_to be_valid
         expect(series.errors[:metrics]).to include('is invalid')
@@ -160,6 +160,161 @@ describe Analytics::Series do
           Analytics::Series::Bucket(metric: 'requests.5xx', date: ^today, count: 0),
         ]
       end
+    end
+  end
+
+  describe ':sparks', :only_clickhouse do
+    it 'returns a spark timeseries with realtime count for today' do
+      three_days_ago = 3.days.ago.to_date
+      two_days_ago   = 2.days.ago.to_date
+      one_day_ago    = 1.day.ago.to_date
+      today          = Date.current
+
+      LicenseSpark.insert_all!([
+        { account_id: account.id, environment_id: nil, count: 10, created_date: two_days_ago, created_at: Time.current },
+        { account_id: account.id, environment_id: nil, count: 12, created_date: one_day_ago, created_at: Time.current },
+        { account_id: account.id, environment_id: nil, count: 12, created_date: today, created_at: Time.current },
+      ])
+
+      create_list(:license, 15, account:)
+
+      series = described_class.new(
+        :sparks,
+        metric: 'licenses',
+        account:,
+        start_date: three_days_ago,
+        end_date: today,
+      )
+
+      expect(series).to be_valid
+      expect(series.buckets).to satisfy do |buckets|
+        buckets in [
+          Analytics::Series::Bucket(metric: :licenses, date: ^three_days_ago, count: 0),
+          Analytics::Series::Bucket(metric: :licenses, date: ^two_days_ago, count: 10),
+          Analytics::Series::Bucket(metric: :licenses, date: ^one_day_ago, count: 12),
+          Analytics::Series::Bucket(metric: :licenses, date: ^today, count: 15),
+        ]
+      end
+    end
+
+    it 'returns a spark timeseries without realtime count for today' do
+      three_days_ago = 3.days.ago.to_date
+      two_days_ago   = 2.days.ago.to_date
+      one_day_ago    = 1.day.ago.to_date
+      today          = Date.current
+
+      LicenseSpark.insert_all!([
+        { account_id: account.id, environment_id: nil, count: 10, created_date: two_days_ago, created_at: Time.current },
+        { account_id: account.id, environment_id: nil, count: 12, created_date: one_day_ago, created_at: Time.current },
+        { account_id: account.id, environment_id: nil, count: 12, created_date: today, created_at: Time.current },
+      ])
+
+      create_list(:license, 15, account:)
+
+      series = described_class.new(
+        :sparks,
+        metric: 'licenses',
+        account:,
+        start_date: three_days_ago,
+        end_date: today,
+        realtime: false,
+      )
+
+      expect(series).to be_valid
+      expect(series.buckets).to satisfy do |buckets|
+        buckets in [
+          Analytics::Series::Bucket(metric: :licenses, date: ^three_days_ago, count: 0),
+          Analytics::Series::Bucket(metric: :licenses, date: ^two_days_ago, count: 10),
+          Analytics::Series::Bucket(metric: :licenses, date: ^one_day_ago, count: 12),
+          Analytics::Series::Bucket(metric: :licenses, date: ^today, count: 12),
+        ]
+      end
+    end
+
+    it 'uses realtime count for today even with zero resources' do
+      one_day_ago = 1.day.ago.to_date
+      today       = Date.current
+
+      MachineSpark.insert_all!([
+        { account_id: account.id, environment_id: nil, count: 5, created_date: one_day_ago, created_at: Time.current },
+      ])
+
+      series = described_class.new(
+        :sparks,
+        metric: :machines,
+        account:,
+        start_date: one_day_ago,
+        end_date: today,
+      )
+
+      expect(series).to be_valid
+      expect(series.buckets).to satisfy do |buckets|
+        buckets in [
+          Analytics::Series::Bucket(metric: :machines, date: ^one_day_ago, count: 5),
+          Analytics::Series::Bucket(metric: :machines, date: ^today, count: 0),
+        ]
+      end
+    end
+
+    it 'overwrites stale clickhouse data for today with realtime count' do
+      today = Date.current
+
+      LicenseSpark.insert_all!([
+        { account_id: account.id, environment_id: nil, count: 8, created_date: today, created_at: Time.current },
+      ])
+
+      create_list(:license, 12, account:)
+
+      series = described_class.new(
+        :sparks,
+        metric: 'licenses',
+        account:,
+        start_date: today,
+        end_date: today,
+      )
+
+      expect(series).to be_valid
+      expect(series.buckets).to satisfy do |buckets|
+        buckets in [
+          Analytics::Series::Bucket(metric: :licenses, date: ^today, count: 12),
+        ]
+      end
+    end
+
+    it 'does not use realtime count when end_date is before today' do
+      three_days_ago = 3.days.ago.to_date
+      one_day_ago    = 1.day.ago.to_date
+
+      LicenseSpark.insert_all!([
+        { account_id: account.id, environment_id: nil, count: 10, created_date: three_days_ago, created_at: Time.current },
+        { account_id: account.id, environment_id: nil, count: 12, created_date: one_day_ago, created_at: Time.current },
+      ])
+
+      create_list(:license, 20, account:)
+
+      series = described_class.new(
+        :sparks,
+        metric: :licenses,
+        account:,
+        start_date: three_days_ago,
+        end_date: one_day_ago,
+      )
+
+      expect(series).to be_valid
+      expect(series.buckets).to satisfy do |buckets|
+        buckets in [
+          Analytics::Series::Bucket(metric: :licenses, date: ^three_days_ago, count: 10),
+          Analytics::Series::Bucket(metric: :licenses, date: Date, count: 0),
+          Analytics::Series::Bucket(metric: :licenses, date: ^one_day_ago, count: 12),
+        ]
+      end
+    end
+
+    it 'is invalid for unknown spark' do
+      series = described_class.new(:sparks, metric: :invalid, account:)
+
+      expect(series).not_to be_valid
+      expect(series.errors[:metrics]).to include('is invalid')
     end
   end
 

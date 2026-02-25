@@ -66,3 +66,23 @@ vacuum_analyze_request_logs:
 vacuum_analyze_event_logs:
   cron: "0 10 * * *" # Every day at 10am (4am CST)
   class: "VacuumAnalyzeEventLogsWorker"
+
+record_license_sparks:
+  cron: "0 0 * * *" # Every day at midnight (6pm CST)
+  class: "RecordLicenseSparksWorker"
+  status: <%= ENV.true?('CLICKHOUSE_DATABASE_ENABLED') ? 'enabled' : 'disabled' %>
+
+record_machine_sparks:
+  cron: "0 0 * * *" # Every day at midnight (6pm CST)
+  class: "RecordMachineSparksWorker"
+  status: <%= ENV.true?('CLICKHOUSE_DATABASE_ENABLED') ? 'enabled' : 'disabled' %>
+
+record_user_sparks:
+  cron: "0 0 * * *" # Every day at midnight (6pm CST)
+  class: "RecordUserSparksWorker"
+  status: <%= ENV.true?('CLICKHOUSE_DATABASE_ENABLED') ? 'enabled' : 'disabled' %>
+
+record_active_licensed_user_sparks:
+  cron: "0 0 * * *" # Every day at midnight (6pm CST)
+  class: "RecordActiveLicensedUserSparksWorker"
+  status: <%= ENV.true?('CLICKHOUSE_DATABASE_ENABLED') ? 'enabled' : 'disabled' %>

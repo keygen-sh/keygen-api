@@ -3,15 +3,15 @@
 module Analytics
   class Series
     class Events
-      def initialize(account:, environment:, event_pattern: nil, resource_type: nil, resource_id: nil)
+      def initialize(account:, environment:, event:, resource_type: nil, resource_id: nil)
         @account       = account
         @environment   = environment
-        @event_pattern = event_pattern
+        @event         = event
         @resource_type = resource_type
         @resource_id   = resource_id
       end
 
-      def metrics = @metrics ||= event_types.map(&:event)
+      def metrics = @metrics ||= event_types.collect(&:event)
 
       def count(start_date:, end_date:)
         scope = EventLog::Clickhouse.where(account_id: account.id, environment_id: environment&.id)
@@ -33,7 +33,9 @@ module Analytics
         mapping = event_types.index_by(&:id).transform_values(&:event)
 
         counts.each_with_object({}) do |((event_type_id, date), count), hash|
-          hash[[mapping[event_type_id], date]] = count
+          metric = mapping[event_type_id]
+
+          hash[[metric, date]] = count
         end
       end
 
@@ -41,11 +43,11 @@ module Analytics
 
       attr_reader :account,
                   :environment,
-                  :event_pattern,
+                  :event,
                   :resource_type,
                   :resource_id
 
-      def event_types    = @event_types ||= EventType.by_pattern(event_pattern)
+      def event_types    = @event_types ||= EventType.by_pattern(event)
       def event_type_ids = event_types.collect(&:id)
     end
   end
