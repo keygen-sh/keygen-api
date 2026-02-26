@@ -17,7 +17,6 @@ module Analytics
         scope = EventLog::Clickhouse.where(account_id: account.id, environment_id: environment&.id)
                                     .where(created_date: start_date..end_date)
                                     .where(event_type_id: event_type_ids)
-                                    .where(is_deleted: 0)
 
         if resource_type.present? && resource_id.present?
           scope = scope.where(
