@@ -400,38 +400,20 @@ Rails.application.routes.draw do
       end
 
       ee do
-        resources :request_logs, path: 'request-logs', only: %i[index show]  do
-          collection do
-            scope :actions, module: 'request_logs/actions' do
-              get :count, to: 'counts#count'
-            end
-          end
-        end
+        resources :request_logs, path: 'request-logs', only: %i[index show]
+        resources :event_logs, path: 'event-logs', only: %i[index show]
 
         resources :environments do
           scope module: 'environments/relationships' do
             resources :tokens, only: %i[index show create]
           end
         end
-
-        resources :event_logs, path: 'event-logs', only: %i[index show]
       end
 
       resources :metrics, only: %i[index show] do
         collection do
           scope :actions, module: 'metrics/actions' do
             get :count, to: 'counts#count'
-          end
-        end
-      end
-
-      resources :analytics, only: [] do
-        collection do
-          scope :actions, module: 'analytics/actions' do
-            get :top_licenses_by_volume, path: 'top-licenses-by-volume', to: 'counts#top_licenses_by_volume'
-            get :top_urls_by_volume,     path: 'top-urls-by-volume',     to: 'counts#top_urls_by_volume'
-            get :top_ips_by_volume,      path: 'top-ips-by-volume',      to: 'counts#top_ips_by_volume'
-            get :count,                                                  to: 'counts#count'
           end
         end
       end
