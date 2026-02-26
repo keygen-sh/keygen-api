@@ -10,7 +10,7 @@ module Analytics
 
       def count(start_date:, end_date:, limit:)
         scope = RequestLog::Clickhouse.where(account_id: account.id, environment_id: environment&.id)
-                                      .where(created_date: start_date..end_date, is_deleted: 0)
+                                      .where(created_date: start_date..end_date)
                                       .where.not(method: ['', nil])
                                       .where.not(url: ['', nil])
                                       .order(Arel.sql('count_all DESC'))
