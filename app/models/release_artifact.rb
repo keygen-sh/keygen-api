@@ -483,6 +483,7 @@ class ReleaseArtifact < ApplicationRecord
 
   delegate :version, :semver, :channel, :tag,
     :tag?, :licensed?, :open?, :closed?,
+    :product_id, :package_id,
     allow_nil: true,
     to: :release
 
