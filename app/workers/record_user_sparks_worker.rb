@@ -5,7 +5,7 @@ class RecordUserSparksWorker < BaseWorker
                   cronitor_enabled: true
 
   def perform
-    Account.unordered.active.find_each do |account|
+    Account.unordered.paid.find_each do |account|
       jitter = rand(0..30.minutes)
 
       RecordUserSparkWorker.perform_in(jitter, account.id)
