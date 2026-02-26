@@ -25,7 +25,7 @@ class EventType < ApplicationRecord
     return none if
       pattern.blank?
 
-    Rails.cache.fetch(cache_key(pattern), expires_in: CACHE_TTL) do
+    Rails.cache.fetch(cache_key("pattern:#{pattern}"), expires_in: CACHE_TTL) do
       types = if pattern.end_with?('.*')
                 where('event LIKE ?', "#{pattern.delete_suffix('.*')}.%")
               else
