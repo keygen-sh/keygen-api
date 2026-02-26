@@ -30,7 +30,7 @@ Feature: Yank release
       { "status": "YANKED" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin yanks a published release for their account
@@ -46,7 +46,7 @@ Feature: Yank release
       { "status": "YANKED" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin yanks a yanked release for their account
@@ -62,7 +62,7 @@ Feature: Yank release
       { "status": "YANKED" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -84,7 +84,7 @@ Feature: Yank release
       { "status": "YANKED" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product yanks a release
@@ -101,7 +101,7 @@ Feature: Yank release
       { "status": "YANKED" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product yanks a release for another product
@@ -114,7 +114,7 @@ Feature: Yank release
     When I send a POST request to "/accounts/test1/releases/$0/actions/yank"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License yanks a release without a license for it

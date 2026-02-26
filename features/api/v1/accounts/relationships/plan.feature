@@ -160,7 +160,7 @@ Feature: Account plan relationship
       """
     Then the response status should be "200"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin changes trialing account to a new plan
@@ -180,7 +180,7 @@ Feature: Account plan relationship
       """
     Then the response status should be "200"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin changes pending account to a new plan
@@ -200,7 +200,7 @@ Feature: Account plan relationship
       """
     Then the response status should be "200"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin changes paused account to a new plan
@@ -220,7 +220,7 @@ Feature: Account plan relationship
       """
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin changes canceled account to a new plan
@@ -240,7 +240,7 @@ Feature: Account plan relationship
       """
     Then the response status should be "200"
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin attempts to change to an invalid plan
@@ -270,7 +270,7 @@ Feature: Account plan relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   @ee
@@ -328,5 +328,5 @@ Feature: Account plan relationship
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs

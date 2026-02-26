@@ -417,14 +417,6 @@ Rails.application.routes.draw do
         resources :event_logs, path: 'event-logs', only: %i[index show]
       end
 
-      resources :metrics, only: %i[index show] do
-        collection do
-          scope :actions, module: 'metrics/actions' do
-            get :count, to: 'counts#count'
-          end
-        end
-      end
-
       resources :analytics, only: [] do
         collection do
           scope :actions, module: 'analytics/actions' do

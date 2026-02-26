@@ -12,7 +12,6 @@ module RequestLogger
     event_logs
     accounts
     searches
-    metrics
     analytics
     health
     stripe

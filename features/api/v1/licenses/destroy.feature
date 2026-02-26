@@ -28,7 +28,7 @@ Feature: Delete license
     And the current account should have 2 "licenses"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Developer deletes one of their licenses
@@ -93,7 +93,7 @@ Feature: Delete license
     Then the response status should be "204"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -112,7 +112,7 @@ Feature: Delete license
     Then the response status should be "204"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -131,7 +131,7 @@ Feature: Delete license
     Then the response status should be "403"
     And the current account should have 2 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to delete their license
@@ -146,7 +146,7 @@ Feature: Delete license
     Then the response status should be "204"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to delete another product's license
@@ -160,7 +160,7 @@ Feature: Delete license
     Then the response status should be "404"
     And the current account should have 2 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to delete themself
@@ -174,7 +174,7 @@ Feature: Delete license
     And the response body should be an array of 1 error
     And the current account should have 2 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to delete another license
@@ -188,7 +188,7 @@ Feature: Delete license
     And the response body should be an array of 1 error
     And the current account should have 2 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to delete one of their licenses (license owner)
@@ -212,7 +212,7 @@ Feature: Delete license
     Then the response status should be "204"
     And the current account should have 2 "licenses"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to delete one of their licenses (license user)
@@ -233,7 +233,7 @@ Feature: Delete license
     Then the response status should be "403"
     And the current account should have 1 "license"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to delete a license for their account
@@ -248,7 +248,7 @@ Feature: Delete license
     And the response body should be an array of 1 error
     And the current account should have 3 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to delete a license for their group
@@ -276,7 +276,7 @@ Feature: Delete license
     And the response body should be an array of 1 error
     And the current account should have 3 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous user attempts to delete a license for their account
@@ -288,7 +288,7 @@ Feature: Delete license
     And the response body should be an array of 1 error
     And the current account should have 3 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to delete a license for another account
@@ -303,5 +303,5 @@ Feature: Delete license
     And the response body should be an array of 1 error
     And the current account should have 3 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job

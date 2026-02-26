@@ -7,7 +7,6 @@
   - [default, 4]
   - [mailers, 3]
   - [billing, 2]
-  - [metrics, 1]
   - [system, 1] # Deprecated
   - [logs, 1]
   - [cron, 1]

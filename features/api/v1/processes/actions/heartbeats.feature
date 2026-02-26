@@ -36,7 +36,7 @@ Feature: Process heartbeat actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -61,7 +61,7 @@ Feature: Process heartbeat actions
     And the response should contain a valid signature header for "test1"
     And the response body should be a "process"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin pings a dead process's heartbeat
@@ -86,7 +86,7 @@ Feature: Process heartbeat actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -125,7 +125,7 @@ Feature: Process heartbeat actions
     # NOTE(ezekg) To assert that the RESURRECTED status is transient
     And the first "process" should have the status "ALIVE"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -161,7 +161,7 @@ Feature: Process heartbeat actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -186,7 +186,7 @@ Feature: Process heartbeat actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -215,7 +215,7 @@ Feature: Process heartbeat actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -242,7 +242,7 @@ Feature: Process heartbeat actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -256,7 +256,7 @@ Feature: Process heartbeat actions
     When I send a POST request to "/accounts/test1/processes/$0/actions/ping"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License pings a process's heartbeat
@@ -280,7 +280,7 @@ Feature: Process heartbeat actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -310,7 +310,7 @@ Feature: Process heartbeat actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -324,7 +324,7 @@ Feature: Process heartbeat actions
     When I send a POST request to "/accounts/test1/processes/$0/actions/ping"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User pings an unprotected process's heartbeat (license owner)
@@ -359,7 +359,7 @@ Feature: Process heartbeat actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -391,7 +391,7 @@ Feature: Process heartbeat actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -414,7 +414,7 @@ Feature: Process heartbeat actions
     Then the response status should be "403"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User pings a protected process's heartbeat
@@ -440,7 +440,7 @@ Feature: Process heartbeat actions
     When I send a POST request to "/accounts/test1/processes/$0/actions/ping"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -454,5 +454,5 @@ Feature: Process heartbeat actions
     When I send a POST request to "/accounts/test1/processes/$0/actions/ping"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job

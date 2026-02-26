@@ -33,7 +33,7 @@ Feature: Delete user
     And the response should contain a valid signature header for "test1"
     And the current account should have 2 "users"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin deletes one of their users with licenses
@@ -58,7 +58,7 @@ Feature: Delete user
     And the current account should have 1 "license"
     And the current account should have 0 "license-users"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Developer attempts to delete an admin
@@ -128,7 +128,7 @@ Feature: Delete user
     Then the response status should be "204"
     And the current account should have 2 "users"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to delete their user (one product)
@@ -238,7 +238,7 @@ Feature: Delete user
     And the response body should be an array of 1 error
     And the current account should have 1 "user"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to delete a user
@@ -253,7 +253,7 @@ Feature: Delete user
     And the response body should be an array of 1 error
     And the current account should have 2 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to delete themself
@@ -267,7 +267,7 @@ Feature: Delete user
     And the response body should be an array of 1 error
     And the current account should have 3 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to delete an associated user
@@ -285,7 +285,7 @@ Feature: Delete user
     And the response body should be an array of 1 error
     And the current account should have 3 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to delete another user
@@ -299,7 +299,7 @@ Feature: Delete user
     And the response body should be an array of 1 error
     And the current account should have 3 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to delete themself when they're not the only admin for the account
@@ -312,7 +312,7 @@ Feature: Delete user
     Then the response status should be "204"
     And the current account should have 1 "admin"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to delete themself when they're the only admin for the account

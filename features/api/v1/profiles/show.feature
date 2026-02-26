@@ -29,7 +29,7 @@ Feature: Show profile of current bearer
       { "tokenId": "$tokens[0].id" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee

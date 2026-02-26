@@ -174,7 +174,7 @@ Feature: Account billing relationship
       """
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin updates the billing info for their account (initialized)
@@ -196,7 +196,7 @@ Feature: Account billing relationship
       """
     Then the response status should be "202"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 0 "request-log" jobs
 
   @ee
@@ -259,7 +259,7 @@ Feature: Account billing relationship
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin attempts to update the billing info for another account
@@ -281,7 +281,7 @@ Feature: Account billing relationship
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin applies a coupon to their account
@@ -303,7 +303,7 @@ Feature: Account billing relationship
       """
     Then the response status should be "202"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Product attempts to apply a coupon to their account
@@ -326,7 +326,7 @@ Feature: Account billing relationship
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin attempts to apply a coupon to another account
@@ -348,7 +348,7 @@ Feature: Account billing relationship
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin applies an invalid coupon to their account
@@ -369,5 +369,5 @@ Feature: Account billing relationship
       """
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs

@@ -101,8 +101,6 @@ permissions = %w[
   machine.read
   machine.update
 
-  metric.read
-
   package.create
   package.delete
   package.read

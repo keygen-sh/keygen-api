@@ -17,7 +17,7 @@ Feature: Spawn machine process
     Then the response status should be "403"
     And the current account should have 0 "processes"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for their account
@@ -58,7 +58,7 @@ Feature: Spawn machine process
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -199,7 +199,7 @@ Feature: Spawn machine process
     And the response body should be a "process" with the pid "977f1752-d6a9-4669-a6af-b039154ec40f"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process with a pid matching another process's ID (different machine)
@@ -234,7 +234,7 @@ Feature: Spawn machine process
       """
     Then the response status should be "201"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process with a pid matching another process's ID (same machine)
@@ -280,7 +280,7 @@ Feature: Spawn machine process
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for their account with a pid matching a reserved word
@@ -311,7 +311,7 @@ Feature: Spawn machine process
       """
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process with missing pid
@@ -338,7 +338,7 @@ Feature: Spawn machine process
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process with missing machine
@@ -360,7 +360,7 @@ Feature: Spawn machine process
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process with an invalid machine UUID
@@ -390,7 +390,7 @@ Feature: Spawn machine process
       """
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for a machine that has no limit (PER_MACHINE leasing strategy)
@@ -432,7 +432,7 @@ Feature: Spawn machine process
     Then the response status should be "201"
     And the response body should be a "process" with the pid "1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for a machine that has no limit (PER_LICENSE leasing strategy)
@@ -474,7 +474,7 @@ Feature: Spawn machine process
     Then the response status should be "201"
     And the response body should be a "process" with the pid "1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for a machine that has no limit (PER_USER leasing strategy, with owner)
@@ -516,7 +516,7 @@ Feature: Spawn machine process
     Then the response status should be "201"
     And the response body should be a "process" with the pid "1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for a machine that has no limit (PER_USER leasing strategy, no owner)
@@ -558,7 +558,7 @@ Feature: Spawn machine process
     Then the response status should be "201"
     And the response body should be a "process" with the pid "1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for a machine that has not reached its limit (PER_MACHINE leasing strategy)
@@ -599,7 +599,7 @@ Feature: Spawn machine process
     Then the response status should be "201"
     And the response body should be a "process" with the pid "1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for a machine that has not reached its limit (PER_LICENSE leasing strategy)
@@ -641,7 +641,7 @@ Feature: Spawn machine process
     Then the response status should be "201"
     And the response body should be a "process" with the pid "1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for a machine that has not reached its limit (PER_USER leasing strategy, with owner)
@@ -683,7 +683,7 @@ Feature: Spawn machine process
     Then the response status should be "201"
     And the response body should be a "process" with the pid "1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for a machine that has not reached its limit (PER_USER leasing strategy, no owner)
@@ -725,7 +725,7 @@ Feature: Spawn machine process
     Then the response status should be "201"
     And the response body should be a "process" with the pid "1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for a machine that has almost reached its limit (PER_MACHINE leasing strategy)
@@ -767,7 +767,7 @@ Feature: Spawn machine process
     Then the response status should be "201"
     And the response body should be a "process" with the pid "1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for a machine that has almost reached its limit (PER_LICENSE leasing strategy)
@@ -810,7 +810,7 @@ Feature: Spawn machine process
     Then the response status should be "201"
     And the response body should be a "process" with the pid "1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for a machine that has almost reached its limit (PER_USER leasing strategy, with owner)
@@ -852,7 +852,7 @@ Feature: Spawn machine process
     Then the response status should be "201"
     And the response body should be a "process" with the pid "1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for a machine that has almost reached its limit (PER_USER leasing strategy, no owner)
@@ -894,7 +894,7 @@ Feature: Spawn machine process
     Then the response status should be "201"
     And the response body should be a "process" with the pid "1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for a machine that has reached its limit (PER_MACHINE leasing strategy, NO_OVERAGE overage strategy)
@@ -946,7 +946,7 @@ Feature: Spawn machine process
       }
       """
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for a machine that has reached its limit (PER_LICENSE leasing strategy, NO_OVERAGE overage strategy)
@@ -1000,7 +1000,7 @@ Feature: Spawn machine process
       }
       """
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for a machine that has reached its limit (PER_USER leasing strategy, NO_OVERAGE overage strategy, with owner)
@@ -1053,7 +1053,7 @@ Feature: Spawn machine process
       }
       """
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for a machine that has reached its limit (PER_USER leasing strategy, NO_OVERAGE overage strategy, no owner)
@@ -1106,7 +1106,7 @@ Feature: Spawn machine process
       }
       """
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for a machine that has exceeded its limit (PER_MACHINE leasing strategy, ALWAYS_ALLOW_OVERAGE overage strategy)
@@ -1148,7 +1148,7 @@ Feature: Spawn machine process
     Then the response status should be "201"
     And the response body should be a "process" with the pid "1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for a machine that has exceeded its limit (PER_LICENSE leasing strategy, ALWAYS_ALLOW_OVERAGE overage strategy)
@@ -1192,7 +1192,7 @@ Feature: Spawn machine process
     Then the response status should be "201"
     And the response body should be a "process" with the pid "1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for a machine that has exceeded its limit (PER_USER leasing strategy, ALWAYS_ALLOW_OVERAGE overage strategy, with owner)
@@ -1235,7 +1235,7 @@ Feature: Spawn machine process
     Then the response status should be "201"
     And the response body should be a "process" with the pid "1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for a machine that has exceeded its limit (PER_USER leasing strategy, ALWAYS_ALLOW_OVERAGE overage strategy, no owner)
@@ -1278,7 +1278,7 @@ Feature: Spawn machine process
     Then the response status should be "201"
     And the response body should be a "process" with the pid "1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for a machine that has exceeded its limit (PER_MACHINE leasing strategy, ALLOW_1_25X_OVERAGE overage strategy)
@@ -1320,7 +1320,7 @@ Feature: Spawn machine process
     Then the response status should be "201"
     And the response body should be a "process" with the pid "1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for a machine that has exceeded its overage limit (PER_MACHINE leasing strategy, ALLOW_1_25X_OVERAGE overage strategy)
@@ -1372,7 +1372,7 @@ Feature: Spawn machine process
       }
       """
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for a machine that has exceeded its overage limit (PER_USER leasing strategy, ALLOW_1_25X_OVERAGE overage strategy, with owner)
@@ -1425,7 +1425,7 @@ Feature: Spawn machine process
       }
       """
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for a machine that has exceeded its overage limit (PER_USER leasing strategy, ALLOW_1_25X_OVERAGE overage strategy, no owner)
@@ -1478,7 +1478,7 @@ Feature: Spawn machine process
       }
       """
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for a machine that has exceeded its limit (PER_MACHINE leasing strategy, ALLOW_1_5X_OVERAGE overage strategy)
@@ -1520,7 +1520,7 @@ Feature: Spawn machine process
     Then the response status should be "201"
     And the response body should be a "process" with the pid "1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for a machine that has exceeded its overage limit (PER_MACHINE leasing strategy, ALLOW_1_5X_OVERAGE overage strategy)
@@ -1572,7 +1572,7 @@ Feature: Spawn machine process
       }
       """
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for a machine that has exceeded its overage limit (PER_USER leasing strategy, ALLOW_1_5X_OVERAGE overage strategy, with owner)
@@ -1625,7 +1625,7 @@ Feature: Spawn machine process
       }
       """
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for a machine that has exceeded its overage limit (PER_USER leasing strategy, ALLOW_1_5X_OVERAGE overage strategy, no owner)
@@ -1678,7 +1678,7 @@ Feature: Spawn machine process
       }
       """
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for a machine that has exceeded its limit (PER_LICENSE leasing strategy, ALLOW_2X_OVERAGE overage strategy)
@@ -1722,7 +1722,7 @@ Feature: Spawn machine process
     Then the response status should be "201"
     And the response body should be a "process" with the pid "1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for a machine that has exceeded its overage limit (PER_LICENSE leasing strategy, ALLOW_2X_OVERAGE overage strategy)
@@ -1776,7 +1776,7 @@ Feature: Spawn machine process
       }
       """
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for a machine that has exceeded its overage limit (PER_USER leasing strategy, ALLOW_2X_OVERAGE overage strategy, with owner)
@@ -1829,7 +1829,7 @@ Feature: Spawn machine process
       }
       """
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for a machine that has exceeded its overage limit (PER_USER leasing strategy, ALLOW_2X_OVERAGE overage strategy, no owner)
@@ -1882,7 +1882,7 @@ Feature: Spawn machine process
       }
       """
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1929,7 +1929,7 @@ Feature: Spawn machine process
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -1963,7 +1963,7 @@ Feature: Spawn machine process
     Then the response status should be "201"
     And the response body should be a "process" with the pid "2"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User spawns a process for their machine (license user, machine owner)
@@ -1997,7 +1997,7 @@ Feature: Spawn machine process
     Then the response status should be "201"
     And the response body should be a "process" with the pid "2"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User spawns a process for their machine (license user)
@@ -2030,7 +2030,7 @@ Feature: Spawn machine process
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User spawns a process for their machine with a protected policy
@@ -2071,7 +2071,7 @@ Feature: Spawn machine process
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User spawns a process for an unprotected machine
@@ -2113,7 +2113,7 @@ Feature: Spawn machine process
     Then the response status should be "201"
     And the response body should be a "process" with the pid "1337"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License spawns a process for their machine
@@ -2146,7 +2146,7 @@ Feature: Spawn machine process
     Then the response status should be "201"
     And the response body should be a "process" with the pid "1337"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License spawns a process for a protected machine
@@ -2183,7 +2183,7 @@ Feature: Spawn machine process
     Then the response status should be "201"
     And the response body should be a "process" with the pid "1337"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License spawns a process for their machine with a duplicate pid
@@ -2231,7 +2231,7 @@ Feature: Spawn machine process
       """
     And the current account should have 1 "process"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License spawns a process for their machine with a blank pid
@@ -2273,7 +2273,7 @@ Feature: Spawn machine process
       """
     And the current account should have 0 "processes"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License spawns a process for another license's machine
@@ -2303,7 +2303,7 @@ Feature: Spawn machine process
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product spawns a process for another product's machine
@@ -2336,7 +2336,7 @@ Feature: Spawn machine process
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User spawns a process for another user's machine
@@ -2367,7 +2367,7 @@ Feature: Spawn machine process
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous attempts to spawn a process
@@ -2395,7 +2395,7 @@ Feature: Spawn machine process
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin of another account attempts to spawn a process
@@ -2425,7 +2425,7 @@ Feature: Spawn machine process
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License activates a process with a pre-determined ID

@@ -38,7 +38,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a license (v1.2)
@@ -55,7 +55,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a license (v1.1)
@@ -72,7 +72,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a license (v1.0)
@@ -89,7 +89,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -111,7 +111,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -129,7 +129,7 @@ Feature: License validation actions
     Then the response status should be "404"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -147,7 +147,7 @@ Feature: License validation actions
     Then the response status should be "404"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -165,7 +165,7 @@ Feature: License validation actions
     Then the response status should be "404"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -187,7 +187,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -209,7 +209,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -223,7 +223,7 @@ Feature: License validation actions
     Then the response status should be "401"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -237,7 +237,7 @@ Feature: License validation actions
     Then the response status should be "401"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -251,7 +251,7 @@ Feature: License validation actions
     Then the response status should be "401"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous quick validates a check-in license that is valid
@@ -278,7 +278,7 @@ Feature: License validation actions
     Then the response status should be "401"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a check-in license that is valid
@@ -322,7 +322,7 @@ Feature: License validation actions
     And sidekiq should process 1 "touch-license" job
     And the first "license" should have a lastValidatedAt within seconds of "$time.now.iso"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a check-in license that is overdue
@@ -363,7 +363,7 @@ Feature: License validation actions
       { "valid": false, "detail": "is overdue for check in", "code": "OVERDUE" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict license that is valid
@@ -409,7 +409,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a suspended license
@@ -456,7 +456,7 @@ Feature: License validation actions
       { "valid": false, "detail": "is suspended", "code": "SUSPENDED" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a license belonging to a banned user
@@ -487,7 +487,7 @@ Feature: License validation actions
       { "valid": false, "detail": "is banned", "code": "BANNED" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict floating license that has too many machines
@@ -534,7 +534,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict license that has too many machines
@@ -574,7 +574,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a non-strict license that has too many machines
@@ -614,7 +614,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a non-strict license that has too many machine cores
@@ -658,7 +658,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict license that has too many machine cores (ALWAYS_ALLOW_OVERAGE overage strategy)
@@ -702,7 +702,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict license that has too many machine cores (ALLOW_1_5X_OVERAGE overage strategy, within overage allowance)
@@ -746,7 +746,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict license that has too many machine cores (ALLOW_1_25X_OVERAGE overage strategy, exceeded overage allowance)
@@ -779,7 +779,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict license that has too many machine cores (ALLOW_1_25X_OVERAGE overage strategy, within overage allowance)
@@ -812,7 +812,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict license that has too many machine cores (ALLOW_1_5X_OVERAGE overage strategy, exceeded overage allowance)
@@ -856,7 +856,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict license that has too many machine cores (ALLOW_2X_OVERAGE overage strategy, within overage allowance)
@@ -900,7 +900,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict license that has too many machine cores (ALLOW_2X_OVERAGE overage strategy, exceeded overage allowance)
@@ -944,7 +944,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict license that has too many machine cores (NO_OVERAGE overage strategy)
@@ -988,7 +988,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a non-strict license that has too much machine memory
@@ -1032,7 +1032,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict license that has too much machine memory (ALWAYS_ALLOW_OVERAGE overage strategy)
@@ -1076,7 +1076,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too much associated machine memory", "code": "TOO_MUCH_MEMORY" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict license that has too much machine memory (ALLOW_1_5X_OVERAGE overage strategy, within overage allowance)
@@ -1120,7 +1120,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too much associated machine memory", "code": "TOO_MUCH_MEMORY" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict license that has too much machine memory (ALLOW_1_25X_OVERAGE overage strategy, exceeded overage allowance)
@@ -1164,7 +1164,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too much associated machine memory", "code": "TOO_MUCH_MEMORY" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict license that has too much machine memory (ALLOW_1_25X_OVERAGE overage strategy, within overage allowance)
@@ -1208,7 +1208,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too much associated machine memory", "code": "TOO_MUCH_MEMORY" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict license that has too much machine memory (ALLOW_1_5X_OVERAGE overage strategy, exceeded overage allowance)
@@ -1252,7 +1252,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too much associated machine memory", "code": "TOO_MUCH_MEMORY" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict license that has too much machine memory (ALLOW_2X_OVERAGE overage strategy, within overage allowance)
@@ -1296,7 +1296,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too much associated machine memory", "code": "TOO_MUCH_MEMORY" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict license that has too much machine memory (ALLOW_2X_OVERAGE overage strategy, exceeded overage allowance)
@@ -1340,7 +1340,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too much associated machine memory", "code": "TOO_MUCH_MEMORY" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict license that has too much machine memory (NO_OVERAGE overage strategy)
@@ -1384,7 +1384,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too much associated machine memory", "code": "TOO_MUCH_MEMORY" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a non-strict license that has too much machine disk
@@ -1428,7 +1428,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict license that has too much machine disk (ALWAYS_ALLOW_OVERAGE overage strategy)
@@ -1472,7 +1472,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too much associated machine disk", "code": "TOO_MUCH_DISK" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict license that has too much machine disk (ALLOW_1_5X_OVERAGE overage strategy, within overage allowance)
@@ -1516,7 +1516,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too much associated machine disk", "code": "TOO_MUCH_DISK" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict license that has too much machine disk (ALLOW_1_25X_OVERAGE overage strategy, exceeded overage allowance)
@@ -1560,7 +1560,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too much associated machine disk", "code": "TOO_MUCH_DISK" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict license that has too much machine disk (ALLOW_1_25X_OVERAGE overage strategy, within overage allowance)
@@ -1604,7 +1604,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too much associated machine disk", "code": "TOO_MUCH_DISK" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict license that has too much machine disk (ALLOW_1_5X_OVERAGE overage strategy, exceeded overage allowance)
@@ -1648,7 +1648,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too much associated machine disk", "code": "TOO_MUCH_DISK" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict license that has too much machine disk (ALLOW_2X_OVERAGE overage strategy, within overage allowance)
@@ -1692,7 +1692,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too much associated machine disk", "code": "TOO_MUCH_DISK" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict license that has too much machine disk (ALLOW_2X_OVERAGE overage strategy, exceeded overage allowance)
@@ -1736,7 +1736,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too much associated machine disk", "code": "TOO_MUCH_DISK" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict license that has too much machine disk (NO_OVERAGE overage strategy)
@@ -1780,7 +1780,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too much associated machine disk", "code": "TOO_MUCH_DISK" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a license that has not been used
@@ -1812,7 +1812,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict floating license that has not been used
@@ -1845,7 +1845,7 @@ Feature: License validation actions
       { "valid": false, "detail": "must have at least 1 associated machine", "code": "NO_MACHINES" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict license that has not been used
@@ -1878,7 +1878,7 @@ Feature: License validation actions
       { "valid": false, "detail": "must have exactly 1 associated machine", "code": "NO_MACHINE" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict license that has too many processes (NO_OVERAGE overage strategy, PER_MACHINE leasing strategy)
@@ -1912,7 +1912,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a license by key that is expired (restrict strategy)
@@ -1948,7 +1948,7 @@ Feature: License validation actions
       { "valid": false, "detail": "is expired", "code": "EXPIRED" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a license by key that is expired (revoke strategy)
@@ -1984,7 +1984,7 @@ Feature: License validation actions
       { "valid": false, "detail": "is expired", "code": "EXPIRED" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a license by key that is expired (maintain strategy)
@@ -2020,7 +2020,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is expired", "code": "EXPIRED" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a license by key that is expired (allow strategy)
@@ -2056,7 +2056,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is expired", "code": "EXPIRED" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a floating license scoped to a mismatched machine fingerprint, but the license has no machines
@@ -2091,7 +2091,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a node-locked license scoped to a mismatched machine fingerprint, but the license has no machines
@@ -2126,7 +2126,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -2151,7 +2151,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin quick validates a valid license that requires a product scope
@@ -2185,7 +2185,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin quick validates a valid license that requires a policy scope
@@ -2219,7 +2219,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin quick validates a valid license that requires a machine scope
@@ -2253,7 +2253,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin quick validates a valid license that requires a fingerprint scope
@@ -2287,7 +2287,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -2311,7 +2311,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "ent1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -2331,7 +2331,7 @@ Feature: License validation actions
     Then the response status should be "404"
     And the response should contain a valid signature header for "ent1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -2355,7 +2355,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "ent1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -2379,7 +2379,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "ent1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   # License validation
@@ -2406,7 +2406,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a license (v1.2)
@@ -2423,7 +2423,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a license (v1.1)
@@ -2440,7 +2440,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a license (v1.0)
@@ -2457,7 +2457,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -2479,7 +2479,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -2497,7 +2497,7 @@ Feature: License validation actions
     Then the response status should be "404"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -2515,7 +2515,7 @@ Feature: License validation actions
     Then the response status should be "404"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -2533,7 +2533,7 @@ Feature: License validation actions
     Then the response status should be "404"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -2555,7 +2555,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -2577,7 +2577,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -2591,7 +2591,7 @@ Feature: License validation actions
     Then the response status should be "401"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -2605,7 +2605,7 @@ Feature: License validation actions
     Then the response status should be "401"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -2619,7 +2619,7 @@ Feature: License validation actions
     Then the response status should be "401"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a check-in license that is valid
@@ -2646,7 +2646,7 @@ Feature: License validation actions
     Then the response status should be "401"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a check-in license that is valid
@@ -2681,7 +2681,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a check-in license that is overdue
@@ -2716,7 +2716,7 @@ Feature: License validation actions
       { "valid": false, "detail": "is overdue for check in", "code": "OVERDUE" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that is valid
@@ -2756,7 +2756,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a suspended license
@@ -2797,7 +2797,7 @@ Feature: License validation actions
       { "valid": false, "detail": "is suspended", "code": "SUSPENDED" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a license belonging to a banned user
@@ -2824,7 +2824,7 @@ Feature: License validation actions
       { "valid": false, "detail": "is banned", "code": "BANNED" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict floating license that has too many machines
@@ -2865,7 +2865,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict floating license that would have too many machines but has overridden max machines
@@ -2907,7 +2907,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict floating license that does not have a machine limit
@@ -2949,7 +2949,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many machines
@@ -2989,7 +2989,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a non-strict license that has too many machine cores
@@ -3031,7 +3031,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many machine cores
@@ -3081,7 +3081,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a non-strict license that has too many machines
@@ -3121,7 +3121,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a license that has not been used
@@ -3153,7 +3153,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict floating license that has not been used
@@ -3186,7 +3186,7 @@ Feature: License validation actions
       { "valid": false, "detail": "must have at least 1 associated machine", "code": "NO_MACHINES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license by key that has not been used
@@ -3223,7 +3223,7 @@ Feature: License validation actions
       { "valid": false, "detail": "must have exactly 1 associated machine", "code": "NO_MACHINE" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a license that is expired
@@ -3249,7 +3249,7 @@ Feature: License validation actions
       { "valid": false, "detail": "is expired", "code": "EXPIRED" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -3286,7 +3286,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -3349,7 +3349,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -3379,7 +3379,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -3435,7 +3435,7 @@ Feature: License validation actions
       { "valid": false, "detail": "environment scope does not match", "code": "ENVIRONMENT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -3465,7 +3465,7 @@ Feature: License validation actions
       { "valid": false, "detail": "environment scope does not match", "code": "ENVIRONMENT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to a specific product
@@ -3507,7 +3507,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a license scoped to a mismatched product
@@ -3549,7 +3549,7 @@ Feature: License validation actions
       { "valid": false, "detail": "product scope does not match", "code": "PRODUCT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to a specific user ID
@@ -3584,7 +3584,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to a specific user email
@@ -3628,7 +3628,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to a specific user email (v1.5)
@@ -3673,7 +3673,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a license scoped to a mismatched user
@@ -3708,7 +3708,7 @@ Feature: License validation actions
       { "valid": false, "detail": "user scope does not match", "code": "USER_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to its owner and a fingerprint (invalid fingerprint)
@@ -3747,7 +3747,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to its owner and a fingerprint (invalid user)
@@ -3786,7 +3786,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to its owner and a fingerprint (no machine owner)
@@ -3825,7 +3825,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to its owner and a fingerprint (license owner == machine owner)
@@ -3864,7 +3864,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to its owner and a fingerprint (license owner != machine owner)
@@ -3904,7 +3904,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to its user and a fingerprint (no machine owner)
@@ -3944,7 +3944,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to its user and a fingerprint (license user == machine owner)
@@ -3984,7 +3984,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to its user, a fingerprint, and components (license user == machine owner)
@@ -4026,7 +4026,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to its user and a fingerprint (license user != machine owner)
@@ -4067,7 +4067,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to its user, a fingerprint, and components (license user != machine owner)
@@ -4110,7 +4110,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to its owner and fingerprints (invalid fingerprint)
@@ -4149,7 +4149,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to its owner and fingerprints (invalid user)
@@ -4188,7 +4188,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to its owner and fingerprints (no machine owners)
@@ -4227,7 +4227,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to its owner and fingerprints (license owner == machine owners)
@@ -4266,7 +4266,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to its owner and fingerprints (license owner != machine owners)
@@ -4307,7 +4307,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to its user and fingerprints (no machine owner)
@@ -4347,7 +4347,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to its user and fingerprints (license user == machine owners)
@@ -4387,7 +4387,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to its user and fingerprints (license user != machine owners)
@@ -4429,7 +4429,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to its owner and a machine (invalid machine)
@@ -4468,7 +4468,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to its owner and a machine (invalid user)
@@ -4507,7 +4507,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to its owner and a machine (no machine owner)
@@ -4546,7 +4546,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to its owner and a machine (license owner == machine owner)
@@ -4585,7 +4585,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to its owner and a machine (license owner != machine owner)
@@ -4625,7 +4625,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to its user and a machine (no machine owner)
@@ -4665,7 +4665,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to its user and a machine (license user == machine owner)
@@ -4705,7 +4705,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to its user and a machine (license user != machine owner)
@@ -4746,7 +4746,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to a specific machine
@@ -4795,7 +4795,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a license scoped to a mismatched machine
@@ -4844,7 +4844,7 @@ Feature: License validation actions
       { "valid": false, "detail": "machine is not activated (does not match any associated machines)", "code": "MACHINE_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to a specific machine fingerprint
@@ -4900,7 +4900,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a license scoped to a mismatched machine fingerprint
@@ -4956,7 +4956,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates an expired license scoped to a mismatched machine fingerprint (expiration strategy: revoke)
@@ -5013,7 +5013,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates an expired license scoped to a mismatched machine fingerprint (expiration strategy: restrict)
@@ -5070,7 +5070,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates an expired license scoped to a mismatched machine fingerprint (expiration strategy: maintain)
@@ -5127,7 +5127,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates an expired license scoped to a mismatched machine fingerprint (expiration strategy: allow)
@@ -5184,7 +5184,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a floating license scoped to a mismatched machine fingerprint, but the license has no machines
@@ -5228,7 +5228,7 @@ Feature: License validation actions
       { "valid": false, "detail": "fingerprint is not activated (has no associated machines)", "code": "NO_MACHINES" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a node-locked license scoped to a mismatched machine fingerprint, but the license has no machines
@@ -5272,7 +5272,7 @@ Feature: License validation actions
       { "valid": false, "detail": "fingerprint is not activated (has no associated machine)", "code": "NO_MACHINE" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to a specific policy
@@ -5314,7 +5314,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a license scoped to a mismatched policy
@@ -5357,7 +5357,7 @@ Feature: License validation actions
       { "valid": false, "detail": "policy scope does not match", "code": "POLICY_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license scoped to a specific product and machine
@@ -5407,7 +5407,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates an invalid license scoped to a specific product and machine
@@ -5457,7 +5457,7 @@ Feature: License validation actions
       { "valid": false, "detail": "product scope does not match", "code": "PRODUCT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license without a request body
@@ -5490,7 +5490,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -5514,7 +5514,7 @@ Feature: License validation actions
       { "valid": false, "detail": "environment scope is required", "code": "ENVIRONMENT_SCOPE_REQUIRED" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license that requires a product scope
@@ -5548,7 +5548,7 @@ Feature: License validation actions
       { "valid": false, "detail": "product scope is required", "code": "PRODUCT_SCOPE_REQUIRED" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license that requires a user scope
@@ -5582,7 +5582,7 @@ Feature: License validation actions
       { "valid": false, "detail": "user scope is required", "code": "USER_SCOPE_REQUIRED" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license that requires a checksum scope
@@ -5606,7 +5606,7 @@ Feature: License validation actions
       { "valid": false, "detail": "checksum scope is required", "code": "CHECKSUM_SCOPE_REQUIRED" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license that requires a version scope
@@ -5630,7 +5630,7 @@ Feature: License validation actions
       { "valid": false, "detail": "version scope is required", "code": "VERSION_SCOPE_REQUIRED" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license that requires a policy scope
@@ -5664,7 +5664,7 @@ Feature: License validation actions
       { "valid": false, "detail": "policy scope is required", "code": "POLICY_SCOPE_REQUIRED" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license that requires a machine scope
@@ -5698,7 +5698,7 @@ Feature: License validation actions
       { "valid": false, "detail": "machine scope is required", "code": "MACHINE_SCOPE_REQUIRED" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a valid license that requires a fingerprint scope
@@ -5732,7 +5732,7 @@ Feature: License validation actions
       { "valid": false, "detail": "fingerprint scope is required", "code": "FINGERPRINT_SCOPE_REQUIRED" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a legacy encrypted license
@@ -5764,7 +5764,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a license using scheme RSA_2048_PKCS1_ENCRYPT
@@ -5783,7 +5783,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a license using scheme RSA_2048_PKCS1_SIGN
@@ -5802,7 +5802,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a license using scheme RSA_2048_PKCS1_PSS_SIGN
@@ -5820,7 +5820,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a license using scheme RSA_2048_JWT_RS256
@@ -5839,7 +5839,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a license using scheme RSA_2048_PKCS1_SIGN_V2
@@ -5858,7 +5858,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a license using scheme RSA_2048_PKCS1_PSS_SIGN_V2
@@ -5876,7 +5876,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a license using scheme ED25519_SIGN
@@ -5894,7 +5894,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a license using scheme ECDSA_P256_SIGN
@@ -5912,7 +5912,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: A user validates a license scoped to their own ID
@@ -5947,7 +5947,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: A user validates a license scoped to their own email
@@ -5982,7 +5982,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: A user validates a license scoped to a different user
@@ -6041,7 +6041,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict floating license that has too many machines (ALLOW_1_25X_OVERAGE overage strategy, within overage allowance)
@@ -6074,7 +6074,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict floating license that has too many machines (ALLOW_1_25X_OVERAGE overage strategy, exceeded overage allowance)
@@ -6107,7 +6107,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict floating license that has too many machines (ALLOW_1_5X_OVERAGE overage strategy, within overage allowance)
@@ -6140,7 +6140,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict floating license that has too many machines (ALLOW_1_5X_OVERAGE overage strategy, exceeded overage allowance)
@@ -6173,7 +6173,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict floating license that has too many machines (ALLOW_2X_OVERAGE overage strategy, within overage allowance)
@@ -6206,7 +6206,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict floating license that has too many machines (ALLOW_2X_OVERAGE overage strategy, exceeded overage allowance)
@@ -6239,7 +6239,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict floating license that has too many machines (ALLOW_2X_OVERAGE overage strategy, within overage allowance, PER_USER leasing strategy, with owner)
@@ -6278,7 +6278,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict floating license that has too many machines (ALLOW_2X_OVERAGE overage strategy, exceeded overage allowance, PER_USER leasing strategy, with owner)
@@ -6321,7 +6321,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict floating license that has too many machines (ALLOW_2X_OVERAGE overage strategy, within overage allowance, PER_USER leasing strategy, no owner)
@@ -6360,7 +6360,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict floating license that has too many machines (ALLOW_2X_OVERAGE overage strategy, exceeded overage allowance, PER_USER leasing strategy, no owner)
@@ -6403,7 +6403,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict floating license that has too many machines (NO_OVERAGE overage strategy)
@@ -6436,7 +6436,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict node-locked license that has too many machines (ALWAYS_ALLOW_OVERAGE overage strategy)
@@ -6469,7 +6469,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict node-locked license that has too many machines (ALLOW_2X_OVERAGE overage strategy, within overage allowance)
@@ -6502,7 +6502,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict node-locked license that has too many machines (ALLOW_2X_OVERAGE overage strategy, exceeded overage allowance)
@@ -6535,7 +6535,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict node-locked license that has too many machines (ALLOW_2X_OVERAGE overage strategy, within overage allowance, PER_USER leasing strategy, with owner)
@@ -6574,7 +6574,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict node-locked license that has too many machines (ALLOW_2X_OVERAGE overage strategy, exceeded overage allowance, PER_USER leasing strategy, with owner)
@@ -6617,7 +6617,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict node-locked license that has too many machines (ALLOW_2X_OVERAGE overage strategy, within overage allowance, PER_USER leasing strategy, no owner)
@@ -6649,7 +6649,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict node-locked license that has too many machines (ALLOW_2X_OVERAGE overage strategy, exceeded overage allowance, PER_USER leasing strategy, no owner)
@@ -6685,7 +6685,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict node-locked license that has too many machines (NO_OVERAGE overage strategy)
@@ -6718,7 +6718,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (ALWAYS_ALLOW_OVERAGE overage strategy, PER_MACHINE leasing strategy, no scope)
@@ -6752,7 +6752,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (ALWAYS_ALLOW_OVERAGE overage strategy, fingerprint scope)
@@ -6795,7 +6795,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (ALWAYS_ALLOW_OVERAGE overage strategy, fingerprints scope)
@@ -6838,7 +6838,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (ALWAYS_ALLOW_OVERAGE overage strategy, machine scope)
@@ -6881,7 +6881,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (ALWAYS_ALLOW_OVERAGE overage strategy, v1.1)
@@ -6925,7 +6925,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated processes", "constant": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (ALWAYS_ALLOW_OVERAGE overage strategy, PER_MACHINE leasing strategy)
@@ -6968,7 +6968,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (ALWAYS_ALLOW_OVERAGE overage strategy, PER_LICENSE leasing strategy)
@@ -7002,7 +7002,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (ALWAYS_ALLOW_OVERAGE overage strategy, PER_USER leasing strategy, with scope)
@@ -7045,7 +7045,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (ALWAYS_ALLOW_OVERAGE overage strategy, PER_USER leasing strategy, no scope)
@@ -7079,7 +7079,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (ALLOW_1_25X_OVERAGE overage strategy, within overage allowance, PER_MACHINE leasing strategy)
@@ -7122,7 +7122,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (ALLOW_1_25X_OVERAGE overage strategy, within overage allowance, PER_LICENSE leasing strategy)
@@ -7156,7 +7156,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (ALLOW_1_25X_OVERAGE overage strategy, within overage allowance, PER_USER leasing strategy, with scope)
@@ -7199,7 +7199,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
 
@@ -7234,7 +7234,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (ALLOW_1_25X_OVERAGE overage strategy, exceeded overage allowance, PER_MACHINE leasing strategy)
@@ -7277,7 +7277,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (ALLOW_1_25X_OVERAGE overage strategy, exceeded overage allowance, PER_LICENSE leasing strategy)
@@ -7311,7 +7311,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (ALLOW_1_25X_OVERAGE overage strategy, exceeded overage allowance, PER_USER leasing strategy, with scope)
@@ -7355,7 +7355,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (ALLOW_1_25X_OVERAGE overage strategy, exceeded overage allowance, PER_USER leasing strategy, no scope)
@@ -7390,7 +7390,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (ALLOW_1_5X_OVERAGE overage strategy, within overage allowance, PER_MACHINE leasing strategy)
@@ -7433,7 +7433,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (ALLOW_1_5X_OVERAGE overage strategy, within overage allowance, PER_LICENSE leasing strategy)
@@ -7467,7 +7467,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (ALLOW_1_5X_OVERAGE overage strategy, within overage allowance, PER_USER leasing strategy, with scope)
@@ -7510,7 +7510,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
 
@@ -7545,7 +7545,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (ALLOW_1_5X_OVERAGE overage strategy, exceeded overage allowance, PER_MACHINE leasing strategy)
@@ -7588,7 +7588,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (ALLOW_1_5X_OVERAGE overage strategy, exceeded overage allowance, PER_LICENSE leasing strategy)
@@ -7622,7 +7622,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (ALLOW_1_5X_OVERAGE overage strategy, exceeded overage allowance, PER_USER leasing strategy, with scope)
@@ -7666,7 +7666,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (ALLOW_1_5X_OVERAGE overage strategy, exceeded overage allowance, PER_USER leasing strategy, no scope)
@@ -7701,7 +7701,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (ALLOW_2X_OVERAGE overage strategy, within overage allowance, PER_MACHINE leasing strategy)
@@ -7744,7 +7744,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (ALLOW_2X_OVERAGE overage strategy, within overage allowance, PER_LICENSE leasing strategy)
@@ -7778,7 +7778,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (ALLOW_2X_OVERAGE overage strategy, within overage allowance, PER_USER leasing strategy, with scope)
@@ -7821,7 +7821,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (ALLOW_2X_OVERAGE overage strategy, within overage allowance, PER_USER leasing strategy, no scope)
@@ -7855,7 +7855,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (ALLOW_2X_OVERAGE overage strategy, exceeded overage allowance, PER_MACHINE leasing strategy)
@@ -7898,7 +7898,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (ALLOW_2X_OVERAGE overage strategy, exceeded overage allowance, PER_LICENSE leasing strategy)
@@ -7932,7 +7932,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (ALLOW_2X_OVERAGE overage strategy, exceeded overage allowance, PER_USER leasing strategy, with scope)
@@ -7976,7 +7976,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (ALLOW_2X_OVERAGE overage strategy, exceeded overage allowance, PER_USER leasing strategy, no scope)
@@ -8011,7 +8011,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (NO_OVERAGE overage strategy, PER_MACHINE leasing strategy)
@@ -8054,7 +8054,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (NO_OVERAGE overage strategy, PER_LICENSE leasing strategy)
@@ -8088,7 +8088,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (NO_OVERAGE overage strategy, PER_USER leasing strategy, with scope)
@@ -8132,7 +8132,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many processes (NO_OVERAGE overage strategy, PER_USER leasing strategy, no scope)
@@ -8167,7 +8167,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a license that has too many users (ALWAYS_ALLOW_OVERAGE overage strategy, within overage allowance)
@@ -8195,7 +8195,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated users", "code": "TOO_MANY_USERS" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a license that has too many users (ALLOW_1_25X_OVERAGE overage strategy, within overage allowance)
@@ -8223,7 +8223,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated users", "code": "TOO_MANY_USERS" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a license that has too many users (ALLOW_1_25X_OVERAGE overage strategy, exceeded overage allowance)
@@ -8255,7 +8255,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated users", "code": "TOO_MANY_USERS" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a license that has too many users (ALLOW_1_5X_OVERAGE overage strategy, within overage allowance)
@@ -8283,7 +8283,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated users", "code": "TOO_MANY_USERS" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a license that has too many users (ALLOW_1_5X_OVERAGE overage strategy, exceeded overage allowance)
@@ -8315,7 +8315,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated users", "code": "TOO_MANY_USERS" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a license that has too many users (ALLOW_2X_OVERAGE overage strategy, within overage allowance)
@@ -8343,7 +8343,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated users", "code": "TOO_MANY_USERS" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a license that has too many users (ALLOW_2X_OVERAGE overage strategy, exceeded overage allowance)
@@ -8375,7 +8375,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated users", "code": "TOO_MANY_USERS" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict node-locked license that has too many machines (NO_OVERAGE overage strategy)
@@ -8410,7 +8410,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated users", "code": "TOO_MANY_USERS" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many machine cores (ALWAYS_ALLOW_OVERAGE overage strategy)
@@ -8454,7 +8454,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many machine cores (ALLOW_1_5X_OVERAGE overage strategy, within overage allowance)
@@ -8498,7 +8498,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many machine cores (ALLOW_1_5X_OVERAGE overage strategy, exceeded overage allowance)
@@ -8542,7 +8542,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many machine cores (ALLOW_2X_OVERAGE overage strategy, within overage allowance)
@@ -8586,7 +8586,7 @@ Feature: License validation actions
       { "valid": true, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many machine cores (ALLOW_2X_OVERAGE overage strategy, exceeded overage allowance)
@@ -8630,7 +8630,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin validates a strict license that has too many machine cores (NO_OVERAGE overage strategy)
@@ -8674,7 +8674,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -8699,7 +8699,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "ent1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -8719,7 +8719,7 @@ Feature: License validation actions
     Then the response status should be "404"
     And the response should contain a valid signature header for "ent1"
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -8744,7 +8744,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "ent1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -8769,7 +8769,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "ent1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   # Key validation
@@ -8800,7 +8800,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license (v1.2)
@@ -8822,7 +8822,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license (v1.1)
@@ -8844,7 +8844,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license (v1.0)
@@ -8866,7 +8866,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license by key
@@ -8898,7 +8898,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates an invalid license by key
@@ -8929,7 +8929,7 @@ Feature: License validation actions
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a legacy encrypted license by key
@@ -8961,7 +8961,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a legacy encrypted license key as an unencrypted key
@@ -8993,7 +8993,7 @@ Feature: License validation actions
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates an unencrypted license key as a legacy encrypted key
@@ -9025,7 +9025,7 @@ Feature: License validation actions
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license using scheme RSA_2048_PKCS1_ENCRYPT by key
@@ -9049,7 +9049,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license using scheme RSA_2048_PKCS1_ENCRYPT by key using the legacy encrypted flag
@@ -9073,7 +9073,7 @@ Feature: License validation actions
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license using scheme RSA_2048_PKCS1_SIGN by key
@@ -9097,7 +9097,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license using scheme RSA_2048_PKCS1_SIGN by key using the legacy encrypted flag
@@ -9121,7 +9121,7 @@ Feature: License validation actions
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license using scheme RSA_2048_PKCS1_PSS_SIGN by key
@@ -9145,7 +9145,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license using scheme RSA_2048_PKCS1_PSS_SIGN by key using the legacy encrypted flag
@@ -9169,7 +9169,7 @@ Feature: License validation actions
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license using scheme RSA_2048_JWT_RS256 by key
@@ -9193,7 +9193,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license using scheme RSA_2048_JWT_RS256 by key using the legacy encrypted flag
@@ -9217,7 +9217,7 @@ Feature: License validation actions
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license using scheme RSA_2048_PKCS1_SIGN_V2 by key
@@ -9241,7 +9241,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license using scheme RSA_2048_PKCS1_SIGN_V2 by key using the legacy encrypted flag
@@ -9265,7 +9265,7 @@ Feature: License validation actions
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license using scheme RSA_2048_PKCS1_PSS_SIGN_V2 by key
@@ -9289,7 +9289,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license using scheme RSA_2048_PKCS1_PSS_SIGN_V2 by key using the legacy encrypted flag
@@ -9313,7 +9313,7 @@ Feature: License validation actions
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license using scheme ED25519_SIGN by key
@@ -9337,7 +9337,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license using scheme ED25519_SIGN by key using the legacy encrypted flag
@@ -9361,7 +9361,7 @@ Feature: License validation actions
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license by key from a pool
@@ -9398,7 +9398,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license that used a pre-determined key
@@ -9430,7 +9430,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a blank license key
@@ -9457,7 +9457,7 @@ Feature: License validation actions
     Then the response status should be "400"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ce
@@ -9489,7 +9489,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -9520,7 +9520,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -9546,7 +9546,7 @@ Feature: License validation actions
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -9577,7 +9577,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -9603,7 +9603,7 @@ Feature: License validation actions
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -9630,7 +9630,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -9663,7 +9663,7 @@ Feature: License validation actions
       { "valid": false, "detail": "environment scope does not match", "code": "ENVIRONMENT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to a specific product
@@ -9705,7 +9705,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key scoped to a mismatched product
@@ -9747,7 +9747,7 @@ Feature: License validation actions
       { "valid": false, "detail": "product scope does not match", "code": "PRODUCT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates an non-existent license key scoped to a specific product
@@ -9789,7 +9789,7 @@ Feature: License validation actions
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to a specific machine
@@ -9838,7 +9838,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key scoped to a mismatched machine
@@ -9887,7 +9887,7 @@ Feature: License validation actions
       { "valid": false, "detail": "machine is not activated (does not match any associated machines)", "code": "MACHINE_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a node-locked license key scoped to a machine, but the license has no machines
@@ -9931,7 +9931,7 @@ Feature: License validation actions
       { "valid": false, "detail": "machine is not activated (has no associated machine)", "code": "NO_MACHINE" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a floating license key scoped to a machine, but the license has no machines
@@ -9975,7 +9975,7 @@ Feature: License validation actions
       { "valid": false, "detail": "machine is not activated (has no associated machines)", "code": "NO_MACHINES" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to a specific machine fingerprint
@@ -10024,7 +10024,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key scoped to a mismatched machine fingerprint
@@ -10073,7 +10073,7 @@ Feature: License validation actions
       { "valid": false, "detail": "fingerprint is not activated (does not match any associated machines)", "code": "FINGERPRINT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates an non-existent license key scoped to a machine fingerprint
@@ -10116,7 +10116,7 @@ Feature: License validation actions
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of valid fingerprints
@@ -10169,7 +10169,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of valid and invalid fingerprints (matching strategy: MATCH_ANY)
@@ -10223,7 +10223,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of majority valid and some invalid fingerprints (matching strategy: MATCH_MOST)
@@ -10279,7 +10279,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of equal valid and invalid fingerprints (matching strategy: MATCH_MOST)
@@ -10334,7 +10334,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of some valid and majority invalid fingerprints (matching strategy: MATCH_MOST)
@@ -10388,7 +10388,7 @@ Feature: License validation actions
       { "valid": false, "detail": "one or more fingerprint is not activated (does not match enough associated machines)", "code": "FINGERPRINT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of an invalid fingerprint (matching strategy: MATCH_MOST)
@@ -10440,7 +10440,7 @@ Feature: License validation actions
       { "valid": false, "detail": "fingerprint is not activated (does not match any associated machines)", "code": "FINGERPRINT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of valid fingerprints (matching strategy: MATCH_TWO)
@@ -10478,7 +10478,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of majority valid and some invalid fingerprints (matching strategy: MATCH_TWO)
@@ -10517,7 +10517,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of equal valid and invalid fingerprints (matching strategy: MATCH_TWO)
@@ -10557,7 +10557,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of some valid and majority invalid fingerprints (matching strategy: MATCH_TWO)
@@ -10596,7 +10596,7 @@ Feature: License validation actions
       { "valid": false, "detail": "one or more fingerprint is not activated (does not match at least 2 associated machines)", "code": "FINGERPRINT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of enough valid and majority invalid fingerprints (matching strategy: MATCH_TWO)
@@ -10639,7 +10639,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of invalid fingerprints (matching strategy: MATCH_TWO)
@@ -10677,7 +10677,7 @@ Feature: License validation actions
       { "valid": false, "detail": "one or more fingerprint is not activated (does not match at least 2 associated machines)", "code": "FINGERPRINT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of a valid fingerprint (matching strategy: MATCH_MOST)
@@ -10729,7 +10729,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of valid and invalid fingerprints (matching strategy: MATCH_ALL)
@@ -10784,7 +10784,7 @@ Feature: License validation actions
       { "valid": false, "detail": "one or more fingerprint is not activated (does not match all associated machines)", "code": "FINGERPRINT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of valid fingerprints (matching strategy: MATCH_ALL)
@@ -10838,7 +10838,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of duplicate fingerprints (matching strategy: MATCH_ALL)
@@ -10893,7 +10893,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an empty array of fingerprints
@@ -10942,7 +10942,7 @@ Feature: License validation actions
       { "valid": false, "detail": "fingerprint scope is empty", "code": "FINGERPRINT_SCOPE_EMPTY" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of nil fingerprints
@@ -10999,7 +10999,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of fingerprints belonging to another license
@@ -11052,7 +11052,7 @@ Feature: License validation actions
       { "valid": false, "detail": "one or more fingerprint is not activated (does not match any associated machines)", "code": "FINGERPRINT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to a specific policy
@@ -11094,7 +11094,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key scoped to a mismatched policy
@@ -11136,7 +11136,7 @@ Feature: License validation actions
       { "valid": false, "detail": "policy scope does not match", "code": "POLICY_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a non-existent license key scoped to a policy
@@ -11178,7 +11178,7 @@ Feature: License validation actions
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to a specific product and machine
@@ -11228,7 +11228,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates an invalid license key scoped to a specific product and machine
@@ -11278,7 +11278,7 @@ Feature: License validation actions
       { "valid": false, "detail": "product scope does not match", "code": "PRODUCT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key with an empty scope
@@ -11318,7 +11318,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key that requires a product scope
@@ -11358,7 +11358,7 @@ Feature: License validation actions
       { "valid": false, "detail": "product scope is required", "code": "PRODUCT_SCOPE_REQUIRED" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key that requires a policy scope
@@ -11398,7 +11398,7 @@ Feature: License validation actions
       { "valid": false, "detail": "policy scope is required", "code": "POLICY_SCOPE_REQUIRED" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key that requires a machine scope
@@ -11438,7 +11438,7 @@ Feature: License validation actions
       { "valid": false, "detail": "machine scope is required", "code": "MACHINE_SCOPE_REQUIRED" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key that requires a fingerprint scope
@@ -11478,7 +11478,7 @@ Feature: License validation actions
       { "valid": false, "detail": "fingerprint scope is required", "code": "FINGERPRINT_SCOPE_REQUIRED" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key that requires a user scope (missing)
@@ -11520,7 +11520,7 @@ Feature: License validation actions
       { "valid": false, "detail": "user scope is required", "code": "USER_SCOPE_REQUIRED" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key that requires a user scope (match owner)
@@ -11563,7 +11563,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key that requires a user scope (match owner email)
@@ -11606,7 +11606,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key that requires a user scope (match user)
@@ -11641,7 +11641,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key that requires a user scope (match user email)
@@ -11676,7 +11676,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key that requires a user scope (mismatch null)
@@ -11719,7 +11719,7 @@ Feature: License validation actions
       { "valid": false, "detail": "user scope does not match", "code": "USER_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key that requires a user scope (match null)
@@ -11762,7 +11762,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key that requires a user scope (mismatch)
@@ -11805,7 +11805,7 @@ Feature: License validation actions
       { "valid": false, "detail": "user scope does not match", "code": "USER_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key that requires a checksum scope (missing)
@@ -11844,7 +11844,7 @@ Feature: License validation actions
       { "valid": false, "detail": "checksum scope is required", "code": "CHECKSUM_SCOPE_REQUIRED" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key that requires a checksum scope (match)
@@ -11889,7 +11889,7 @@ Feature: License validation actions
     And sidekiq should process 1 "touch-license" job
     And the first "license" should have a lastValidatedVersion "$releases[0].version"
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key with a checksum scope (multiple matches)
@@ -11955,7 +11955,7 @@ Feature: License validation actions
     And the first "license" should have a lastValidatedChecksum "49a01da77a888350f45d329ecd45c3e18cb282f69959b1290a1cee1b26780c30"
     And the first "license" should have a lastValidatedVersion "2.0.1+hotfix"
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key with a checksum and version scope (multiple matches)
@@ -12017,7 +12017,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key that requires a checksum scope (null)
@@ -12057,7 +12057,7 @@ Feature: License validation actions
       { "valid": false, "detail": "checksum scope is required", "code": "CHECKSUM_SCOPE_REQUIRED" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key that requires a checksum scope (mismatch)
@@ -12097,7 +12097,7 @@ Feature: License validation actions
       { "valid": false, "detail": "checksum scope is not valid (does not match any accessible artifacts)", "code": "CHECKSUM_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key that requires a checksum scope (match open product)
@@ -12144,7 +12144,7 @@ Feature: License validation actions
       { "valid": false, "detail": "checksum scope is not valid (does not match any accessible artifacts)", "code": "CHECKSUM_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key that requires a checksum scope (match published and uploaded artifact)
@@ -12187,7 +12187,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key that requires a checksum scope (match published and waiting artifact)
@@ -12227,7 +12227,7 @@ Feature: License validation actions
       { "valid": false, "detail": "checksum scope is not valid (does not match any accessible artifacts)", "code": "CHECKSUM_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key that requires a checksum scope (match published and failed artifact)
@@ -12267,7 +12267,7 @@ Feature: License validation actions
       { "valid": false, "detail": "checksum scope is not valid (does not match any accessible artifacts)", "code": "CHECKSUM_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key that requires a checksum scope (match draft and uploaded artifact)
@@ -12307,7 +12307,7 @@ Feature: License validation actions
       { "valid": false, "detail": "checksum scope is not valid (does not match any accessible artifacts)", "code": "CHECKSUM_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key that requires a checksum scope (match yanked artifact)
@@ -12347,7 +12347,7 @@ Feature: License validation actions
       { "valid": false, "detail": "checksum scope is not valid (does not match any accessible artifacts)", "code": "CHECKSUM_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key that requires a version scope (missing)
@@ -12385,7 +12385,7 @@ Feature: License validation actions
       { "valid": false, "detail": "version scope is required", "code": "VERSION_SCOPE_REQUIRED" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key that requires a version scope (match)
@@ -12427,7 +12427,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key that requires a version scope (null)
@@ -12466,7 +12466,7 @@ Feature: License validation actions
       { "valid": false, "detail": "version scope is required", "code": "VERSION_SCOPE_REQUIRED" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key that requires a version scope (mismatch)
@@ -12505,7 +12505,7 @@ Feature: License validation actions
       { "valid": false, "detail": "version scope is not valid (does not match any accessible releases)", "code": "VERSION_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a perpetual fallback license scoped to an inaccessible release
@@ -12544,7 +12544,7 @@ Feature: License validation actions
       { "valid": false, "detail": "version scope is not valid (does not match any accessible releases)", "code": "VERSION_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a perpetual fallback license scoped to a backdated release
@@ -12583,7 +12583,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is expired", "code": "EXPIRED" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key that requires a version scope (match open product)
@@ -12628,7 +12628,7 @@ Feature: License validation actions
       { "valid": false, "detail": "version scope is not valid (does not match any accessible releases)", "code": "VERSION_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key that requires a version scope (match published release)
@@ -12670,7 +12670,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key that requires a version scope (match draft release)
@@ -12709,7 +12709,7 @@ Feature: License validation actions
       { "valid": false, "detail": "version scope is not valid (does not match any accessible releases)", "code": "VERSION_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key that requires a version scope (match yanked release)
@@ -12748,7 +12748,7 @@ Feature: License validation actions
       { "valid": false, "detail": "version scope is not valid (does not match any accessible releases)", "code": "VERSION_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License quick validates their license
@@ -12844,7 +12844,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates an expired license key and sends a nonce
@@ -12881,7 +12881,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key and sends a nonce
@@ -12916,7 +12916,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key with an entitlement scope (missing all entitlements)
@@ -12955,7 +12955,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key with an entitlement scope (has some entitlements)
@@ -12998,7 +12998,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key with an entitlement scope (has all entitlements)
@@ -13045,7 +13045,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key with an entitlement scope (has duplicate entitlements)
@@ -13088,7 +13088,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key with an empty entitlement scope
@@ -13127,7 +13127,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a license key using an invalid content type
@@ -13162,7 +13162,7 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   # Expiration basis
@@ -13333,7 +13333,6 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
     And sidekiq should have 1 "event-log" job
 
@@ -13380,7 +13379,6 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
     And sidekiq should have 1 "event-log" job
 
@@ -13427,7 +13425,6 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
     And sidekiq should have 1 "event-log" job
 
@@ -13474,7 +13471,6 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
     And sidekiq should have 1 "event-log" job
 
@@ -13524,7 +13520,6 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
     And sidekiq should have 1 "event-log" job
 
@@ -13574,7 +13569,6 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
     And sidekiq should have 1 "event-log" job
 
@@ -13612,7 +13606,6 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
     And sidekiq should have 1 "event-log" job
 
@@ -13650,7 +13643,6 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
     And sidekiq should have 1 "event-log" job
 
@@ -13689,7 +13681,6 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
     And sidekiq should have 1 "event-log" job
 
@@ -13728,7 +13719,6 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
     And sidekiq should have 1 "event-log" job
 
@@ -13767,7 +13757,6 @@ Feature: License validation actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
     And sidekiq should have 1 "event-log" job
 
@@ -13942,7 +13931,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -13977,7 +13966,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "ent1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -14009,7 +13998,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "ent1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -14042,7 +14031,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "ent1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -14073,7 +14062,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "ent1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -14105,7 +14094,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "ent1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -14137,7 +14126,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "ent1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -14169,7 +14158,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "ent1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -14198,7 +14187,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -14227,7 +14216,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -14256,7 +14245,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -14285,7 +14274,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -14314,7 +14303,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -14343,7 +14332,7 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -14364,7 +14353,7 @@ Feature: License validation actions
     Then the response status should be "401"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -14385,7 +14374,7 @@ Feature: License validation actions
     Then the response status should be "401"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -14406,7 +14395,7 @@ Feature: License validation actions
     Then the response status should be "401"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of valid components (matching strategy: MATCH_ANY)
@@ -14447,7 +14436,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of majority valid components (matching strategy: MATCH_ANY)
@@ -14488,7 +14477,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of invalid components (matching strategy: MATCH_ANY)
@@ -14529,7 +14518,7 @@ Feature: License validation actions
       { "valid": false, "detail": "one or more component is not activated (does not match any associated components)", "code": "COMPONENTS_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of majority invalid components (matching strategy: MATCH_ANY)
@@ -14570,7 +14559,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of misassociated components (matching strategy: MATCH_ANY)
@@ -14611,7 +14600,7 @@ Feature: License validation actions
       { "valid": false, "detail": "one or more component is not activated (does not match any associated components)", "code": "COMPONENTS_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of valid components (matching strategy: MATCH_TWO)
@@ -14652,7 +14641,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of majority valid components (matching strategy: MATCH_TWO)
@@ -14693,7 +14682,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of invalid components (matching strategy: MATCH_TWO)
@@ -14734,7 +14723,7 @@ Feature: License validation actions
       { "valid": false, "detail": "one or more component is not activated (does not match at least 2 associated components)", "code": "COMPONENTS_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of majority invalid components (matching strategy: MATCH_TWO)
@@ -14775,7 +14764,7 @@ Feature: License validation actions
       { "valid": false, "detail": "one or more component is not activated (does not match at least 2 associated components)", "code": "COMPONENTS_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of misassociated components (matching strategy: MATCH_TWO)
@@ -14816,7 +14805,7 @@ Feature: License validation actions
       { "valid": false, "detail": "one or more component is not activated (does not match at least 2 associated components)", "code": "COMPONENTS_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of valid components (matching strategy: MATCH_MOST)
@@ -14857,7 +14846,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of majority valid components (matching strategy: MATCH_MOST)
@@ -14898,7 +14887,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of invalid components (matching strategy: MATCH_MOST)
@@ -14939,7 +14928,7 @@ Feature: License validation actions
       { "valid": false, "detail": "one or more component is not activated (does not match enough associated components)", "code": "COMPONENTS_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of majority invalid components (matching strategy: MATCH_MOST)
@@ -14980,7 +14969,7 @@ Feature: License validation actions
       { "valid": false, "detail": "one or more component is not activated (does not match enough associated components)", "code": "COMPONENTS_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of misassociated components (matching strategy: MATCH_MOST)
@@ -15021,7 +15010,7 @@ Feature: License validation actions
       { "valid": false, "detail": "one or more component is not activated (does not match enough associated components)", "code": "COMPONENTS_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of valid components (matching strategy: MATCH_ALL)
@@ -15062,7 +15051,7 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of majority valid components (matching strategy: MATCH_ALL)
@@ -15103,7 +15092,7 @@ Feature: License validation actions
       { "valid": false, "detail": "one or more component is not activated (does not match all associated components)", "code": "COMPONENTS_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of invalid components (matching strategy: MATCH_ALL)
@@ -15144,7 +15133,7 @@ Feature: License validation actions
       { "valid": false, "detail": "one or more component is not activated (does not match all associated components)", "code": "COMPONENTS_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of majority invalid components (matching strategy: MATCH_ALL)
@@ -15185,7 +15174,7 @@ Feature: License validation actions
       { "valid": false, "detail": "one or more component is not activated (does not match all associated components)", "code": "COMPONENTS_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of misassociated components (matching strategy: MATCH_ALL)
@@ -15226,7 +15215,7 @@ Feature: License validation actions
       { "valid": false, "detail": "one or more component is not activated (does not match all associated components)", "code": "COMPONENTS_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of components without a fingerprint scope
@@ -15263,7 +15252,7 @@ Feature: License validation actions
       { "valid": false, "detail": "fingerprint scope is required when using the components scope", "code": "FINGERPRINT_SCOPE_REQUIRED" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of components with a fingerprints scope
@@ -15301,7 +15290,7 @@ Feature: License validation actions
       { "valid": false, "detail": "fingerprint scope is required when using the components scope", "code": "FINGERPRINT_SCOPE_REQUIRED" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a valid license key scoped to an array of components with an invalid fingerprint
@@ -15338,7 +15327,7 @@ Feature: License validation actions
       { "valid": false, "detail": "fingerprint is not activated (does not match any associated machines)", "code": "FINGERPRINT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   # product-specific webhook smoke tests
@@ -15364,5 +15353,5 @@ Feature: License validation actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 4 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job

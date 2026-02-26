@@ -46,7 +46,7 @@ Feature: License permit actions
     And the response body should be a "license" with a nextCheckIn that is not nil
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -86,7 +86,7 @@ Feature: License permit actions
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product checks in a license
@@ -118,7 +118,7 @@ Feature: License permit actions
     And the response body should be a "license" with a lastCheckIn that is not nil
     And the response body should be a "license" with a nextCheckIn that is not nil
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License checks in itself
@@ -148,7 +148,7 @@ Feature: License permit actions
     And the response body should be a "license" with a lastCheckIn that is not nil
     And the response body should be a "license" with a nextCheckIn that is not nil
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User checks in one of their licenses (license owner)
@@ -179,7 +179,7 @@ Feature: License permit actions
     And the response body should be a "license" with a lastCheckIn that is not nil
     And the response body should be a "license" with a nextCheckIn that is not nil
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User checks in one of their licenses (license user)
@@ -201,7 +201,7 @@ Feature: License permit actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-in"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User checks in one of their licenses for an unprotected policy
@@ -233,7 +233,7 @@ Feature: License permit actions
     And the response body should be a "license" with a lastCheckIn that is not nil
     And the response body should be a "license" with a nextCheckIn that is not nil
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User checks in one of their licenses for a protected policy
@@ -263,7 +263,7 @@ Feature: License permit actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-in"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin suspends a license
@@ -276,7 +276,7 @@ Feature: License permit actions
     Then the response status should be "200"
     And the response body should be a "license" that is suspended
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin suspends a license that is already suspended
@@ -294,7 +294,7 @@ Feature: License permit actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/suspend"
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -316,7 +316,7 @@ Feature: License permit actions
       { "suspended": true }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User suspends their license (license owner)
@@ -330,7 +330,7 @@ Feature: License permit actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/suspend"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User suspends their license (license user)
@@ -345,7 +345,7 @@ Feature: License permit actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/suspend"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin suspends a license by key that implements a protected policy
@@ -363,7 +363,7 @@ Feature: License permit actions
     Then the response status should be "200"
     And the response body should be a "license" that is suspended
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product suspends a license that implements a protected policy
@@ -379,7 +379,7 @@ Feature: License permit actions
     Then the response status should be "200"
     And the response body should be a "license" that is suspended
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User suspends their license that implements a protected policy
@@ -401,7 +401,7 @@ Feature: License permit actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/suspend"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin reinstates a license
@@ -420,7 +420,7 @@ Feature: License permit actions
     Then the response status should be "200"
     And the response body should be a "license" that is not suspended
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin reinstates a license that is not suspended
@@ -438,7 +438,7 @@ Feature: License permit actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/reinstate"
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -460,7 +460,7 @@ Feature: License permit actions
       { "suspended": false }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User reinstates their license (license owner)
@@ -478,7 +478,7 @@ Feature: License permit actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/reinstate"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User reinstates their license (license owner)
@@ -496,7 +496,7 @@ Feature: License permit actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/reinstate"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin reinstates a license that implements a protected policy
@@ -514,7 +514,7 @@ Feature: License permit actions
     Then the response status should be "200"
     And the response body should be a "license" that is not suspended
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product reinstates a license that implements a protected policy
@@ -534,7 +534,7 @@ Feature: License permit actions
     Then the response status should be "200"
     And the response body should be a "license" that is not suspended
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User reinstates their license that implements a protected policy
@@ -556,7 +556,7 @@ Feature: License permit actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/reinstate"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin renews a license
@@ -578,7 +578,7 @@ Feature: License permit actions
     Then the response status should be "200"
     And the response body should be a "license" with the expiry "2021-10-19T00:00:00.000Z"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin renews a license (from expiry renewal basis)
@@ -603,7 +603,7 @@ Feature: License permit actions
     Then the response status should be "200"
     And the response body should be a "license" with the expiry "2021-08-19T00:00:00.000Z"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -629,7 +629,7 @@ Feature: License permit actions
     Then the response status should be "200"
     And the response body should be a "license" with the expiry "2024-02-21T21:30:00.000Z"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -655,7 +655,7 @@ Feature: License permit actions
     Then the response status should be "200"
     And the response body should be a "license" with the expiry "2025-06-21T00:00:00.000Z"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -681,7 +681,7 @@ Feature: License permit actions
     Then the response status should be "200"
     And the response body should be a "license" with the expiry "2025-01-21T21:30:00.000Z"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -713,7 +713,7 @@ Feature: License permit actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -740,7 +740,7 @@ Feature: License permit actions
       { "expiry": "2025-03-31T00:00:00.000Z" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -768,7 +768,7 @@ Feature: License permit actions
     Then the response status should be "200"
     And the response body should be a "license" with the expiry "2016-12-31T22:53:37.000Z"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User renews their license (license user)
@@ -791,7 +791,7 @@ Feature: License permit actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/renew"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User renews their license without permission
@@ -820,7 +820,7 @@ Feature: License permit actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/renew"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin renews a license that implements a protected policy
@@ -842,7 +842,7 @@ Feature: License permit actions
     Then the response status should be "200"
     And the response body should be a "license" with the expiry "2016-11-05T22:53:37.000Z"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product renews a license that implements a protected policy
@@ -867,7 +867,7 @@ Feature: License permit actions
     Then the response status should be "200"
     And the response body should be a "license" with the expiry "2016-10-05T22:53:37.000Z"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User renews their license that implements a protected policy
@@ -893,7 +893,7 @@ Feature: License permit actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/renew"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to renew a license for another account
@@ -906,7 +906,7 @@ Feature: License permit actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/renew"
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin revokes a license
@@ -919,7 +919,7 @@ Feature: License permit actions
     Then the response status should be "204"
     And the current account should have 2 "licenses"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -937,7 +937,7 @@ Feature: License permit actions
     When I send a DELETE request to "/accounts/test1/licenses/$0/actions/revoke"
     Then the response status should be "204"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User revokes their own license (license owner)
@@ -952,7 +952,7 @@ Feature: License permit actions
     Then the response status should be "204"
     And the current account should have 2 "licenses"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User revokes their own license (license user)
@@ -967,7 +967,7 @@ Feature: License permit actions
     Then the response status should be "403"
     And the current account should have 3 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin revokes a license that implements a protected policy
@@ -982,7 +982,7 @@ Feature: License permit actions
     Then the response status should be "204"
     And the current account should have 2 "licenses"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product revokes a license that implements a protected policy
@@ -998,7 +998,7 @@ Feature: License permit actions
     Then the response status should be "204"
     And the current account should have 2 "licenses"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User revokes their own license that implements a protected policy
@@ -1017,7 +1017,7 @@ Feature: License permit actions
     Then the response status should be "403"
     And the current account should have 3 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User tries to revoke another user's license
@@ -1031,7 +1031,7 @@ Feature: License permit actions
     Then the response status should be "404"
     And the current account should have 3 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin tries to revoke a license for another account
@@ -1044,5 +1044,5 @@ Feature: License permit actions
     Then the response status should be "401"
     And the current account should have 3 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job

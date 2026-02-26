@@ -17,7 +17,7 @@ Feature: Create machine
     Then the response status should be "403"
     And the current account should have 0 "machines"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for their account
@@ -59,7 +59,7 @@ Feature: Create machine
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine with complex metadata
@@ -243,7 +243,7 @@ Feature: Create machine
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine with an owner (license owner matches license user)
@@ -292,7 +292,7 @@ Feature: Create machine
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine with an owner (license owner is not associated)
@@ -341,7 +341,7 @@ Feature: Create machine
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine with a null owner (relationship)
@@ -384,7 +384,7 @@ Feature: Create machine
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine with a null owner (linkage)
@@ -429,7 +429,7 @@ Feature: Create machine
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Developer creates a machine for their account
@@ -588,7 +588,7 @@ Feature: Create machine
       { "Keygen-Environment": null }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -640,7 +640,7 @@ Feature: Create machine
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -689,7 +689,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -734,7 +734,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -786,7 +786,7 @@ Feature: Create machine
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -835,7 +835,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -880,7 +880,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -913,7 +913,7 @@ Feature: Create machine
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -966,7 +966,7 @@ Feature: Create machine
       """
     And the current account should have 1 "machine"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1019,7 +1019,7 @@ Feature: Create machine
       """
     And the current account should have 1 "machine"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1066,7 +1066,7 @@ Feature: Create machine
       """
     And the current account should have 1 "machine"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1117,7 +1117,7 @@ Feature: Create machine
       """
     And the current account should have 0 "machines"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1163,7 +1163,7 @@ Feature: Create machine
       """
     And the current account should have 0 "machines"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine with nested hardware components
@@ -1233,7 +1233,7 @@ Feature: Create machine
     And the current account should have 1 "machine"
     And the current account should have 3 "components"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine with too many hardware components
@@ -1299,7 +1299,7 @@ Feature: Create machine
     And the current account should have 0 "machines"
     And the current account should have 0 "components"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine with duplicate hardware components
@@ -1373,7 +1373,7 @@ Feature: Create machine
     And the current account should have 0 "machines"
     And the current account should have 0 "components"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine with conflicting hardware components (UNIQUE_PER_ACCOUNT)
@@ -1435,7 +1435,7 @@ Feature: Create machine
     And the current account should have 1 "machine"
     And the current account should have 1 "component"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine with conflicting hardware components (UNIQUE_PER_PRODUCT)
@@ -1498,7 +1498,7 @@ Feature: Create machine
     And the current account should have 1 "machine"
     And the current account should have 1 "component"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine with conflicting hardware components (UNIQUE_PER_POLICY)
@@ -1560,7 +1560,7 @@ Feature: Create machine
     And the current account should have 1 "machine"
     And the current account should have 1 "component"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine with conflicting hardware components (UNIQUE_PER_LICENSE)
@@ -1622,7 +1622,7 @@ Feature: Create machine
     And the current account should have 1 "machine"
     And the current account should have 1 "component"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine with conflicting hardware components (UNIQUE_PER_MACHINE)
@@ -1680,7 +1680,7 @@ Feature: Create machine
     And the current account should have 2 "machines"
     And the current account should have 2 "components"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License creates a machine with nested hardware components (has permission)
@@ -1753,7 +1753,7 @@ Feature: Create machine
     And the current account should have 1 "machine"
     And the current account should have 3 "components"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License creates a machine with nested hardware components (no permission)
@@ -1826,7 +1826,7 @@ Feature: Create machine
     And the current account should have 0 "machines"
     And the current account should have 0 "components"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a grouped machine for their account
@@ -1867,7 +1867,7 @@ Feature: Create machine
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a grouped machine for their account (null group)
@@ -1908,7 +1908,7 @@ Feature: Create machine
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a grouped machine for their account (invalid group)
@@ -1951,7 +1951,7 @@ Feature: Create machine
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a grouped machine for their account (limit exceeded, explicit group)
@@ -2003,7 +2003,7 @@ Feature: Create machine
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a grouped machine for their account (limit exceeded, inherited group)
@@ -2056,7 +2056,7 @@ Feature: Create machine
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a grouped machine for their account (inherited from license)
@@ -2102,7 +2102,7 @@ Feature: Create machine
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a grouped machine for their account (inherited from user)
@@ -2153,7 +2153,7 @@ Feature: Create machine
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -2209,7 +2209,7 @@ Feature: Create machine
     And the response should contain a valid signature header for "test1"
     And the current account should have 1 "machine"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product creates a grouped machine for their account
@@ -2260,7 +2260,7 @@ Feature: Create machine
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User creates a grouped machine for their account
@@ -2308,7 +2308,7 @@ Feature: Create machine
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License creates a grouped machine for their account
@@ -2351,7 +2351,7 @@ Feature: Create machine
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for their account with a UUID fingerprint
@@ -2383,7 +2383,7 @@ Feature: Create machine
     And the response body should be a "machine" with the fingerprint "977f1752-d6a9-4669-a6af-b039154ec40f"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for their account with a fingerprint matching another machine's ID
@@ -2414,7 +2414,7 @@ Feature: Create machine
       """
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for their account with a fingerprint matching a reserved word
@@ -2445,7 +2445,7 @@ Feature: Create machine
       """
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine with missing fingerprint
@@ -2472,7 +2472,7 @@ Feature: Create machine
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine with missing license
@@ -2494,7 +2494,7 @@ Feature: Create machine
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine with an invalid license UUID
@@ -2524,7 +2524,7 @@ Feature: Create machine
       """
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User creates a machine for their license (as license owner)
@@ -2556,7 +2556,7 @@ Feature: Create machine
     Then the response status should be "201"
     And the response body should be a "machine" with the fingerprint "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
     # Sanity check on license's machine counter
@@ -2610,7 +2610,7 @@ Feature: Create machine
     Then the response status should be "201"
     And the response body should be a "machine" with the fingerprint "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User creates a machine for their license (as licensee, other owner)
@@ -2649,7 +2649,7 @@ Feature: Create machine
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User creates a machine for their license (as licensee, no owner)
@@ -2681,7 +2681,7 @@ Feature: Create machine
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User creates a machine for their license with a protected policy
@@ -2716,7 +2716,7 @@ Feature: Create machine
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User creates a machine for an unprotected license
@@ -2752,7 +2752,7 @@ Feature: Create machine
     Then the response status should be "201"
     And the response body should be a "machine" with the fingerprint "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License creates a machine for their license
@@ -2789,7 +2789,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License creates a machine for a protected license
@@ -2831,7 +2831,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License creates a machine for a protected license but they've hit their activation limit
@@ -2890,7 +2890,7 @@ Feature: Create machine
       """
     And the current account should have 0 "machines"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License creates a machine for their license with a duplicate fingerprint
@@ -2957,7 +2957,7 @@ Feature: Create machine
       """
     And the current account should have 1 "machine"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License creates a machine for their license with a blank fingerprint
@@ -3016,7 +3016,7 @@ Feature: Create machine
       """
     And the current account should have 0 "machines"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License creates a machine for another license
@@ -3052,7 +3052,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product creates a machine associated to a license they don't own
@@ -3108,7 +3108,7 @@ Feature: Create machine
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User creates a machine for another user's license
@@ -3139,7 +3139,7 @@ Feature: Create machine
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Unauthenticated user attempts to create a machine
@@ -3167,7 +3167,7 @@ Feature: Create machine
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin of another account attempts to create a machine
@@ -3197,7 +3197,7 @@ Feature: Create machine
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that has already reached its limit (allows overages)
@@ -3251,7 +3251,7 @@ Feature: Create machine
     Then the response status should be "201"
     And the response body should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that has already reached its limit (allows 1.25x overages)
@@ -3292,7 +3292,7 @@ Feature: Create machine
     Then the response status should be "201"
     And the response body should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that has exceeded its limit (allows 1.25x overages)
@@ -3343,7 +3343,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that has already reached its limit (allows 1.5x overages)
@@ -3397,7 +3397,7 @@ Feature: Create machine
     Then the response status should be "201"
     And the response body should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that has exceeded its limit (allows 1.5x overages)
@@ -3461,7 +3461,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that has already reached its limit (allows 2x overages)
@@ -3515,7 +3515,7 @@ Feature: Create machine
     Then the response status should be "201"
     And the response body should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that has exceeded its limit (allows 2x overages)
@@ -3579,7 +3579,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that does not have a limit (no overages)
@@ -3633,7 +3633,7 @@ Feature: Create machine
     Then the response status should be "201"
     And the response body should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that has almost reached its limit (no overages)
@@ -3687,7 +3687,7 @@ Feature: Create machine
     Then the response status should be "201"
     And the response body should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that has already reached its limit (no overages)
@@ -3751,7 +3751,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a node-locked license that has already reached its limit (allow overages)
@@ -3805,7 +3805,7 @@ Feature: Create machine
     Then the response status should be "201"
     And the response body should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a node-locked license that has already reached its limit (allows 2x overages)
@@ -3859,7 +3859,7 @@ Feature: Create machine
     Then the response status should be "201"
     And the response body should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a node-locked license that has exceeded its limit (allows 2x overages)
@@ -3923,7 +3923,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a node-locked license that has already reached its limit (no overages)
@@ -3987,7 +3987,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a node-locked license that does not have a limit (no overages)
@@ -4041,7 +4041,7 @@ Feature: Create machine
     Then the response status should be "201"
     And the response body should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that is under its limit (PER_USER leasing strategy, with owner)
@@ -4091,7 +4091,7 @@ Feature: Create machine
     Then the response status should be "201"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that is under its limit (PER_USER leasing strategy, no owner)
@@ -4135,7 +4135,7 @@ Feature: Create machine
     Then the response status should be "201"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that has exceeded its limit (PER_USER leasing strategy, with owner)
@@ -4195,7 +4195,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that has exceeded its limit (PER_USER leasing strategy, no owner)
@@ -4249,7 +4249,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that is under its overage limit (PER_USER leasing strategy, with owner)
@@ -4300,7 +4300,7 @@ Feature: Create machine
     Then the response status should be "201"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that is under its overage limit (PER_USER leasing strategy, no owner)
@@ -4345,7 +4345,7 @@ Feature: Create machine
     Then the response status should be "201"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that has exceeded its overage limit (PER_USER leasing strategy, with owner)
@@ -4406,7 +4406,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that has exceeded its overage limit (PER_USER leasing strategy, no owner)
@@ -4461,7 +4461,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a node-locked license that has not reached its limit (PER_USER leasing strategy, with owner)
@@ -4510,7 +4510,7 @@ Feature: Create machine
     Then the response status should be "201"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a node-locked license that has not reached its limit (PER_USER leasing strategy, no owner)
@@ -4553,7 +4553,7 @@ Feature: Create machine
     Then the response status should be "201"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a node-locked license that has exceeded its limit (PER_USER leasing strategy, with owner)
@@ -4612,7 +4612,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a node-locked license that has exceeded its limit (PER_USER leasing strategy, no owner)
@@ -4666,7 +4666,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License creates a machine with a fingerprint from another license's machine for a license-scoped machine uniqueness strategy
@@ -4730,7 +4730,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License creates a machine with a fingerprint matching another license's machine for a policy-scoped machine uniqueness strategy (same policy)
@@ -4798,7 +4798,7 @@ Feature: Create machine
       """
     And the current account should have 1 "machine"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License creates a machine with a fingerprint from another license's machine for a policy-scoped machine uniqueness strategy (different policy)
@@ -4856,7 +4856,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License creates a machine with a fingerprint from another license's machine for a product-scoped machine uniqueness strategy (same product)
@@ -4925,7 +4925,7 @@ Feature: Create machine
       """
     And the current account should have 1 "machine"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License creates a machine with a fingerprint from another license's machine for a product-scoped machine uniqueness strategy (different product)
@@ -4989,7 +4989,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 3 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License creates a machine with a fingerprint from another license's machine for a account-scoped machine uniqueness strategy (same account)
@@ -5057,7 +5057,7 @@ Feature: Create machine
       """
     And the current account should have 1 "machine"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that has not reached its core limit
@@ -5116,7 +5116,7 @@ Feature: Create machine
     And the response body should be a "machine" with the cores "12"
     And the first "license" should have a correct machine core count
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that has exceeded its core limit (no overages)
@@ -5183,7 +5183,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license with a max cores override (no overages)
@@ -5243,7 +5243,7 @@ Feature: Create machine
     And the response body should be a "machine" with the cores "32"
     And the first "license" should have a correct machine core count
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that has exceeded its core limit (allow overage)
@@ -5302,7 +5302,7 @@ Feature: Create machine
     And the response body should be a "machine" with the cores "16"
     And the first "license" should have a correct machine core count
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that is under its core overage limit (allow 1.5x overage)
@@ -5359,7 +5359,7 @@ Feature: Create machine
     And the response body should be a "machine" with the cores "16"
     And the first "license" should have a correct machine core count
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that has exceeded its core overage limit (allow 1.5x overage)
@@ -5424,7 +5424,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that is under its core overage limit (allow 2x overage)
@@ -5481,7 +5481,7 @@ Feature: Create machine
     And the response body should be a "machine" with the cores "16"
     And the first "license" should have a correct machine core count
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that has exceeded its core overage limit (allow 2x overage)
@@ -5546,7 +5546,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a node-locked license that has not reached its core limit
@@ -5597,7 +5597,7 @@ Feature: Create machine
     And the response body should be a "machine" with the cores "8"
     And the first "license" should have a correct machine core count
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a node-locked license that has exceeded its core limit
@@ -5656,7 +5656,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that is under its limit (PER_USER leasing strategy, with owner)
@@ -5713,7 +5713,7 @@ Feature: Create machine
     And the response body should be a "machine" with the cores "16"
     And the first "license" should have a correct machine core count
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that is under its core overage limit (PER_USER leasing strategy, no owner)
@@ -5764,7 +5764,7 @@ Feature: Create machine
     And the response body should be a "machine" with the cores "16"
     And the first "license" should have a correct machine core count
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that has exceeded its core overage limit (PER_USER leasing strategy, with owner)
@@ -5837,7 +5837,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that has exceeded its core overage limit (PER_USER leasing strategy, no owner)
@@ -5896,7 +5896,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a node-locked license that has not reached its core limit (PER_USER leasing strategy, no owner)
@@ -5941,7 +5941,7 @@ Feature: Create machine
     And the response body should be a "machine" with the cores "8"
     And the first "license" should have a correct machine core count
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a node-locked license that has exceeded its core limit (PER_USER leasing strategy, no owner)
@@ -5994,7 +5994,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine with an invalid core count
@@ -6036,7 +6036,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine with a large core count but policy has no maximum
@@ -6070,7 +6070,7 @@ Feature: Create machine
     And the response body should be a "machine" with the cores "2147483647"
     And the first "license" should have a correct machine core count
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that has not reached its memory limit
@@ -6129,7 +6129,7 @@ Feature: Create machine
     And the response body should be a "machine" with the memory "12288"
     And the first "license" should have a correct machine memory count
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that has exceeded its memory limit (no overages)
@@ -6196,7 +6196,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license with a max memory override (no overages)
@@ -6256,7 +6256,7 @@ Feature: Create machine
     And the response body should be a "machine" with the memory "32768"
     And the first "license" should have a correct machine memory count
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that has exceeded its memory limit (allow overage)
@@ -6315,7 +6315,7 @@ Feature: Create machine
     And the response body should be a "machine" with the memory "16384"
     And the first "license" should have a correct machine memory count
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that is under its memory overage limit (allow 1.5x overage)
@@ -6374,7 +6374,7 @@ Feature: Create machine
     And the response body should be a "machine" with the memory "16384"
     And the first "license" should have a correct machine memory count
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that has exceeded its memory overage limit (allow 1.5x overage)
@@ -6441,7 +6441,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine with an invalid memory count
@@ -6481,7 +6481,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine with a large memory count but policy has no maximum
@@ -6515,7 +6515,7 @@ Feature: Create machine
     And the response body should be a "machine" with the memory "9223372036854775807"
     And the first "license" should have a correct machine memory count
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that has not reached its disk limit
@@ -6574,7 +6574,7 @@ Feature: Create machine
     And the response body should be a "machine" with the disk "393216"
     And the first "license" should have a correct machine disk count
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that has exceeded its disk limit (no overages)
@@ -6641,7 +6641,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license with a max disk override (no overages)
@@ -6701,7 +6701,7 @@ Feature: Create machine
     And the response body should be a "machine" with the disk "1048576"
     And the first "license" should have a correct machine disk count
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that has exceeded its disk limit (allow overage)
@@ -6760,7 +6760,7 @@ Feature: Create machine
     And the response body should be a "machine" with the disk "524288"
     And the first "license" should have a correct machine disk count
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a floating license that is under its disk overage limit (allow 2x overage)
@@ -6819,7 +6819,7 @@ Feature: Create machine
     And the response body should be a "machine" with the disk "262144"
     And the first "license" should have a correct machine disk count
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine with an invalid disk count
@@ -6859,7 +6859,7 @@ Feature: Create machine
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine with a large disk count but policy has no maximum
@@ -6893,7 +6893,7 @@ Feature: Create machine
     And the response body should be a "machine" with the disk "9223372036854775807"
     And the first "license" should have a correct machine disk count
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   # Permissions
@@ -7783,7 +7783,7 @@ Feature: Create machine
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -7827,7 +7827,7 @@ Feature: Create machine
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -7865,5 +7865,5 @@ Feature: Create machine
       """
     Then the response status should be "201"
     And sidekiq should have 3 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job

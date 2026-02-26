@@ -67,7 +67,7 @@ Feature: Generate authentication token for environment
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Isolated admin generates a token for an isolated environment (by code)
@@ -115,7 +115,7 @@ Feature: Generate authentication token for environment
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Shared admin generates a token for an isolated environment
@@ -147,7 +147,7 @@ Feature: Generate authentication token for environment
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Global admin generates a token for an isolated environment
@@ -178,7 +178,7 @@ Feature: Generate authentication token for environment
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Shared admin generates a token for an shared environment
@@ -223,7 +223,7 @@ Feature: Generate authentication token for environment
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Isolated admin generates a token for a shared environment
@@ -255,7 +255,7 @@ Feature: Generate authentication token for environment
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Global admin generates a token for a shared environment
@@ -295,7 +295,7 @@ Feature: Generate authentication token for environment
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Global admin generates a token for an isolated environment
@@ -329,7 +329,7 @@ Feature: Generate authentication token for environment
       { "Keygen-Environment": null }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Global admin generates a token for a shared environment
@@ -363,7 +363,7 @@ Feature: Generate authentication token for environment
       { "Keygen-Environment": null }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates a token for the nil environment (from an isolated environment)
@@ -401,7 +401,7 @@ Feature: Generate authentication token for environment
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates a token for an isolated environment (from a shared environment)
@@ -440,7 +440,7 @@ Feature: Generate authentication token for environment
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates a token for a shared environment (from an isolated environment)
@@ -479,7 +479,7 @@ Feature: Generate authentication token for environment
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates a token for a shared environment (from the global environment)
@@ -513,7 +513,7 @@ Feature: Generate authentication token for environment
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates an environment token with custom permissions (standard tier, EE)
@@ -560,7 +560,7 @@ Feature: Generate authentication token for environment
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates an environment token with custom permissions (ent tier, EE)
@@ -607,7 +607,7 @@ Feature: Generate authentication token for environment
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates an environment token with permissions that exceed the environment's permissions (standard tier)
@@ -663,7 +663,7 @@ Feature: Generate authentication token for environment
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates an environment token with permissions that exceed the environment's permissions (ent tier)
@@ -719,7 +719,7 @@ Feature: Generate authentication token for environment
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates an environment token with unsupported permissions (standard tier)
@@ -761,7 +761,7 @@ Feature: Generate authentication token for environment
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates an environment token with unsupported permissions (ent tier)
@@ -803,7 +803,7 @@ Feature: Generate authentication token for environment
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates an environment token with invalid permissions (standard tier)
@@ -845,7 +845,7 @@ Feature: Generate authentication token for environment
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates an environment token with invalid permissions (ent tier)
@@ -887,7 +887,7 @@ Feature: Generate authentication token for environment
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates an environment token with permissions for environment with wildcard permission (standard tier)
@@ -945,7 +945,7 @@ Feature: Generate authentication token for environment
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates an environment token with permissions for environment with wildcard permission (ent tier)
@@ -1003,7 +1003,7 @@ Feature: Generate authentication token for environment
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Environment attempts to generate a token
