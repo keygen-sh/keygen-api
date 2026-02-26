@@ -48,10 +48,10 @@ class BroadcastEventService < BaseService
           metadata =
             case event
             when /^release\.upgraded$/
-              { prev: meta[:current], next: meta[:next] }
+              { package: resource.package_id, prev: meta[:current], next: meta[:next] }
             when /^artifact\.downloaded$/,
-                /^release\.downloaded$/
-              { version: resource.version }
+                 /^release\.downloaded$/
+              { package: resource.package_id, version: resource.version }
             when /^license\.validation\./
               { code: meta[:code] }
             when /\.updated$/
