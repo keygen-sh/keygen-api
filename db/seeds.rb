@@ -177,8 +177,6 @@ permissions = %w[
 ]
 
 events = %w[
-  *
-
   account.billing.updated
   account.plan.updated
   account.settings.created
