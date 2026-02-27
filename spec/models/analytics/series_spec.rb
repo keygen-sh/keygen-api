@@ -345,6 +345,139 @@ describe Analytics::Series, :only_clickhouse do
       expect(series).to be_valid
       expect(series.buckets).to be_empty
     end
+
+    it 'returns realtime counts for today from event log' do
+      license = create(:license, account:)
+
+      one_day_ago = 1.day.ago.to_date
+      today       = Date.current
+
+      LicenseValidationSpark.insert_all!([
+        { account_id: account.id, environment_id: nil, license_id: license.id, validation_code: 'VALID', count: 5, created_date: one_day_ago, created_at: Time.current },
+      ])
+
+      create_list(:event_log, 3, :license_validation_succeeded, account:, resource: license, metadata: { code: 'VALID' })
+      create_list(:event_log, 2, :license_validation_failed,    account:, resource: license, metadata: { code: 'EXPIRED' })
+
+      series = described_class.new(
+        :validations,
+        account:,
+        start_date: one_day_ago,
+        end_date: today,
+      )
+
+      expect(series).to be_valid
+      expect(series.buckets).to contain_exactly(
+        satisfy { it in Analytics::Series::Bucket(metric: 'validations.valid',   date: ^one_day_ago, count: 5) },
+        satisfy { it in Analytics::Series::Bucket(metric: 'validations.valid',   date: ^today,       count: 3) },
+        satisfy { it in Analytics::Series::Bucket(metric: 'validations.expired', date: ^today,       count: 2) },
+      )
+    end
+
+    it 'overwrites stale spark data for today with realtime count' do
+      license = create(:license, account:)
+
+      today = Date.current
+
+      LicenseValidationSpark.insert_all!([
+        { account_id: account.id, environment_id: nil, license_id: license.id, validation_code: 'VALID', count: 2, created_date: today, created_at: Time.current },
+      ])
+
+      create_list(:event_log, 7, :license_validation_succeeded, account:, resource: license, metadata: { code: 'VALID' })
+
+      series = described_class.new(
+        :validations,
+        account:,
+        start_date: today,
+        end_date: today,
+      )
+
+      expect(series).to be_valid
+      expect(series.buckets).to satisfy do |buckets|
+        buckets in [
+          Analytics::Series::Bucket(metric: 'validations.valid', date: ^today, count: 7),
+        ]
+      end
+    end
+
+    it 'does not use realtime count when realtime is false' do
+      license = create(:license, account:)
+
+      today = Date.current
+
+      LicenseValidationSpark.insert_all!([
+        { account_id: account.id, environment_id: nil, license_id: license.id, validation_code: 'VALID', count: 2, created_date: today, created_at: Time.current },
+      ])
+
+      create_list(:event_log, 7, :license_validation_succeeded, account:, resource: license, metadata: { code: 'VALID' })
+
+      series = described_class.new(
+        :validations,
+        account:,
+        start_date: today,
+        end_date: today,
+        realtime: false,
+      )
+
+      expect(series).to be_valid
+      expect(series.buckets).to satisfy do |buckets|
+        buckets in [
+          Analytics::Series::Bucket(metric: 'validations.valid', date: ^today, count: 2),
+        ]
+      end
+    end
+
+    it 'does not use realtime count when end_date is before today' do
+      license = create(:license, account:)
+
+      two_days_ago = 2.days.ago.to_date
+      one_day_ago  = 1.day.ago.to_date
+
+      LicenseValidationSpark.insert_all!([
+        { account_id: account.id, environment_id: nil, license_id: license.id, validation_code: 'VALID', count: 5, created_date: two_days_ago, created_at: Time.current },
+      ])
+
+      create_list(:event_log, 10, :license_validation_succeeded, account:, resource: license, metadata: { code: 'VALID' })
+
+      series = described_class.new(
+        :validations,
+        account:,
+        start_date: two_days_ago,
+        end_date: one_day_ago,
+      )
+
+      expect(series).to be_valid
+      expect(series.buckets).to satisfy do |buckets|
+        buckets in [
+          Analytics::Series::Bucket(metric: 'validations.valid', date: ^two_days_ago, count: 5),
+        ]
+      end
+    end
+
+    it 'supports license filtering with realtime count' do
+      license1 = create(:license, account:)
+      license2 = create(:license, account:)
+
+      today = Date.current
+
+      create_list(:event_log, 5, :license_validation_succeeded, account:, resource: license1, metadata: { code: 'VALID' })
+      create_list(:event_log, 3, :license_validation_succeeded, account:, resource: license2, metadata: { code: 'VALID' })
+
+      series = described_class.new(
+        :validations,
+        account:,
+        license_id: license1.id,
+        start_date: today,
+        end_date: today,
+      )
+
+      expect(series).to be_valid
+      expect(series.buckets).to satisfy do |buckets|
+        buckets in [
+          Analytics::Series::Bucket(metric: 'validations.valid', date: ^today, count: 5),
+        ]
+      end
+    end
   end
 
   describe 'invalid series' do
