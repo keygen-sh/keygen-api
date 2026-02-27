@@ -9,14 +9,15 @@ module Analytics
         @license_id  = license_id
       end
 
-      def metrics = Analytics::Series::Validations::METRICS
+      def metrics = Analytics::Series::Sparks::Validations::METRICS
       def count
         event_type_ids = EventType.by_pattern('license.validation.*')
                                   .collect(&:id)
         return {} if
           event_type_ids.empty?
 
-        scope = EventLog::Clickhouse.where(account_id: account.id, environment_id: environment&.id)
+        scope = EventLog::Clickhouse.for_account(account)
+                                    .for_environment(environment)
                                     .where(
                                       event_type_id: event_type_ids,
                                       created_date: Date.current,

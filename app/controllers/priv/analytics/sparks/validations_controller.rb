@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-module Priv::Analytics
-  class ValidationsController < BaseController
+module Priv::Analytics::Sparks
+  class ValidationsController < Priv::Analytics::BaseController
     use_clickhouse
 
     CACHE_TTL      = 10.minutes

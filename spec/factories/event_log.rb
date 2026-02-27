@@ -7,7 +7,7 @@ FactoryBot.define do
     account     { NIL_ACCOUNT }
     environment { NIL_ENVIRONMENT }
     resource    { build(:license, account:, environment:) }
-    whodunnit   { build(:user, account:, environment:) }
+    whodunnit   { nil }
     event_type
 
     # HACK(ezekg) sometimes we create logs in the past but that causes clickhouse
