@@ -10,7 +10,10 @@ module Analytics
 
       def metrics = %w[machines]
       def count
-        account.machines.for_environment(environment).count
+        count  = account.machines.for_environment(environment).count
+        metric = metrics.sole
+
+        { metric => count }
       end
 
       private

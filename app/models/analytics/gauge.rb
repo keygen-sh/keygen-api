@@ -4,6 +4,8 @@ module Analytics
   class GaugeNotFoundError < StandardError; end
 
   class Gauge
+    Measurement = Data.define(:metric, :count)
+
     include ActiveModel::Model
     include ActiveModel::Attributes
 
@@ -35,26 +37,21 @@ module Analytics
       super(**options)
     end
 
-    def metrics = @metrics ||= counter.metrics
-    def count
-      @count ||= counter.count
-    end
+    def metrics      = @metrics ||= counter.metrics
+    def measurements = @measurements ||= begin
+      counts = counter.count
 
-    def as_json(*)
-      if metrics.many?
-        counts = count
+      metrics.filter_map do |metric|
+        count = counts[metric]
+        next if
+          count.nil?
 
-        metrics.filter_map do |metric|
-          count = counts[metric]
-          next if
-            count.nil?
-
-          { metric:, count: }
-        end
-      else
-        metrics.map {{ metric: it, count: }}
+        Measurement.new(metric:, count:)
       end
     end
+
+    delegate :as_json, :to_json,
+      to: :measurements
 
     def cache_key
       digest = Digest::SHA2.hexdigest("#{counter_name}")

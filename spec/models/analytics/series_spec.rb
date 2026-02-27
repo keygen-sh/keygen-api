@@ -141,8 +141,8 @@ describe Analytics::Series, :only_clickhouse do
 
       LicenseSpark.insert_all!([
         { account_id: account.id, environment_id: nil, count: 10, created_date: two_days_ago, created_at: Time.current },
-        { account_id: account.id, environment_id: nil, count: 12, created_date: one_day_ago, created_at: Time.current },
-        { account_id: account.id, environment_id: nil, count: 12, created_date: today, created_at: Time.current },
+        { account_id: account.id, environment_id: nil, count: 12, created_date: one_day_ago,  created_at: Time.current },
+        { account_id: account.id, environment_id: nil, count: 12, created_date: today,        created_at: Time.current },
       ])
 
       create_list(:license, 15, account:)
@@ -159,8 +159,8 @@ describe Analytics::Series, :only_clickhouse do
       expect(series.buckets).to satisfy do |buckets|
         buckets in [
           Analytics::Series::Bucket(metric: :licenses, date: ^two_days_ago, count: 10),
-          Analytics::Series::Bucket(metric: :licenses, date: ^one_day_ago, count: 12),
-          Analytics::Series::Bucket(metric: :licenses, date: ^today, count: 15),
+          Analytics::Series::Bucket(metric: :licenses, date: ^one_day_ago,  count: 12),
+          Analytics::Series::Bucket(metric: :licenses, date: ^today,        count: 15),
         ]
       end
     end
@@ -172,8 +172,8 @@ describe Analytics::Series, :only_clickhouse do
 
       LicenseSpark.insert_all!([
         { account_id: account.id, environment_id: nil, count: 10, created_date: two_days_ago, created_at: Time.current },
-        { account_id: account.id, environment_id: nil, count: 12, created_date: one_day_ago, created_at: Time.current },
-        { account_id: account.id, environment_id: nil, count: 12, created_date: today, created_at: Time.current },
+        { account_id: account.id, environment_id: nil, count: 12, created_date: one_day_ago,  created_at: Time.current },
+        { account_id: account.id, environment_id: nil, count: 12, created_date: today,        created_at: Time.current },
       ])
 
       create_list(:license, 15, account:)

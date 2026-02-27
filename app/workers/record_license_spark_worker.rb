@@ -15,7 +15,7 @@ class RecordLicenseSparkWorker < BaseWorker
       {
         account_id: account.id,
         environment_id: environment&.id,
-        count: gauge.count,
+        count: gauge.measurements.sole.count,
         created_date: today,
         created_at: now,
       }

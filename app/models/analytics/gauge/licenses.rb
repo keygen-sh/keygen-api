@@ -10,7 +10,10 @@ module Analytics
 
       def metrics = %w[licenses]
       def count
-        account.licenses.for_environment(environment).count
+        count  = account.licenses.for_environment(environment).count
+        metric = metrics.sole
+
+        { metric => count }
       end
 
       private
