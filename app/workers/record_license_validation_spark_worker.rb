@@ -11,7 +11,7 @@ class RecordLicenseValidationSparkWorker < BaseWorker
       event_type_ids.empty?
 
     events_cte = EventLog::Clickhouse.where(account_id:, created_date: Date.yesterday, event_type_id: event_type_ids)
-                                     .where('validation_code IS NOT NULL')
+                                     .where('metadata.code IS NOT NULL')
                                      .select(
                                        :account_id,
                                        :environment_id,

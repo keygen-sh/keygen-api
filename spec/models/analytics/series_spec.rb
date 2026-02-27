@@ -339,11 +339,11 @@ describe Analytics::Series, :only_clickhouse do
       end
     end
 
-    it 'is invalid with no validation data' do
+    it 'returns empty buckets with no validation data' do
       series = described_class.new(:validations, account:)
 
-      expect(series).not_to be_valid
-      expect(series.errors[:metrics]).to include('is invalid')
+      expect(series).to be_valid
+      expect(series.buckets).to be_empty
     end
   end
 
