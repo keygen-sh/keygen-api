@@ -504,6 +504,7 @@ Rails.application.routes.draw do
         get 'heatmaps/:heatmap',         to: 'heatmaps#show',      as: :heatmap
         get 'gauges/:metric',            to: 'gauges#show',        as: :gauge
         get 'sparks/:metric',            to: 'sparks#show',        as: :spark
+        get 'validations',               to: 'validations#show',   as: :validations
         get 'usage',                     to: 'usage#show',         as: :usage
       end
     end

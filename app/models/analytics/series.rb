@@ -10,6 +10,7 @@ module Analytics
       requests: Requests,
       events: Events,
       sparks: Sparks,
+      validations: Validations,
     }
 
     include ActiveModel::Model

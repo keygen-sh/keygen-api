@@ -282,6 +282,69 @@ describe Analytics::Series, :only_clickhouse do
     end
   end
 
+  describe ':validations' do
+    it 'returns validation counts grouped by validation code' do
+      license1 = create(:license, account:)
+      license2 = create(:license, account:)
+
+      two_days_ago = 2.days.ago.to_date
+      one_day_ago  = 1.day.ago.to_date
+
+      LicenseValidationSpark.insert_all!([
+        { account_id: account.id, environment_id: nil, license_id: license1.id, validation_code: 'VALID', count: 5, created_date: two_days_ago, created_at: Time.current },
+        { account_id: account.id, environment_id: nil, license_id: license2.id, validation_code: 'VALID', count: 3, created_date: two_days_ago, created_at: Time.current },
+        { account_id: account.id, environment_id: nil, license_id: license1.id, validation_code: 'EXPIRED', count: 2, created_date: one_day_ago, created_at: Time.current },
+      ])
+
+      series = described_class.new(
+        :validations,
+        account:,
+        start_date: 3.days.ago.to_date,
+        end_date: Date.current,
+      )
+
+      expect(series).to be_valid
+      expect(series.buckets).to contain_exactly(
+        satisfy { it in Analytics::Series::Bucket(metric: 'validations.VALID', date: ^two_days_ago, count: 8) },
+        satisfy { it in Analytics::Series::Bucket(metric: 'validations.EXPIRED', date: ^one_day_ago, count: 2) },
+      )
+    end
+
+    it 'supports license filtering' do
+      license1 = create(:license, account:)
+      license2 = create(:license, account:)
+
+      two_days_ago = 2.days.ago.to_date
+
+      LicenseValidationSpark.insert_all!([
+        { account_id: account.id, environment_id: nil, license_id: license1.id, validation_code: 'VALID', count: 5, created_date: two_days_ago, created_at: Time.current },
+        { account_id: account.id, environment_id: nil, license_id: license2.id, validation_code: 'VALID', count: 3, created_date: two_days_ago, created_at: Time.current },
+      ])
+
+      series = described_class.new(
+        :validations,
+        account:,
+        license_id: license1.id,
+        start_date: 3.days.ago.to_date,
+        end_date: Date.current,
+      )
+
+      expect(series).to be_valid
+      expect(series.buckets).to satisfy do |buckets|
+        buckets in [
+          Analytics::Series::Bucket(metric: 'validations.VALID', date: ^two_days_ago, count: 5),
+        ]
+      end
+    end
+
+    it 'is invalid with no validation data' do
+      series = described_class.new(:validations, account:)
+
+      expect(series).not_to be_valid
+      expect(series.errors[:metrics]).to include('is invalid')
+    end
+  end
+
   describe 'invalid series' do
     it 'raises for unknown counter' do
       expect { described_class.new(:invalid, account:) }.to raise_error(Analytics::SeriesNotFoundError)
