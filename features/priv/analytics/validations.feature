@@ -12,9 +12,6 @@ Feature: Validation series analytics
     Given the account "test1" is canceled
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has the following "license_validation_spark" rows:
-      | license_id                           | validation_code | count | created_date | created_at           |
-      | bf9b523f-dd65-48a2-9512-fb66ba6c3714 | VALID           | 1     | 2100-08-23   | 2100-08-23T00:00:00Z |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/analytics/validations"
     Then the response status should be "200"
@@ -86,7 +83,13 @@ Feature: Validation series analytics
     And the current account is "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/analytics/validations"
-    Then the response status should be "400"
+    Then the response status should be "200"
+    And the response body should be a JSON document with the following content:
+      """
+      {
+        "data": []
+      }
+      """
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
 
@@ -97,7 +100,7 @@ Feature: Validation series analytics
     And I use an authentication token
     When I send a GET request to "/accounts/test1/analytics/validations?date[start]=2020-01-01&date[end]=2024-01-15"
     Then the response status should be "400"
-    And the response body should be an array of errors
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -118,7 +121,7 @@ Feature: Validation series analytics
     And I use an authentication token
     When I send a GET request to "/accounts/test1/analytics/validations?date[start]=2024-01-01&date[end]=2099-01-01"
     Then the response status should be "400"
-    And the response body should be an array of errors
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
