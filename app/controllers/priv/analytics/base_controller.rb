@@ -8,8 +8,8 @@ module Priv::Analytics
     private
 
     # mark controller action as requiring clickhouse to be enabled
-    def self.use_clickhouse
-      before_action do
+    def self.use_clickhouse(**)
+      before_action(**) do
         render_not_supported unless
           Keygen.database.clickhouse_available? && Keygen.database.clickhouse_enabled?
       end

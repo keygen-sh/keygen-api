@@ -7,6 +7,7 @@ module Analytics
         @account = account
       end
 
+      def metrics = %w[alus]
       def count
         account.active_licensed_user_count
       end

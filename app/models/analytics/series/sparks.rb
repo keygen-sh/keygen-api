@@ -4,11 +4,10 @@ module Analytics
   class Series
     class Sparks
       MAPPING = {
-        active_licensed_users: ActiveLicensedUserSpark,
-        machines: MachineSpark,
+        alus: ActiveLicensedUserSpark,
         licenses: LicenseSpark,
+        machines: MachineSpark,
         users: UserSpark,
-        alus: ActiveLicensedUserSpark, # alias
       }
 
       def initialize(account:, environment:, metric:, realtime: true, **)
