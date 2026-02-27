@@ -14,7 +14,8 @@ module Analytics
       def metrics = @metrics ||= event_types.collect(&:event)
 
       def count(start_date:, end_date:)
-        scope = EventLog::Clickhouse.where(account_id: account.id, environment_id: environment&.id)
+        scope = EventLog::Clickhouse.for_account(account)
+                                    .for_environment(environment)
                                     .where(created_date: start_date..end_date)
                                     .where(event_type_id: event_type_ids)
 

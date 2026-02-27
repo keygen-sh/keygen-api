@@ -1,15 +1,21 @@
 # frozen_string_literal: true
 
-module Priv::Analytics
-  class GaugesController < BaseController
+module Priv::Analytics::Gauges
+  class ValidationsController < Priv::Analytics::BaseController
+    use_clickhouse
+
     CACHE_TTL      = 10.minutes
     CACHE_RACE_TTL = 1.minute
 
+    typed_query {
+      param :license, type: :uuid, optional: true, as: :license_id
+    }
     def show
       authorize! with: Accounts::AnalyticsPolicy
 
       gauge = Analytics::Gauge.new(
-        params[:metric],
+        :validations,
+        **validation_query,
       )
 
       unless gauge.valid?
@@ -26,8 +32,6 @@ module Priv::Analytics
       end
 
       render json: { data: }
-    rescue Analytics::GaugeNotFoundError
-      render_not_found
     end
   end
 end

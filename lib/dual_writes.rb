@@ -267,11 +267,14 @@ module DualWrites
           database_class = Class.new(base_class) do |klass|
             klass.primary_key = false
             klass.table_name  = table
-
-            klass.include Module.new(&extension)
           end
 
           const_set(database_class_name, database_class)
+
+          # NB(ezekg) apply our extension after the class is constantized
+          unless extension.nil?
+            database_class.module_exec &extension
+          end
         end
 
         # define virtual attributes for columns ignored on primary so they can be

@@ -12,7 +12,12 @@ class RequestLog < ApplicationRecord
 
   dual_writes to: :clickhouse, strategy: :clickhouse,
     ignored_columns: { primary: %w[ttl] }, # NB(ezekg) ttl is only applicable to clickhouse
-    if: -> { Keygen.database.clickhouse_enabled? }
+    if: -> { Keygen.database.clickhouse_enabled? } do
+      include Accountable, Environmental
+
+      has_environment
+      has_account
+    end
 
   belongs_to :requestor, polymorphic: true, optional: true
   belongs_to :resource, polymorphic: true, optional: true

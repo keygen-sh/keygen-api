@@ -13,7 +13,8 @@ module Analytics
       def metrics = METRICS
 
       def count(start_date:, end_date:)
-        rows = RequestLog::Clickhouse.where(account_id: account.id, environment_id: environment&.id)
+        rows = RequestLog::Clickhouse.for_account(account)
+                                     .for_environment(environment)
                                      .where(created_date: start_date..end_date)
                                      .group(:created_date)
                                      .pluck(
