@@ -10,6 +10,11 @@ Given /^the following "([^\"]*)"(?: rows)? exist:$/ do |resource, rows|
     hash.transform_values!(&:presence)
         .compact!
 
+    # explicitly parse metadata column for clickhouse
+    if hash.key?(:metadata)
+      hash[:metadata] = JSON.parse(hash[:metadata])
+    end
+
     # FIXME(ezekg) treating release models a bit differently for convenience
     case factory
     when :account
@@ -214,6 +219,11 @@ Given /^the current account has the following "([^\"]*)" rows:$/ do |resource, r
 
   hashes.each do |hash|
     hash.transform_values!(&:presence)
+
+    # explicitly parse metadata column for clickhouse
+    if hash.key?(:metadata)
+      hash[:metadata] = JSON.parse(hash[:metadata])
+    end
 
     # FIXME(ezekg) Treating releases a bit differently for convenience
     case factory

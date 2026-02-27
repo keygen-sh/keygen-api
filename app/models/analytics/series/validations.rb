@@ -79,7 +79,7 @@ module Analytics
         if realtime? && end_date.today?
           gauge = Analytics::Gauge::Validations.new(account:, environment:, license_id:)
 
-          gauge.counts.each do |metric, count|
+          gauge.count.each do |metric, count|
             counts[[metric, end_date]] = count
           end
         end

@@ -9,39 +9,37 @@ describe Analytics::Gauge do
   describe '.new' do
     context 'with valid gauge' do
       it 'returns gauge for machines' do
-        create_list(:machine, 3, account:)
-
         gauge = described_class.new(:machines, account:)
 
-        expect(gauge).to be_a(Analytics::Gauge)
+        expect(gauge).to be_an Analytics::Gauge
         expect(gauge).to be_valid
-        expect(gauge.count).to eq(3)
       end
 
       it 'returns gauge for users' do
-        create_list(:user, 2, account:)
-
         gauge = described_class.new(:users, account:)
 
-        expect(gauge).to be_a(Analytics::Gauge)
+        expect(gauge).to be_an Analytics::Gauge
         expect(gauge).to be_valid
-        expect(gauge.count).to eq(2)
       end
 
       it 'returns gauge for licenses' do
-        create_list(:license, 4, account:)
-
         gauge = described_class.new(:licenses, account:)
 
-        expect(gauge).to be_a(Analytics::Gauge)
+        expect(gauge).to be_an Analytics::Gauge
         expect(gauge).to be_valid
-        expect(gauge.count).to eq(4)
+      end
+
+      it 'returns gauge for validations', :only_clickhouse do
+        gauge = described_class.new(:validations, account:)
+
+        expect(gauge).to be_an Analytics::Gauge
+        expect(gauge).to be_valid
       end
 
       it 'accepts string names' do
         gauge = described_class.new('machines', account:)
 
-        expect(gauge).to be_a(Analytics::Gauge)
+        expect(gauge).to be_an Analytics::Gauge
         expect(gauge).to be_valid
       end
     end
@@ -202,7 +200,7 @@ describe Analytics::Gauge do
   describe 'active_licensed_users' do
     context 'with no licenses' do
       it 'returns zero' do
-        gauge = described_class.new(:active_licensed_users, account:)
+        gauge = described_class.new(:alus, account:)
 
         expect(gauge.count).to eq(0)
       end
@@ -212,7 +210,7 @@ describe Analytics::Gauge do
       before { create_list(:license, 5, account:) }
 
       it 'returns correct count' do
-        gauge = described_class.new(:active_licensed_users, account:)
+        gauge = described_class.new(:alus, account:)
 
         expect(gauge.count).to eq(5)
       end
@@ -224,20 +222,81 @@ describe Analytics::Gauge do
       before { create_list(:license, 3, account:) }
 
       it 'ignores environment scoping' do
-        gauge = described_class.new(:active_licensed_users, account:, environment:)
+        gauge = described_class.new(:alus, account:, environment:)
 
         expect(gauge.count).to eq(3)
       end
     end
   end
 
-  describe 'alus' do
-    before { create_list(:license, 2, account:) }
+  describe 'validations', :only_clickhouse do
+    before { Sidekiq::Testing.inline! }
+    after  { Sidekiq::Testing.fake! }
 
-    it 'is an alias for active_licensed_users' do
-      gauge = described_class.new(:alus, account:)
+    context 'with no validations' do
+      it 'returns zero' do
+        gauge = described_class.new(:validations, account:)
 
-      expect(gauge.count).to eq(2)
+        expect(gauge.count).to eq({})
+      end
+    end
+
+    context 'with validations' do
+      before do
+        license = create(:license, account:)
+
+        create_list(:event_log, 3, :license_validation_succeeded, account:, resource: license, metadata: { code: 'VALID' })
+        create_list(:event_log, 2, :license_validation_failed,    account:, resource: license, metadata: { code: 'EXPIRED' })
+      end
+
+      it 'returns count' do
+        counter = Analytics::Gauge::Validations.new(account:, environment: nil)
+
+        expect(counter.count).to eq(
+          'validations.valid'   => 3,
+          'validations.expired' => 2,
+        )
+      end
+    end
+
+    context 'with license filtering' do
+      let(:license1) { create(:license, account:) }
+      let(:license2) { create(:license, account:) }
+
+      before do
+        create_list(:event_log, 3, :license_validation_succeeded, account:, resource: license1, metadata: { code: 'VALID' })
+        create_list(:event_log, 2, :license_validation_failed,    account:, resource: license2, metadata: { code: 'EXPIRED' })
+      end
+
+      it 'filters by license' do
+        counter = Analytics::Gauge::Validations.new(account:, environment: nil, license_id: license1.id)
+
+        expect(counter.count).to eq({ 'validations.valid' => 3 })
+      end
+    end
+
+    context 'with environment scoping' do
+      let(:environment) { create(:environment, account:) }
+
+      before do
+        scoped_license = create(:license, account:, environment:)
+        global_license = create(:license, account:, environment: nil)
+
+        create_list(:event_log, 3, :license_validation_succeeded, account:, resource: scoped_license, environment:,     metadata: { code: 'VALID' })
+        create_list(:event_log, 2, :license_validation_succeeded, account:, resource: global_license, environment: nil, metadata: { code: 'VALID' })
+      end
+
+      it 'returns only environment-scoped count' do
+        gauge = described_class.new(:validations, account:, environment:)
+
+        expect(gauge.count).to eq({ 'validations.valid' => 3 })
+      end
+
+      it 'returns only global count when no environment' do
+        gauge = described_class.new(:validations, account:)
+
+        expect(gauge.count).to eq({ 'validations.valid' => 2 })
+      end
     end
   end
 end

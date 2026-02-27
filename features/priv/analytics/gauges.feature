@@ -27,9 +27,9 @@ Feature: Gauge analytics
     And the response body should be a JSON document with the following content:
       """
       {
-        "data": {
-          "count": 5
-        }
+        "data": [
+          { "metric": "machines", "count": 5 }
+        ]
       }
       """
     And sidekiq should have 0 "request-log" jobs
@@ -45,9 +45,9 @@ Feature: Gauge analytics
     And the response body should be a JSON document with the following content:
       """
       {
-        "data": {
-          "count": 3
-        }
+        "data": [
+          { "metric": "users", "count": 3 }
+        ]
       }
       """
     And sidekiq should have 0 "request-log" jobs
@@ -63,9 +63,9 @@ Feature: Gauge analytics
     And the response body should be a JSON document with the following content:
       """
       {
-        "data": {
-          "count": 4
-        }
+        "data": [
+          { "metric": "licenses", "count": 4 }
+        ]
       }
       """
     And sidekiq should have 0 "request-log" jobs
@@ -139,14 +139,73 @@ Feature: Gauge analytics
     And the response body should be a JSON document with the following content:
       """
       {
-        "data": {
-          "count": 14
-        }
+        "data": [
+          { "metric": "alus", "count": 14 }
+        ]
       }
       """
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
     And time is unfrozen
+
+  Scenario: Admin retrieves validations gauge for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has the following "license" rows:
+      | id                                   | name      |
+      | df0beed9-1ab2-4097-9558-cd0adddf321a | License 1 |
+      | c29fc20f-ec09-4cf4-8145-f910109e5705 | License 2 |
+    And the current account has the following "event_log" rows:
+      | id                                   | event                        | metadata                 | resource_type | resource_id                          |
+      | d00998f9-d224-4ee7-ac4e-f1e5fe318ff7 | license.validation.succeeded | { "code": "VALID" }      | License       | df0beed9-1ab2-4097-9558-cd0adddf321a |
+      | 96faacd6-16e6-4661-8e16-9e8064fbeb0a | license.validation.succeeded | { "code": "VALID" }      | License       | df0beed9-1ab2-4097-9558-cd0adddf321a |
+      | 31e30cc1-d454-40dc-b4ae-93ad683ddf33 | license.validation.succeeded | { "code": "VALID" }      | License       | c29fc20f-ec09-4cf4-8145-f910109e5705 |
+      | d1e6f594-7bcb-455f-971b-1e8b3ea63fd7 | license.validation.failed    | { "code": "NO_MACHINE" } | License       | c29fc20f-ec09-4cf4-8145-f910109e5705 |
+      | 99e87418-ade4-460f-a5aa-a856a0059397 | license.validation.failed    | { "code": "EXPIRED" }    | License       | df0beed9-1ab2-4097-9558-cd0adddf321a |
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/analytics/gauges/validations"
+    Then the response status should be "200"
+    And the response body should be a JSON document with the following content:
+      """
+      {
+        "data": [
+          { "metric": "validations.expired", "count": 1 },
+          { "metric": "validations.no-machine", "count": 1 },
+          { "metric": "validations.valid", "count": 3 }
+        ]
+      }
+      """
+    And sidekiq should have 0 "request-log" jobs
+    And sidekiq should have 0 "event-log" jobs
+
+  Scenario: Admin retrieves validations gauge by license
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has the following "license" rows:
+      | id                                   | name      |
+      | df0beed9-1ab2-4097-9558-cd0adddf321a | License 1 |
+      | c29fc20f-ec09-4cf4-8145-f910109e5705 | License 2 |
+    And the current account has the following "event_log" rows:
+      | id                                   | event                        | metadata                 | resource_type | resource_id                          |
+      | d00998f9-d224-4ee7-ac4e-f1e5fe318ff7 | license.validation.succeeded | { "code": "VALID" }      | License       | df0beed9-1ab2-4097-9558-cd0adddf321a |
+      | 96faacd6-16e6-4661-8e16-9e8064fbeb0a | license.validation.succeeded | { "code": "VALID" }      | License       | df0beed9-1ab2-4097-9558-cd0adddf321a |
+      | 31e30cc1-d454-40dc-b4ae-93ad683ddf33 | license.validation.succeeded | { "code": "VALID" }      | License       | c29fc20f-ec09-4cf4-8145-f910109e5705 |
+      | d1e6f594-7bcb-455f-971b-1e8b3ea63fd7 | license.validation.failed    | { "code": "NO_MACHINE" } | License       | c29fc20f-ec09-4cf4-8145-f910109e5705 |
+      | 99e87418-ade4-460f-a5aa-a856a0059397 | license.validation.failed    | { "code": "EXPIRED" }    | License       | df0beed9-1ab2-4097-9558-cd0adddf321a |
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/analytics/gauges/validations?license=df0beed9-1ab2-4097-9558-cd0adddf321a"
+    Then the response status should be "200"
+    And the response body should be a JSON document with the following content:
+      """
+      {
+        "data": [
+          { "metric": "validations.expired", "count": 1 },
+          { "metric": "validations.valid", "count": 2 }
+        ]
+      }
+      """
+    And sidekiq should have 0 "request-log" jobs
+    And sidekiq should have 0 "event-log" jobs
 
   Scenario: Admin retrieves invalid gauge
     Given I am an admin of account "test1"
@@ -154,6 +213,16 @@ Feature: Gauge analytics
     And I use an authentication token
     When I send a GET request to "/accounts/test1/analytics/gauges/invalid"
     Then the response status should be "404"
+    And sidekiq should have 0 "request-log" jobs
+    And sidekiq should have 0 "event-log" jobs
+
+  Scenario: Admin retrieves licenses gauge with invalid filters
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 4 "licenses"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/analytics/gauges/licenses?license=df0beed9-1ab2-4097-9558-cd0adddf321a"
+    Then the response status should be "400"
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
 
@@ -175,9 +244,9 @@ Feature: Gauge analytics
     And the response body should be a JSON document with the following content:
       """
       {
-        "data": {
-          "count": 3
-        }
+        "data": [
+          { "metric": "machines", "count": 3 }
+        ]
       }
       """
     And sidekiq should have 0 "request-log" jobs
@@ -201,9 +270,9 @@ Feature: Gauge analytics
     And the response body should be a JSON document with the following content:
       """
       {
-        "data": {
-          "count": 5
-        }
+        "data": [
+          { "metric": "machines", "count": 5 }
+        ]
       }
       """
     And sidekiq should have 0 "request-log" jobs
@@ -222,9 +291,9 @@ Feature: Gauge analytics
     And the response body should be a JSON document with the following content:
       """
       {
-        "data": {
-          "count": 2
-        }
+        "data": [
+          { "metric": "machines", "count": 2 }
+        ]
       }
       """
     And sidekiq should have 0 "request-log" jobs

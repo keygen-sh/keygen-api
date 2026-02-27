@@ -8,6 +8,7 @@ module Analytics
         @environment = environment
       end
 
+      def metrics = %w[users]
       def count
         account.users.for_environment(environment)
                      .with_roles(:user)

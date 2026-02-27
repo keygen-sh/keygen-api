@@ -9,7 +9,8 @@ module Analytics
         @license_id  = license_id
       end
 
-      def counts
+      def metrics = Analytics::Series::Validations::METRICS
+      def count
         event_type_ids = EventType.where(event: %w[license.validation.succeeded license.validation.failed])
                                   .ids
         return {} if
@@ -20,6 +21,9 @@ module Analytics
                                       event_type_id: event_type_ids,
                                       created_date: Date.current,
                                     )
+                                    .where(
+                                      Arel.sql('metadata.code IS NOT NULL'),
+                                    )
 
         unless license_id.nil?
           scope = scope.where(
@@ -28,10 +32,10 @@ module Analytics
           )
         end
 
-        rows = scope.group(Arel.sql('metadata.code.:String'))
+        rows = scope.group(Arel.sql('validation_code'))
                     .pluck(
-                      Arel.sql('metadata.code.:String'),
-                      Arel.sql('count()'),
+                      Arel.sql('metadata.code.:String AS validation_code'),
+                      Arel.sql('count() AS count'),
                     )
 
         rows.each_with_object({}) do |(code, count), hash|

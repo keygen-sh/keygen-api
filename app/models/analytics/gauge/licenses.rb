@@ -8,6 +8,7 @@ module Analytics
         @environment = environment
       end
 
+      def metrics = %w[licenses]
       def count
         account.licenses.for_environment(environment).count
       end

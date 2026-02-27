@@ -2,14 +2,20 @@
 
 module Priv::Analytics
   class GaugesController < BaseController
+    use_clickhouse if: -> { metric.validations? }
+
     CACHE_TTL      = 10.minutes
     CACHE_RACE_TTL = 1.minute
 
+    typed_query(strict: true) {
+      param :license, type: :uuid, optional: true, as: :license_id, if: -> { metric.validations? }
+    }
     def show
       authorize! with: Accounts::AnalyticsPolicy
 
       gauge = Analytics::Gauge.new(
-        params[:metric],
+        metric,
+        **gauge_query,
       )
 
       unless gauge.valid?
@@ -29,5 +35,9 @@ module Priv::Analytics
     rescue Analytics::GaugeNotFoundError
       render_not_found
     end
+
+    private
+
+    def metric = params[:metric].inquiry
   end
 end
