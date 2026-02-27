@@ -54,7 +54,7 @@ module Analytics
       to: :measurements
 
     def cache_key
-      digest = Digest::SHA2.hexdigest("#{counter_name}")
+      digest = Digest::SHA2.hexdigest("#{counter_name}:#{counter_options.sort.as_json}")
 
       "analytics:gauges:#{account.id}:#{environment&.id}:#{digest}:#{CACHE_KEY_VERSION}"
     end
