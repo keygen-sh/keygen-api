@@ -17,6 +17,7 @@ module Analytics
                                       .pluck(:validation_code)
 
         codes.map { "validations.#{it.underscore.dasherize}" }
+             .sort
       end
 
       def count(start_date:, end_date:)
