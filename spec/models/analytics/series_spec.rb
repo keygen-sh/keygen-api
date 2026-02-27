@@ -291,9 +291,10 @@ describe Analytics::Series, :only_clickhouse do
       one_day_ago  = 1.day.ago.to_date
 
       LicenseValidationSpark.insert_all!([
-        { account_id: account.id, environment_id: nil, license_id: license1.id, validation_code: 'VALID', count: 5, created_date: two_days_ago, created_at: Time.current },
-        { account_id: account.id, environment_id: nil, license_id: license2.id, validation_code: 'VALID', count: 3, created_date: two_days_ago, created_at: Time.current },
-        { account_id: account.id, environment_id: nil, license_id: license1.id, validation_code: 'EXPIRED', count: 2, created_date: one_day_ago, created_at: Time.current },
+        { account_id: account.id, environment_id: nil, license_id: license1.id, validation_code: 'VALID',      count: 5, created_date: two_days_ago, created_at: Time.current },
+        { account_id: account.id, environment_id: nil, license_id: license2.id, validation_code: 'VALID',      count: 3, created_date: two_days_ago, created_at: Time.current },
+        { account_id: account.id, environment_id: nil, license_id: license1.id, validation_code: 'EXPIRED',    count: 2, created_date: one_day_ago,  created_at: Time.current },
+        { account_id: account.id, environment_id: nil, license_id: license1.id, validation_code: 'NO_MACHINE', count: 3, created_date: one_day_ago,  created_at: Time.current },
       ])
 
       series = described_class.new(
@@ -305,8 +306,9 @@ describe Analytics::Series, :only_clickhouse do
 
       expect(series).to be_valid
       expect(series.buckets).to contain_exactly(
-        satisfy { it in Analytics::Series::Bucket(metric: 'validations.VALID', date: ^two_days_ago, count: 8) },
-        satisfy { it in Analytics::Series::Bucket(metric: 'validations.EXPIRED', date: ^one_day_ago, count: 2) },
+        satisfy { it in Analytics::Series::Bucket(metric: 'validations.valid',      date: ^two_days_ago, count: 8) },
+        satisfy { it in Analytics::Series::Bucket(metric: 'validations.expired',    date: ^one_day_ago,  count: 2) },
+        satisfy { it in Analytics::Series::Bucket(metric: 'validations.no-machine', date: ^one_day_ago,  count: 3) },
       )
     end
 
@@ -332,7 +334,7 @@ describe Analytics::Series, :only_clickhouse do
       expect(series).to be_valid
       expect(series.buckets).to satisfy do |buckets|
         buckets in [
-          Analytics::Series::Bucket(metric: 'validations.VALID', date: ^two_days_ago, count: 5),
+          Analytics::Series::Bucket(metric: 'validations.valid', date: ^two_days_ago, count: 5),
         ]
       end
     end
