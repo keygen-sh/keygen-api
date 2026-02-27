@@ -9,13 +9,14 @@ module Analytics
         @license_id  = license_id
       end
 
+      # FIXME(ezekg) add caching
       def metrics = @metrics ||= begin
         codes = LicenseValidationSpark.for_account(account)
                                       .for_environment(environment)
                                       .distinct
                                       .pluck(:validation_code)
 
-        codes.map { "validations.#{it}" }
+        codes.map { "validations.#{it.underscore.dasherize}" }
       end
 
       def count(start_date:, end_date:)
@@ -37,7 +38,7 @@ module Analytics
                     )
 
         rows.each_with_object({}) do |(date, code, count), hash|
-          hash[["validations.#{code}", date]] = count
+          hash[["validations.#{code.underscore.dasherize}", date]] = count
         end
       end
 
