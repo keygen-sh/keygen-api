@@ -11,8 +11,8 @@ module Analytics
 
       def metrics = Analytics::Series::Validations::METRICS
       def count
-        event_type_ids = EventType.where(event: %w[license.validation.succeeded license.validation.failed])
-                                  .ids
+        event_type_ids = EventType.by_pattern('license.validation.*')
+                                  .collect(&:id)
         return {} if
           event_type_ids.empty?
 

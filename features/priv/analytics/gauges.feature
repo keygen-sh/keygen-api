@@ -148,6 +148,7 @@ Feature: Gauge analytics
     And sidekiq should have 0 "event-log" jobs
     And time is unfrozen
 
+  @clickhouse
   Scenario: Admin retrieves validations gauge for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -178,6 +179,7 @@ Feature: Gauge analytics
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
 
+  @clickhouse
   Scenario: Admin retrieves validations gauge by license
     Given I am an admin of account "test1"
     And the current account is "test1"

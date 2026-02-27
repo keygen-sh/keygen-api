@@ -77,10 +77,10 @@ module Analytics
 
         # defer to gauge for a realtime count since sparks are nightly
         if realtime? && end_date.today?
-          gauge = Analytics::Gauge::Validations.new(account:, environment:, license_id:)
+          gauge = Analytics::Gauge.new(:validations, account:, environment:, license_id:)
 
-          gauge.count.each do |metric, count|
-            counts[[metric, end_date]] = count
+          gauge.measurements.each do |measurement|
+            counts[[measurement.metric, end_date]] = measurement.count
           end
         end
 

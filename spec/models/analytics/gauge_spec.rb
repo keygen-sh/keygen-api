@@ -62,14 +62,18 @@ describe Analytics::Gauge do
         gauge = described_class.new(:machines, account:, environment:)
 
         expect(gauge).to be_valid
-        expect(gauge.count).to eq(2)
+        expect(gauge.measurements).to satisfy do
+          it in [Analytics::Gauge::Measurement(metric: 'machines', count: 2)]
+        end
       end
 
       it 'returns global count when no environment' do
         gauge = described_class.new(:machines, account:)
 
         expect(gauge).to be_valid
-        expect(gauge.count).to eq(3)
+        expect(gauge.measurements).to satisfy do
+          it in [Analytics::Gauge::Measurement(metric: 'machines', count: 3)]
+        end
       end
     end
   end
@@ -79,7 +83,9 @@ describe Analytics::Gauge do
       it 'returns zero' do
         gauge = described_class.new(:machines, account:)
 
-        expect(gauge.count).to eq(0)
+        expect(gauge.measurements).to satisfy do
+          it in [Analytics::Gauge::Measurement(metric: 'machines', count: 0)]
+        end
       end
     end
 
@@ -89,7 +95,9 @@ describe Analytics::Gauge do
       it 'returns correct count' do
         gauge = described_class.new(:machines, account:)
 
-        expect(gauge.count).to eq(3)
+        expect(gauge.measurements).to satisfy do
+          it in [Analytics::Gauge::Measurement(metric: 'machines', count: 3)]
+        end
       end
     end
 
@@ -104,13 +112,17 @@ describe Analytics::Gauge do
       it 'returns only environment-scoped count' do
         gauge = described_class.new(:machines, account:, environment:)
 
-        expect(gauge.count).to eq(2)
+        expect(gauge.measurements).to satisfy do
+          it in [Analytics::Gauge::Measurement(metric: 'machines', count: 2)]
+        end
       end
 
       it 'returns only global count when no environment' do
         gauge = described_class.new(:machines, account:)
 
-        expect(gauge.count).to eq(3)
+        expect(gauge.measurements).to satisfy do
+          it in [Analytics::Gauge::Measurement(metric: 'machines', count: 3)]
+        end
       end
     end
   end
@@ -120,7 +132,9 @@ describe Analytics::Gauge do
       it 'returns zero' do
         gauge = described_class.new(:licenses, account:)
 
-        expect(gauge.count).to eq(0)
+        expect(gauge.measurements).to satisfy do
+          it in [Analytics::Gauge::Measurement(metric: 'licenses', count: 0)]
+        end
       end
     end
 
@@ -130,7 +144,9 @@ describe Analytics::Gauge do
       it 'returns correct count' do
         gauge = described_class.new(:licenses, account:)
 
-        expect(gauge.count).to eq(3)
+        expect(gauge.measurements).to satisfy do
+          it in [Analytics::Gauge::Measurement(metric: 'licenses', count: 3)]
+        end
       end
     end
 
@@ -145,13 +161,17 @@ describe Analytics::Gauge do
       it 'returns only environment-scoped count' do
         gauge = described_class.new(:licenses, account:, environment:)
 
-        expect(gauge.count).to eq(2)
+        expect(gauge.measurements).to satisfy do
+          it in [Analytics::Gauge::Measurement(metric: 'licenses', count: 2)]
+        end
       end
 
       it 'returns only global count when no environment' do
         gauge = described_class.new(:licenses, account:)
 
-        expect(gauge.count).to eq(3)
+        expect(gauge.measurements).to satisfy do
+          it in [Analytics::Gauge::Measurement(metric: 'licenses', count: 3)]
+        end
       end
     end
   end
@@ -161,7 +181,9 @@ describe Analytics::Gauge do
       it 'returns zero' do
         gauge = described_class.new(:users, account:)
 
-        expect(gauge.count).to eq(0)
+        expect(gauge.measurements).to satisfy do
+          it in [Analytics::Gauge::Measurement(metric: 'users', count: 0)]
+        end
       end
     end
 
@@ -171,7 +193,9 @@ describe Analytics::Gauge do
       it 'returns correct count' do
         gauge = described_class.new(:users, account:)
 
-        expect(gauge.count).to eq(3)
+        expect(gauge.measurements).to satisfy do
+          it in [Analytics::Gauge::Measurement(metric: 'users', count: 3)]
+        end
       end
     end
 
@@ -186,13 +210,17 @@ describe Analytics::Gauge do
       it 'returns only environment-scoped count' do
         gauge = described_class.new(:users, account:, environment:)
 
-        expect(gauge.count).to eq(2)
+        expect(gauge.measurements).to satisfy do
+          it in [Analytics::Gauge::Measurement(metric: 'users', count: 2)]
+        end
       end
 
       it 'returns only global count when no environment' do
         gauge = described_class.new(:users, account:)
 
-        expect(gauge.count).to eq(3)
+        expect(gauge.measurements).to satisfy do
+          it in [Analytics::Gauge::Measurement(metric: 'users', count: 3)]
+        end
       end
     end
   end
@@ -202,7 +230,9 @@ describe Analytics::Gauge do
       it 'returns zero' do
         gauge = described_class.new(:alus, account:)
 
-        expect(gauge.count).to eq(0)
+        expect(gauge.measurements).to satisfy do
+          it in [Analytics::Gauge::Measurement(metric: 'alus', count: 0)]
+        end
       end
     end
 
@@ -212,7 +242,9 @@ describe Analytics::Gauge do
       it 'returns correct count' do
         gauge = described_class.new(:alus, account:)
 
-        expect(gauge.count).to eq(5)
+        expect(gauge.measurements).to satisfy do
+          it in [Analytics::Gauge::Measurement(metric: 'alus', count: 5)]
+        end
       end
     end
 
@@ -224,7 +256,9 @@ describe Analytics::Gauge do
       it 'ignores environment scoping' do
         gauge = described_class.new(:alus, account:, environment:)
 
-        expect(gauge.count).to eq(3)
+        expect(gauge.measurements).to satisfy do
+          it in [Analytics::Gauge::Measurement(metric: 'alus', count: 3)]
+        end
       end
     end
   end
@@ -234,10 +268,10 @@ describe Analytics::Gauge do
     after  { Sidekiq::Testing.fake! }
 
     context 'with no validations' do
-      it 'returns zero' do
+      it 'returns empty measurements' do
         gauge = described_class.new(:validations, account:)
 
-        expect(gauge.count).to eq({})
+        expect(gauge.measurements).to be_empty
       end
     end
 
@@ -249,13 +283,15 @@ describe Analytics::Gauge do
         create_list(:event_log, 2, :license_validation_failed,    account:, resource: license, metadata: { code: 'EXPIRED' })
       end
 
-      it 'returns count' do
-        counter = Analytics::Gauge::Validations.new(account:, environment: nil)
+      it 'returns measurements' do
+        gauge = described_class.new(:validations, account:)
 
-        expect(counter.count).to eq(
-          'validations.valid'   => 3,
-          'validations.expired' => 2,
-        )
+        expect(gauge.measurements).to satisfy do
+          it in [
+            Analytics::Gauge::Measurement(metric: 'validations.expired', count: 2),
+            Analytics::Gauge::Measurement(metric: 'validations.valid',   count: 3),
+          ]
+        end
       end
     end
 
@@ -269,9 +305,11 @@ describe Analytics::Gauge do
       end
 
       it 'filters by license' do
-        counter = Analytics::Gauge::Validations.new(account:, environment: nil, license_id: license1.id)
+        gauge = described_class.new(:validations, account:, license_id: license1.id)
 
-        expect(counter.count).to eq({ 'validations.valid' => 3 })
+        expect(gauge.measurements).to satisfy do
+          it in [Analytics::Gauge::Measurement(metric: 'validations.valid', count: 3)]
+        end
       end
     end
 
@@ -286,16 +324,20 @@ describe Analytics::Gauge do
         create_list(:event_log, 2, :license_validation_succeeded, account:, resource: global_license, environment: nil, metadata: { code: 'VALID' })
       end
 
-      it 'returns only environment-scoped count' do
+      it 'returns only environment-scoped measurements' do
         gauge = described_class.new(:validations, account:, environment:)
 
-        expect(gauge.count).to eq({ 'validations.valid' => 3 })
+        expect(gauge.measurements).to satisfy do
+          it in [Analytics::Gauge::Measurement(metric: 'validations.valid', count: 3)]
+        end
       end
 
-      it 'returns only global count when no environment' do
+      it 'returns only global measurements when no environment' do
         gauge = described_class.new(:validations, account:)
 
-        expect(gauge.count).to eq({ 'validations.valid' => 2 })
+        expect(gauge.measurements).to satisfy do
+          it in [Analytics::Gauge::Measurement(metric: 'validations.valid', count: 2)]
+        end
       end
     end
   end

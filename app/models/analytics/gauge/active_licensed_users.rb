@@ -9,7 +9,10 @@ module Analytics
 
       def metrics = %w[alus]
       def count
-        account.active_licensed_user_count
+        count  = account.active_licensed_user_count
+        metric = metrics.sole
+
+        { metric => count }
       end
 
       private

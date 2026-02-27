@@ -10,9 +10,10 @@ module Analytics
 
       def metrics = %w[users]
       def count
-        account.users.for_environment(environment)
-                     .with_roles(:user)
-                     .count
+        count  = account.users.for_environment(environment).with_roles(:user).count
+        metric = metrics.sole
+
+        { metric => count }
       end
 
       private
