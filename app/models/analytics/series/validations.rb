@@ -44,10 +44,11 @@ module Analytics
         validations.version-scope-required
       ].freeze
 
-      def initialize(account:, environment:, license_id: nil, **)
+      def initialize(account:, environment:, license_id: nil, realtime: true, **)
         @account     = account
         @environment = environment
         @license_id  = license_id
+        @realtime    = realtime
       end
 
       def metrics = METRICS
@@ -70,16 +71,30 @@ module Analytics
                       Arel.sql('sum(count)'),
                     )
 
-        rows.each_with_object({}) do |(date, code, count), hash|
+        counts = rows.each_with_object({}) do |(date, code, count), hash|
           hash[["validations.#{code.underscore.dasherize}", date]] = count
         end
+
+        # defer to gauge for a realtime count since sparks are nightly
+        if realtime? && end_date.today?
+          gauge = Analytics::Gauge::Validations.new(account:, environment:, license_id:)
+
+          gauge.counts.each do |metric, count|
+            counts[[metric, end_date]] = count
+          end
+        end
+
+        counts
       end
 
       private
 
       attr_reader :account,
                   :environment,
-                  :license_id
+                  :license_id,
+                  :realtime
+
+      def realtime? = !!realtime
     end
   end
 end
