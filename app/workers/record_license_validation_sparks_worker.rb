@@ -6,7 +6,7 @@ class RecordLicenseValidationSparksWorker < BaseWorker
 
   def perform
     Account.unordered.paid.find_each do |account|
-      jitter = rand(0..6.hours) # prevent a thundering herd effect
+      jitter = rand(0..30.minutes) # prevent a thundering herd effect
 
       RecordLicenseValidationSparkWorker.perform_in(jitter, account.id)
     end
