@@ -21,6 +21,10 @@ class NullPlan < NullObject
 
   def free? = false
   def paid? = true
+
   def ent?  = true
+  def std?  = false
+  def dev?  = false
+
   def price = 0
 end
