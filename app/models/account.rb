@@ -167,14 +167,25 @@ class Account < ApplicationRecord
     new_accounts.or(with_activity)
   }
 
-  scope :paid, -> { joins(:plan, :billing).where(plan: Plan.paid, billings: { state: 'subscribed' }) }
-  scope :free, -> { joins(:plan, :billing).where(plan: Plan.free, billings: { state: 'subscribed' }) }
-  scope :ent,  -> { joins(:plan, :billing).where(plan: Plan.ent, billings: { state: 'subscribed' }) }
-  scope :with_plan, -> (id) { where plan: id }
+  scope :subscribed_to, -> plan {
+    joins(:plan, :billing).where(
+      billings: { state: 'subscribed' },
+      plan:,
+    )
+  }
+
+  # NB(ezekg) special case since plan and billing associations use the null
+  #           object pattern when self-hosting
+  scope :paid, -> { Keygen.self_hosted? ? all  : subscribed_to(Plan.paid) }
+  scope :free, -> { Keygen.self_hosted? ? none : subscribed_to(Plan.free) }
+  scope :ent,  -> { Keygen.self_hosted? ? all  : subscribed_to(Plan.ent) }
+  scope :std,  -> { Keygen.self_hosted? ? none : subscribed_to(Plan.std) }
+  scope :dev,  -> { Keygen.self_hosted? ? none : subscribed_to(Plan.dev) }
 
   delegate :max_users, :max_policies, :max_licenses, :max_products, :max_reqs, :max_admins,
     :request_log_retention_duration, :event_log_retention_duration,
     :max_storage, :max_transfer, :max_upload,
+    :ent?, :std?, :dev?,
     to: :plan
 
   def billing!
@@ -311,7 +322,6 @@ class Account < ApplicationRecord
   def trialing_or_free? = (billing.trialing? && billing.card.nil?) || plan.free?
   def paid?             = (billing.active? || billing.card.present?) && plan.paid?
   def free?             = plan.free?
-  def ent?              = plan.ent?
 
   def protected?
     protected
