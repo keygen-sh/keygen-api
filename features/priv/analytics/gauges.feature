@@ -221,6 +221,15 @@ Feature: Gauge analytics
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
 
+  Scenario: Admin retrieves invalid gauge
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/analytics/gauges/invalid"
+    Then the response status should be "404"
+    And sidekiq should have 0 "request-log" jobs
+    And sidekiq should have 0 "event-log" jobs
+
   Scenario: Product attempts to retrieve gauge for their account
     Given the current account is "test1"
     And the current account has 1 "product"
