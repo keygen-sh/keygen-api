@@ -23,7 +23,7 @@ module Analytics
                                       created_date: Date.current,
                                     )
                                     .where(
-                                      Arel.sql('metadata.code IS NOT NULL'),
+                                      'metadata.code IS NOT NULL',
                                     )
 
         unless license_id.nil?
