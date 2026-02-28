@@ -9,7 +9,7 @@ module Analytics
         @license_id  = license_id
       end
 
-      def metrics = Analytics::Series::Sparks::Validations::METRICS
+      def metrics = LicenseValidation::CODES.map { "validations.#{it.underscore.dasherize}" }
       def count
         event_type_ids = EventType.by_pattern('license.validation.*')
                                   .collect(&:id)
