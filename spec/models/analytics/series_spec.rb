@@ -305,11 +305,13 @@ describe Analytics::Series, :only_clickhouse do
       )
 
       expect(series).to be_valid
-      expect(series.buckets).to contain_exactly(
-        satisfy { it in Analytics::Series::Bucket(metric: 'validations.valid',      date: ^two_days_ago, count: 8) },
-        satisfy { it in Analytics::Series::Bucket(metric: 'validations.expired',    date: ^one_day_ago,  count: 2) },
-        satisfy { it in Analytics::Series::Bucket(metric: 'validations.no-machine', date: ^one_day_ago,  count: 3) },
-      )
+      expect(series.buckets).to satisfy do
+        it in [
+          Analytics::Series::Bucket(metric: 'validations.expired',    date: ^one_day_ago,  count: 2),
+          Analytics::Series::Bucket(metric: 'validations.no-machine', date: ^one_day_ago,  count: 3),
+          Analytics::Series::Bucket(metric: 'validations.valid',      date: ^two_days_ago, count: 8),
+        ]
+      end
     end
 
     it 'supports license filtering' do
@@ -367,11 +369,13 @@ describe Analytics::Series, :only_clickhouse do
       )
 
       expect(series).to be_valid
-      expect(series.buckets).to contain_exactly(
-        satisfy { it in Analytics::Series::Bucket(metric: 'validations.valid',   date: ^one_day_ago, count: 5) },
-        satisfy { it in Analytics::Series::Bucket(metric: 'validations.valid',   date: ^today,       count: 3) },
-        satisfy { it in Analytics::Series::Bucket(metric: 'validations.expired', date: ^today,       count: 2) },
-      )
+      expect(series.buckets).to satisfy do
+        it in [
+          Analytics::Series::Bucket(metric: 'validations.expired', date: ^today,       count: 2),
+          Analytics::Series::Bucket(metric: 'validations.valid',   date: ^one_day_ago, count: 5),
+          Analytics::Series::Bucket(metric: 'validations.valid',   date: ^today,       count: 3),
+        ]
+      end
     end
 
     it 'overwrites stale spark data for today with realtime count' do
