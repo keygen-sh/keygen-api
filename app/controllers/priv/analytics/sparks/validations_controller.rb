@@ -28,6 +28,7 @@ module Priv::Analytics::Sparks
           source: :parameter,
           sources: {
             parameters: {
+              license_id: 'license',
               start_date: 'date[start]',
               end_date: 'date[end]',
             },
