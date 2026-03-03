@@ -51,7 +51,7 @@ class BroadcastEventService < BaseService
               { product: resource.product_id, package: resource.package_id, prev: meta[:current], next: meta[:next] }
             when /^artifact\.downloaded$/,
                  /^release\.downloaded$/
-              { product: resource.product_id, package: resource.package_id, version: resource.version }
+              { product: resource.product_id, package: resource.package_id, release: resource.release_id, version: resource.version }
             when /^license\.validation\./
               { code: meta[:code] }
             when /\.updated$/

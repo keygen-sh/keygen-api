@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_26_205815) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_03_070458) do
   # TABLE: active_licensed_user_sparks
   # SQL: CREATE TABLE active_licensed_user_sparks ( `account_id` UUID, `environment_id` Nullable(UUID), `count` UInt64 DEFAULT 0, `created_date` Date, `created_at` DateTime64(3), INDEX idx_environment environment_id TYPE bloom_filter GRANULARITY 4 ) ENGINE = MergeTree PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date) SETTINGS index_granularity = 8192
   create_table "active_licensed_user_sparks", id: false, options: "MergeTree PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date) SETTINGS index_granularity = 8192", force: :cascade do |t|
@@ -90,6 +90,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_26_205815) do
     t.datetime "created_at", precision: 3, null: false
 
     t.index "environment_id", name: "idx_environment", type: "bloom_filter", granularity: 4
+  end
+
+  # TABLE: release_download_sparks
+  # SQL: CREATE TABLE release_download_sparks ( `account_id` UUID, `environment_id` Nullable(UUID), `product_id` UUID, `package_id` Nullable(UUID), `release_id` UUID, `count` UInt64 DEFAULT 0, `created_date` Date, `created_at` DateTime64(3), INDEX idx_environment environment_id TYPE bloom_filter GRANULARITY 4, INDEX idx_package package_id TYPE bloom_filter GRANULARITY 4 ) ENGINE = MergeTree PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date, product_id, release_id) SETTINGS index_granularity = 8192
+  create_table "release_download_sparks", id: false, options: "MergeTree PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date, product_id, release_id) SETTINGS index_granularity = 8192", force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.uuid "environment_id"
+    t.uuid "product_id", null: false
+    t.uuid "package_id"
+    t.uuid "release_id", null: false
+    t.integer "count", limit: 8, default: 0, null: false
+    t.date "created_date", null: false
+    t.datetime "created_at", precision: 3, null: false
+
+    t.index "environment_id", name: "idx_environment", type: "bloom_filter", granularity: 4
+    t.index "package_id", name: "idx_package", type: "bloom_filter", granularity: 4
   end
 
   # TABLE: request_logs

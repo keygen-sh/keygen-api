@@ -7,6 +7,7 @@ module Analytics
     Bucket = Data.define(:metric, :date, :count)
 
     COUNTERS = {
+      downloads: Sparks::Downloads,
       events: Events,
       requests: Requests,
       sparks: Sparks,
