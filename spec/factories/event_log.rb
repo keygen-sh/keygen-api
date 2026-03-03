@@ -23,6 +23,10 @@ FactoryBot.define do
       event_type { build(:event_type, event: 'license.validation.failed') }
     end
 
+    trait :artifact_downloaded do
+      event_type { build(:event_type, event: 'artifact.downloaded') }
+    end
+
     trait :machine_heartbeat_ping do
       event_type { build(:event_type, event: 'machine.heartbeat.ping') }
     end

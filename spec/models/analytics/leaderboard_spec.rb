@@ -39,6 +39,20 @@ describe Analytics::Leaderboard do
         expect(leaderboard).to be_valid
       end
 
+      it 'returns leaderboard for products' do
+        leaderboard = described_class.new(:products, account:)
+
+        expect(leaderboard).to be_a(Analytics::Leaderboard)
+        expect(leaderboard).to be_valid
+      end
+
+      it 'returns leaderboard for packages' do
+        leaderboard = described_class.new(:packages, account:)
+
+        expect(leaderboard).to be_a(Analytics::Leaderboard)
+        expect(leaderboard).to be_valid
+      end
+
       it 'accepts string names' do
         leaderboard = described_class.new('ips', account:)
 
@@ -427,6 +441,245 @@ describe Analytics::Leaderboard do
         leaderboard = described_class.new(:user_agents, account:, environment:, start_date: 7.days.ago.to_date, end_date: Date.current)
 
         expect(leaderboard.scores).to satisfy { it in [Analytics::Leaderboard::Score(discriminator: 'curl/8.1.2', count: 1)] }
+      end
+    end
+  end
+
+  describe 'products', :only_clickhouse do
+    context 'with no sparks' do
+      it 'returns empty array' do
+        leaderboard = described_class.new(:products, account:, start_date: 7.days.ago.to_date, end_date: Date.current)
+
+        expect(leaderboard.scores).to eq([])
+      end
+    end
+
+    context 'with sparks for different products' do
+      let(:product_a) { create(:product, account:) }
+      let(:product_b) { create(:product, account:) }
+      let(:product_c) { create(:product, account:) }
+
+      before do
+        create(:release_download_spark, account:, product_id: product_a.id, count: 5, created_date: 3.days.ago.to_date, created_at: 3.days.ago)
+        create(:release_download_spark, account:, product_id: product_a.id, count: 3, created_date: 2.days.ago.to_date, created_at: 2.days.ago)
+        create(:release_download_spark, account:, product_id: product_b.id, count: 4, created_date: 3.days.ago.to_date, created_at: 3.days.ago)
+        create(:release_download_spark, account:, product_id: product_c.id, count: 2, created_date: 3.days.ago.to_date, created_at: 3.days.ago)
+      end
+
+      it 'returns scores ordered by count descending' do
+        product_a_id = product_a.id
+        product_b_id = product_b.id
+        product_c_id = product_c.id
+
+        leaderboard = described_class.new(:products, account:, start_date: 7.days.ago.to_date, end_date: Date.current)
+
+        expect(leaderboard.scores).to satisfy do
+          it in [
+            Analytics::Leaderboard::Score(discriminator: ^product_a_id, count: 8),
+            Analytics::Leaderboard::Score(discriminator: ^product_b_id, count: 4),
+            Analytics::Leaderboard::Score(discriminator: ^product_c_id, count: 2),
+          ]
+        end
+      end
+    end
+
+    context 'with date range filtering' do
+      let(:product_a) { create(:product, account:) }
+      let(:product_b) { create(:product, account:) }
+
+      before do
+        create(:release_download_spark, account:, product_id: product_a.id, count: 3, created_date: 3.days.ago.to_date, created_at: 3.days.ago)
+        create(:release_download_spark, account:, product_id: product_b.id, count: 2, created_date: 10.days.ago.to_date, created_at: 10.days.ago)
+      end
+
+      it 'only includes sparks within date range' do
+        product_a_id = product_a.id
+
+        leaderboard = described_class.new(:products, account:, start_date: 7.days.ago.to_date, end_date: Date.current)
+
+        expect(leaderboard.scores).to satisfy { it in [Analytics::Leaderboard::Score(discriminator: ^product_a_id, count: 3)] }
+      end
+    end
+
+    context 'with limit parameter' do
+      before do
+        5.times { create(:release_download_spark, account:, product_id: create(:product, account:).id, count: 1, created_date: 3.days.ago.to_date, created_at: 3.days.ago) }
+      end
+
+      it 'respects custom limit' do
+        leaderboard = described_class.new(:products, account:, start_date: 7.days.ago.to_date, end_date: Date.current, limit: 3)
+
+        expect(leaderboard.scores.length).to eq(3)
+      end
+    end
+
+    context 'with environment scoping' do
+      let(:environment) { create(:environment, account:) }
+      let(:product_a)   { create(:product, account:, environment:) }
+      let(:product_b)   { create(:product, account:, environment: nil) }
+
+      before do
+        create(:release_download_spark, account:, environment:, product_id: product_a.id, count: 3, created_date: 3.days.ago.to_date, created_at: 3.days.ago)
+        create(:release_download_spark, account:, environment: nil, product_id: product_b.id, count: 2, created_date: 3.days.ago.to_date, created_at: 3.days.ago)
+      end
+
+      it 'filters by environment' do
+        product_a_id = product_a.id
+
+        leaderboard = described_class.new(:products, account:, environment:, start_date: 7.days.ago.to_date, end_date: Date.current)
+
+        expect(leaderboard.scores).to satisfy { it in [Analytics::Leaderboard::Score(discriminator: ^product_a_id, count: 3)] }
+      end
+    end
+
+    context 'with sparks for other accounts' do
+      let(:other_account) { create(:account) }
+      let(:product)       { create(:product, account:) }
+      let(:other_product) { create(:product, account: other_account) }
+
+      before do
+        create(:release_download_spark, account:, product_id: product.id, count: 3, created_date: 3.days.ago.to_date, created_at: 3.days.ago)
+        create(:release_download_spark, account: other_account, product_id: other_product.id, count: 5, created_date: 3.days.ago.to_date, created_at: 3.days.ago)
+      end
+
+      it 'does not include other accounts' do
+        product_id = product.id
+
+        leaderboard = described_class.new(:products, account:, start_date: 7.days.ago.to_date, end_date: Date.current)
+
+        expect(leaderboard.scores).to satisfy { it in [Analytics::Leaderboard::Score(discriminator: ^product_id, count: 3)] }
+      end
+    end
+  end
+
+  describe 'packages', :only_clickhouse do
+    context 'with no sparks' do
+      it 'returns empty array' do
+        leaderboard = described_class.new(:packages, account:, start_date: 7.days.ago.to_date, end_date: Date.current)
+
+        expect(leaderboard.scores).to eq([])
+      end
+    end
+
+    context 'with sparks for different packages' do
+      let(:product)   { create(:product, account:) }
+      let(:package_a) { create(:release_package, account:, product:) }
+      let(:package_b) { create(:release_package, account:, product:) }
+      let(:package_c) { create(:release_package, account:, product:) }
+
+      before do
+        create(:release_download_spark, account:, product_id: product.id, package_id: package_a.id, count: 5, created_date: 3.days.ago.to_date, created_at: 3.days.ago)
+        create(:release_download_spark, account:, product_id: product.id, package_id: package_a.id, count: 3, created_date: 2.days.ago.to_date, created_at: 2.days.ago)
+        create(:release_download_spark, account:, product_id: product.id, package_id: package_b.id, count: 4, created_date: 3.days.ago.to_date, created_at: 3.days.ago)
+        create(:release_download_spark, account:, product_id: product.id, package_id: package_c.id, count: 2, created_date: 3.days.ago.to_date, created_at: 3.days.ago)
+      end
+
+      it 'returns scores ordered by count descending' do
+        package_a_id = package_a.id
+        package_b_id = package_b.id
+        package_c_id = package_c.id
+
+        leaderboard = described_class.new(:packages, account:, start_date: 7.days.ago.to_date, end_date: Date.current)
+
+        expect(leaderboard.scores).to satisfy do
+          it in [
+            Analytics::Leaderboard::Score(discriminator: ^package_a_id, count: 8),
+            Analytics::Leaderboard::Score(discriminator: ^package_b_id, count: 4),
+            Analytics::Leaderboard::Score(discriminator: ^package_c_id, count: 2),
+          ]
+        end
+      end
+    end
+
+    context 'with sparks with nil package_id' do
+      let(:product) { create(:product, account:) }
+      let(:package) { create(:release_package, account:, product:) }
+
+      before do
+        create(:release_download_spark, account:, product_id: product.id, package_id: package.id, count: 3, created_date: 3.days.ago.to_date, created_at: 3.days.ago)
+        create(:release_download_spark, account:, product_id: product.id, package_id: nil, count: 5, created_date: 3.days.ago.to_date, created_at: 3.days.ago)
+      end
+
+      it 'excludes nil packages' do
+        package_id = package.id
+
+        leaderboard = described_class.new(:packages, account:, start_date: 7.days.ago.to_date, end_date: Date.current)
+
+        expect(leaderboard.scores).to satisfy { it in [Analytics::Leaderboard::Score(discriminator: ^package_id, count: 3)] }
+      end
+    end
+
+    context 'with date range filtering' do
+      let(:product)   { create(:product, account:) }
+      let(:package_a) { create(:release_package, account:, product:) }
+      let(:package_b) { create(:release_package, account:, product:) }
+
+      before do
+        create(:release_download_spark, account:, product_id: product.id, package_id: package_a.id, count: 3, created_date: 3.days.ago.to_date, created_at: 3.days.ago)
+        create(:release_download_spark, account:, product_id: product.id, package_id: package_b.id, count: 2, created_date: 10.days.ago.to_date, created_at: 10.days.ago)
+      end
+
+      it 'only includes sparks within date range' do
+        package_a_id = package_a.id
+
+        leaderboard = described_class.new(:packages, account:, start_date: 7.days.ago.to_date, end_date: Date.current)
+
+        expect(leaderboard.scores).to satisfy { it in [Analytics::Leaderboard::Score(discriminator: ^package_a_id, count: 3)] }
+      end
+    end
+
+    context 'with limit parameter' do
+      let(:product) { create(:product, account:) }
+
+      before do
+        5.times { create(:release_download_spark, account:, product_id: product.id, package_id: create(:release_package, account:, product:).id, count: 1, created_date: 3.days.ago.to_date, created_at: 3.days.ago) }
+      end
+
+      it 'respects custom limit' do
+        leaderboard = described_class.new(:packages, account:, start_date: 7.days.ago.to_date, end_date: Date.current, limit: 3)
+
+        expect(leaderboard.scores.length).to eq(3)
+      end
+    end
+
+    context 'with environment scoping' do
+      let(:environment) { create(:environment, account:) }
+      let(:product)     { create(:product, account:) }
+      let(:package_a)   { create(:release_package, account:, product:) }
+      let(:package_b)   { create(:release_package, account:, product:) }
+
+      before do
+        create(:release_download_spark, account:, environment:, product_id: product.id, package_id: package_a.id, count: 3, created_date: 3.days.ago.to_date, created_at: 3.days.ago)
+        create(:release_download_spark, account:, environment: nil, product_id: product.id, package_id: package_b.id, count: 2, created_date: 3.days.ago.to_date, created_at: 3.days.ago)
+      end
+
+      it 'filters by environment' do
+        package_a_id = package_a.id
+
+        leaderboard = described_class.new(:packages, account:, environment:, start_date: 7.days.ago.to_date, end_date: Date.current)
+
+        expect(leaderboard.scores).to satisfy { it in [Analytics::Leaderboard::Score(discriminator: ^package_a_id, count: 3)] }
+      end
+    end
+
+    context 'with sparks for other accounts' do
+      let(:other_account) { create(:account) }
+      let(:product)       { create(:product, account:) }
+      let(:other_product) { create(:product, account: other_account) }
+      let(:package)       { create(:release_package, account:, product:) }
+      let(:other_package) { create(:release_package, account: other_account, product: other_product) }
+
+      before do
+        create(:release_download_spark, account:, product_id: product.id, package_id: package.id, count: 3, created_date: 3.days.ago.to_date, created_at: 3.days.ago)
+        create(:release_download_spark, account: other_account, product_id: other_product.id, package_id: other_package.id, count: 5, created_date: 3.days.ago.to_date, created_at: 3.days.ago)
+      end
+
+      it 'does not include other accounts' do
+        package_id = package.id
+
+        leaderboard = described_class.new(:packages, account:, start_date: 7.days.ago.to_date, end_date: Date.current)
+
+        expect(leaderboard.scores).to satisfy { it in [Analytics::Leaderboard::Score(discriminator: ^package_id, count: 3)] }
       end
     end
   end
