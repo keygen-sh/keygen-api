@@ -147,6 +147,83 @@ Feature: Leaderboard analytics
     And sidekiq should have 0 "event-log" jobs
     And time is unfrozen
 
+  Scenario: Admin retrieves products leaderboard
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And time is frozen at "2100-08-30T00:00:00.000Z"
+    And the current account has the following "product" rows:
+      | id                                   | name      |
+      | c9e2cd2e-2543-4d3f-8563-d0bf0b11e233 | Product 1 |
+      | fa48996c-9c98-41c1-a2c3-21de98aefafe | Product 2 |
+      | 0aef7c4a-953e-4824-9e16-9be2361afcf4 | Product 3 |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel |
+      | bf9b523f-dd65-48a2-9512-fb66ba6c3714 | c9e2cd2e-2543-4d3f-8563-d0bf0b11e233 | 1.0.0   | stable  |
+      | a499bb93-9902-4b52-8a04-76944ad7f660 | fa48996c-9c98-41c1-a2c3-21de98aefafe | 2.0.0   | stable  |
+      | 7559899f-2761-4b9c-a43e-2d919efa9b04 | 0aef7c4a-953e-4824-9e16-9be2361afcf4 | 3.0.0   | stable  |
+    And the current account has the following "release_download_spark" rows:
+      | product_id                           | release_id                           | count | created_date | created_at               |
+      | c9e2cd2e-2543-4d3f-8563-d0bf0b11e233 | bf9b523f-dd65-48a2-9512-fb66ba6c3714 | 5     | 2100-08-23   | 2100-08-23T00:00:00.000Z |
+      | c9e2cd2e-2543-4d3f-8563-d0bf0b11e233 | bf9b523f-dd65-48a2-9512-fb66ba6c3714 | 3     | 2100-08-24   | 2100-08-24T00:00:00.000Z |
+      | fa48996c-9c98-41c1-a2c3-21de98aefafe | a499bb93-9902-4b52-8a04-76944ad7f660 | 4     | 2100-08-23   | 2100-08-23T00:00:00.000Z |
+      | 0aef7c4a-953e-4824-9e16-9be2361afcf4 | 7559899f-2761-4b9c-a43e-2d919efa9b04 | 2     | 2100-08-25   | 2100-08-25T00:00:00.000Z |
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/analytics/leaderboards/products?date[start]=2100-08-20&date[end]=2100-08-27"
+    Then the response status should be "200"
+    And the response body should be a JSON document with the following content:
+      """
+      {
+        "data": [
+          { "discriminator": "c9e2cd2e-2543-4d3f-8563-d0bf0b11e233", "count": 8 },
+          { "discriminator": "fa48996c-9c98-41c1-a2c3-21de98aefafe", "count": 4 },
+          { "discriminator": "0aef7c4a-953e-4824-9e16-9be2361afcf4", "count": 2 }
+        ]
+      }
+      """
+    And sidekiq should have 0 "request-log" jobs
+    And sidekiq should have 0 "event-log" jobs
+    And time is unfrozen
+
+  Scenario: Admin retrieves packages leaderboard
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And time is frozen at "2100-08-30T00:00:00.000Z"
+    And the current account has the following "product" rows:
+      | id                                   | name      |
+      | c9e2cd2e-2543-4d3f-8563-d0bf0b11e233 | Product 1 |
+    And the current account has the following "package" rows:
+      | id                                   | product_id                           | name      | key  |
+      | 46e034e3-1c8e-4e3b-8a6b-76c2e2ec3694 | c9e2cd2e-2543-4d3f-8563-d0bf0b11e233 | Package 1 | pkg1 |
+      | f6cac50e-7153-4b0d-897d-3f1a79a13304 | c9e2cd2e-2543-4d3f-8563-d0bf0b11e233 | Package 2 | pkg2 |
+      | 8fec17e8-17f1-4869-aeb1-19e050cf4dea | c9e2cd2e-2543-4d3f-8563-d0bf0b11e233 | Package 3 | pkg3 |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | package_id                           | version | channel |
+      | bf9b523f-dd65-48a2-9512-fb66ba6c3714 | c9e2cd2e-2543-4d3f-8563-d0bf0b11e233 | 46e034e3-1c8e-4e3b-8a6b-76c2e2ec3694 | 1.0.0   | stable  |
+      | a499bb93-9902-4b52-8a04-76944ad7f660 | c9e2cd2e-2543-4d3f-8563-d0bf0b11e233 | f6cac50e-7153-4b0d-897d-3f1a79a13304 | 2.0.0   | stable  |
+      | 7559899f-2761-4b9c-a43e-2d919efa9b04 | c9e2cd2e-2543-4d3f-8563-d0bf0b11e233 | 8fec17e8-17f1-4869-aeb1-19e050cf4dea | 3.0.0   | stable  |
+    And the current account has the following "release_download_spark" rows:
+      | product_id                           | package_id                           | release_id                           | count | created_date | created_at               |
+      | c9e2cd2e-2543-4d3f-8563-d0bf0b11e233 | 46e034e3-1c8e-4e3b-8a6b-76c2e2ec3694 | bf9b523f-dd65-48a2-9512-fb66ba6c3714 | 5     | 2100-08-23   | 2100-08-23T00:00:00.000Z |
+      | c9e2cd2e-2543-4d3f-8563-d0bf0b11e233 | 46e034e3-1c8e-4e3b-8a6b-76c2e2ec3694 | bf9b523f-dd65-48a2-9512-fb66ba6c3714 | 3     | 2100-08-24   | 2100-08-24T00:00:00.000Z |
+      | c9e2cd2e-2543-4d3f-8563-d0bf0b11e233 | f6cac50e-7153-4b0d-897d-3f1a79a13304 | a499bb93-9902-4b52-8a04-76944ad7f660 | 4     | 2100-08-23   | 2100-08-23T00:00:00.000Z |
+      | c9e2cd2e-2543-4d3f-8563-d0bf0b11e233 | 8fec17e8-17f1-4869-aeb1-19e050cf4dea | 7559899f-2761-4b9c-a43e-2d919efa9b04 | 2     | 2100-08-25   | 2100-08-25T00:00:00.000Z |
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/analytics/leaderboards/packages?date[start]=2100-08-20&date[end]=2100-08-27"
+    Then the response status should be "200"
+    And the response body should be a JSON document with the following content:
+      """
+      {
+        "data": [
+          { "discriminator": "46e034e3-1c8e-4e3b-8a6b-76c2e2ec3694", "count": 8 },
+          { "discriminator": "f6cac50e-7153-4b0d-897d-3f1a79a13304", "count": 4 },
+          { "discriminator": "8fec17e8-17f1-4869-aeb1-19e050cf4dea", "count": 2 }
+        ]
+      }
+      """
+    And sidekiq should have 0 "request-log" jobs
+    And sidekiq should have 0 "event-log" jobs
+    And time is unfrozen
+
   Scenario: Admin retrieves leaderboard with limit
     Given I am an admin of account "test1"
     And the current account is "test1"

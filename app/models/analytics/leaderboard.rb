@@ -13,6 +13,8 @@ module Analytics
     COUNTERS  = {
       ips: Ips,
       licenses: Licenses,
+      packages: Packages,
+      products: Products,
       urls: Urls,
       user_agents: UserAgents,
     }
