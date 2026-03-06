@@ -30,9 +30,6 @@ if max_request_size = ENV['RAILS_MAX_REQUEST_BODY_SIZE']
   http_content_length_limit max_request_size.to_i
 end
 
-# FIXME(ezekg) https://www.heroku.com/blog/pumas-routers-keepalives-ohmy/
-enable_keep_alives false
-
 # Ensure our backlog is drained
 drain_on_shutdown
 
@@ -40,24 +37,24 @@ drain_on_shutdown
 # This directive tells Puma to first boot the application and load code
 # before forking the application. This takes advantage of Copy On Write
 # process behavior so workers use less memory. If you use this option
-# you need to make sure to reconnect any threads in the `on_worker_boot`
+# you need to make sure to reconnect any threads in the `before_worker_boot`
 # block.
 preload_app!
 
 # Add some logging to understand what Puma is doing
-on_worker_boot do
+before_worker_boot do
   Keygen.logger.info("[puma] [#{Process.pid}] worker boot event")
 end
 
-on_worker_shutdown do
+before_worker_shutdown do
   Keygen.logger.info("[puma] [#{Process.pid}] worker shutdown event")
 end
 
-on_refork do
+before_refork do
   Keygen.logger.info("[puma] [#{Process.pid}] refork event")
 end
 
-on_restart do
+before_restart do
   Keygen.logger.info("[puma] [#{Process.pid}] restart event")
 end
 
