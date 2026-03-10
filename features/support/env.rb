@@ -6,6 +6,13 @@
 
 require 'cucumber/rails'
 
+# NB(ezekg) silence noisy SystemExit stack traces due to --fail-fast
+#
+#           at this point the interrupt has already been handled
+if ENV.key?('TEST_ENV_NUMBER')
+  trap('INT') { exit! }
+end
+
 # NB(ezekg) we do this manually in our own before/after hooks
 Cucumber::Rails::Database.autorun_database_cleaner = false
 
