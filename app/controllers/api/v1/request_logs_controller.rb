@@ -20,7 +20,7 @@ module Api::V1
       authorize! with: RequestLogPolicy
 
       json = Rails.cache.fetch(cache_key, expires_in: 1.minute, race_condition_ttl: 30.seconds) do
-        request_logs = apply_pagination(authorized_scope(apply_scopes(RequestLog::Clickhouse.for_account(current_account).order(created_at: :desc))).without_blobs.preload(:account, :requestor, :resource))
+        request_logs = apply_pagination(authorized_scope(apply_scopes(RequestLog::Clickhouse.for_account(current_account))).ordered.without_blobs.preload(:account, :requestor, :resource))
         data = Keygen::JSONAPI.render(request_logs)
 
         data.tap do |d|

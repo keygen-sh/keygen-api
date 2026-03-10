@@ -18,7 +18,7 @@ module Api::V1
       authorize! with: EventLogPolicy
 
       json = Rails.cache.fetch(cache_key, expires_in: 1.minute, race_condition_ttl: 30.seconds) do
-        event_logs = apply_pagination(authorized_scope(apply_scopes(EventLog::Clickhouse.for_account(current_account).order(created_at: :desc))).preload(:event_type, :account, :whodunnit, :resource))
+        event_logs = apply_pagination(authorized_scope(apply_scopes(EventLog::Clickhouse.for_account(current_account))).ordered.preload(:event_type, :account, :whodunnit, :resource))
         data = Keygen::JSONAPI.render(event_logs)
 
         data.tap do |d|

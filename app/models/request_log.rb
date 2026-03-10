@@ -25,11 +25,16 @@ class RequestLog < ApplicationRecord
       has_environment
       has_account
 
-      # FIXME(ezekg) duplicated scopes for clickhouse
+      # NB(ezekg) this is based on the clickhouse table's ordering key
+      scope :ordered, -> {
+        order(created_date: :desc).order('UUIDToNum(id) DESC')
+      }
+
       scope :without_blobs, -> {
         select(column_names - %w[request_headers request_body response_headers response_body response_signature])
       }
 
+      # FIXME(ezekg) duplicated search scopes for clickhouse
       scope :search_id, -> (term) {
         id = term.to_s
         return none if
