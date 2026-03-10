@@ -1,5 +1,5 @@
+@ee @clickhouse
 @api/v1
-@ee
 Feature: List event logs
   Background:
     Given the following "plan" rows exist:
