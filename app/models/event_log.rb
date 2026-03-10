@@ -14,10 +14,106 @@ class EventLog < ApplicationRecord
   dual_writes to: :clickhouse, strategy: :clickhouse,
     ignored_columns: { primary: %w[ttl] }, # NB(ezekg) ttl is only applicable to clickhouse
     if: -> { Keygen.database.clickhouse_enabled? } do
+      # FIXME(ezekg) use base model name for error messages and serializer lookups
+      def self.model_name = EventLog.model_name
+
       include Accountable, Environmental
+      include DateRangeable, Limitable, Orderable, Pageable
+
+      belongs_to :event_type
+      belongs_to :resource, polymorphic: true, optional: true
+      belongs_to :whodunnit, polymorphic: true, optional: true
+      belongs_to :request_log, optional: true
 
       has_environment
       has_account
+
+      # FIXME(ezekg) duplicated scopes for clickhouse
+      scope :for_event_type, -> event {
+        event_type_ids = EventType.where(event:)
+                                  .ids
+
+        where(event_type_id: event_type_ids)
+      }
+
+      scope :search_request_id, -> (term) {
+        request_log_id = term.to_s
+        return none if
+          request_log_id.empty?
+
+        return where(request_log_id:) if
+          UUID_RE.match?(request_log_id)
+
+        where('ilike(toString(request_log_id), ?)', "%#{sanitize_sql_like(request_log_id)}%")
+      }
+
+      scope :search_whodunnit, -> *terms {
+        case terms
+        in [Hash => params]
+          search_whodunnit(params.symbolize_keys.values_at(:type, :id))
+        in [[String | Symbol => type, String => id]]
+          search_whodunnit_type(type).search_whodunnit_id(id)
+        in [String | Symbol => type, String => id]
+          search_whodunnit_type(type).search_whodunnit_id(id)
+        in [String => id]
+          search_whodunnit_id(id)
+        else
+          none
+        end
+      }
+
+      scope :search_whodunnit_type, -> (term) {
+        whodunnit_type = term.to_s.underscore.classify
+        return none if
+          whodunnit_type.empty?
+
+        where(whodunnit_type:)
+      }
+
+      scope :search_whodunnit_id, -> (term) {
+        whodunnit_id = term.to_s
+        return none if
+          whodunnit_id.empty?
+
+        return where(whodunnit_id:) if
+          UUID_RE.match?(whodunnit_id)
+
+        where('ilike(toString(whodunnit_id), ?)', "%#{sanitize_sql_like(whodunnit_id)}%")
+      }
+
+      scope :search_resource, -> *terms {
+        case terms
+        in [Hash => params]
+          search_resource(params.symbolize_keys.values_at(:type, :id))
+        in [[String | Symbol => type, String => id]]
+          search_resource_type(type).search_resource_id(id)
+        in [String | Symbol => type, String => id]
+          search_resource_type(type).search_resource_id(id)
+        in [String => id]
+          search_resource_id(id)
+        else
+          none
+        end
+      }
+
+      scope :search_resource_type, -> (term) {
+        resource_type = term.to_s.underscore.classify
+        return none if
+          resource_type.empty?
+
+        where(resource_type:)
+      }
+
+      scope :search_resource_id, -> (term) {
+        resource_id = term.to_s
+        return none if
+          resource_id.empty?
+
+        return where(resource_id:) if
+          UUID_RE.match?(resource_id)
+
+        where('ilike(toString(resource_id), ?)', "%#{sanitize_sql_like(resource_id)}%")
+      }
     end
 
   belongs_to :event_type

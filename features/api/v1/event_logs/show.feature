@@ -49,7 +49,7 @@ Feature: Show event logs
       """
       {
         "title": "Not found",
-        "detail": "The requested event log 'invalid' was not found",
+        "detail": "The requested event log was not found",
         "code": "NOT_FOUND"
       }
       """
