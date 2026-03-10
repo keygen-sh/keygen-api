@@ -18,7 +18,11 @@ JSONAPI::Rails.configure do |config|
   logger.level = Logger::WARN
 
   # Dynamic serializer class resolver
-  config.jsonapi_class  = -> klass { "#{klass}Serializer".safe_constantize }
+  config.jsonapi_class  = -> class_name {
+    class_name = class_name.to_s.constantize.model_name.name # respect model naming
+
+    "#{class_name}Serializer".safe_constantize
+  }
   config.jsonapi_object = nil
   config.logger         = logger
 end

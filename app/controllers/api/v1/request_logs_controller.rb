@@ -14,13 +14,13 @@ module Api::V1
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
-    before_action :set_request_log, only: [:show]
+    before_action :set_request_log, only: %i[show]
 
     def index
       authorize! with: RequestLogPolicy
 
       json = Rails.cache.fetch(cache_key, expires_in: 1.minute, race_condition_ttl: 30.seconds) do
-        request_logs = apply_pagination(authorized_scope(apply_scopes(current_account.request_logs)).without_blobs.preload(:account, :requestor, :resource))
+        request_logs = apply_pagination(authorized_scope(apply_scopes(RequestLog::Clickhouse.for_account(current_account).order(created_at: :desc))).without_blobs.preload(:account, :requestor, :resource))
         data = Keygen::JSONAPI.render(request_logs)
 
         data.tap do |d|
@@ -42,9 +42,9 @@ module Api::V1
     attr_reader :request_log
 
     def set_request_log
-      scoped_request_logs = authorized_scope(current_account.request_logs)
+      scoped_request_logs = authorized_scope(RequestLog::Clickhouse.for_account(current_account))
 
-      @request_log = scoped_request_logs.find(params[:id])
+      @request_log = scoped_request_logs.find_by!(id: params[:id])
 
       Current.resource = request_log
     end

@@ -42,7 +42,7 @@ module Pageable
           self.class
         end
 
-      if WITHOUT_COUNT_MODELS.include?(model.name)
+      if WITHOUT_COUNT_MODELS.include?(model.model_name.name)
         paginate(number).without_count.per(size)
       else
         paginate(number).per(size)

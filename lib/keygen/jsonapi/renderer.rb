@@ -9,7 +9,11 @@ module Keygen::JSONAPI
       @api_version     = api_version
       @account         = account
       @default_options = {
-        class: -> klass { "#{klass}Serializer".safe_constantize },
+        class: -> class_name {
+          class_name = class_name.to_s.constantize.model_name.name # respect model naming
+
+          "#{class_name}Serializer".safe_constantize
+        },
         expose: {
           url_helpers: ::Rails.application.routes.url_helpers,
           context:,
