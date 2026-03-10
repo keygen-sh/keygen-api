@@ -28,14 +28,19 @@ class EventLog < ApplicationRecord
       has_environment
       has_account
 
-      # FIXME(ezekg) duplicated scopes for clickhouse
+      # NB(ezekg) this is based on the clickhouse table's ordering key
+      scope :ordered, -> {
+        order(created_date: :desc).order('UUIDToNum(id) DESC')
+      }
+
       scope :for_event_type, -> event {
         event_type_ids = EventType.where(event:)
-                                  .ids
+        .ids
 
         where(event_type_id: event_type_ids)
       }
 
+      # FIXME(ezekg) duplicated search scopes for clickhouse
       scope :search_request_id, -> (term) {
         request_log_id = term.to_s
         return none if
