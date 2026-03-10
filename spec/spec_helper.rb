@@ -21,7 +21,12 @@ WebMock.disable_net_connect!(allow: 'localhost:8123')
 #
 # The `.rspec` file also contains a few flags that are not defaults but that
 # users commonly want.
-#
+
+# NB(ezekg) silence noisy SystemExit stack traces due to --fail-fast
+if ENV.key?('TEST_ENV_NUMBER')
+  trap('INT') { exit! }
+end
+
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
   config.color = ENV.key?('CI')
