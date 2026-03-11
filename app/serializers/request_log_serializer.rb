@@ -80,45 +80,24 @@ class RequestLogSerializer < BaseSerializer
 
   relationship :requestor do
     linkage always: true do
-      next if @object.requestor_id.nil? || @object.requestor_type.nil?
-
-      t = @object.requestor_type.underscore.pluralize.parameterize
-
-      { type: t, id: @object.requestor_id }
+      Keygen::JSONAPI.linkage_for(@object.requestor_type, @object.requestor_id)
     end
 
-    if @object.requestor_id.present? && @object.requestor_type.present?
+    if @object.requestor_type? &&@object.requestor_id?
       link :related do
-        @url_helpers.polymorphic_path [:v1, @object.account, @object.requestor]
+        Keygen.routing.path_for(@object.requestor_type, id: @object.requestor_id, account: @object.account)
       end
     end
   end
 
   relationship :resource do
     linkage always: true do
-      next if @object.resource_id.nil? || @object.resource_type.nil?
-
-      # FIXME(ezekg) This is a probably not a great idea but we need to support
-      #              models where the type does not match the model name, e.g.
-      #              artifacts and platforms.
-      t = "#{@object.resource_type}Serializer".safe_constantize
-                                              .type_val
-
-      { type: t, id: @object.resource_id }
+      Keygen::JSONAPI.linkage_for(@object.resource_type, @object.resource_id)
     end
 
-    if @object.resource_id.present? && @object.resource_type.present?
+    if @object.resource_type? && @object.resource_id?
       link :related do
-        next unless @object.resource.present? # handle when resource no longer exists
-
-        case @object.resource
-        in Billing | Plan # special case singular routes
-          @url_helpers.polymorphic_path [:v1, @object.account, @object.resource_type.underscore.to_sym]
-        in Accountable
-          @url_helpers.polymorphic_path [:v1, @object.account, @object.resource]
-        else
-          @url_helpers.polymorphic_path [:v1, @object.resource]
-        end
+        Keygen.routing.path_for(@object.resource_type, id: @object.resource_id, account: @object.account)
       end
     end
   end
