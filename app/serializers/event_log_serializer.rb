@@ -61,46 +61,24 @@ class EventLogSerializer < BaseSerializer
 
   relationship :whodunnit do
     linkage always: true do
-      next if
-        @object.whodunnit_id.nil? || @object.whodunnit_type.nil?
-
-      t = @object.whodunnit_type.underscore.pluralize.parameterize
-
-      { type: t, id: @object.whodunnit_id }
+      Keygen::JSONAPI.linkage_for(@object.whodunnit_type, @object.whodunnit_id)
     end
 
-    if @object.whodunnit_id.present? && @object.whodunnit_type.present?
+    if @object.whodunnit_type? && @object.whodunnit_id?
       link :related do
-        @url_helpers.polymorphic_path [:v1, @object.account, @object.whodunnit]
+        Keygen.routing.path_for(@object.whodunnit_type, id: @object.whodunnit_id, account: @object.account)
       end
     end
   end
 
   relationship :resource do
     linkage always: true do
-      next if @object.resource_id.nil? || @object.resource_type.nil?
-
-      # FIXME(ezekg) This is a probably not a great idea but we need to support
-      #              models where the type does not match the model name, e.g.
-      #              artifacts and platforms.
-      t = "#{@object.resource_type}Serializer".safe_constantize
-                                              .type_val
-
-      { type: t, id: @object.resource_id }
+      Keygen::JSONAPI.linkage_for(@object.resource_type, @object.resource_id)
     end
 
-    if @object.resource_id.present? && @object.resource_type.present?
+    if @object.resource_type? && @object.resource_id?
       link :related do
-        next unless @object.resource.present? # handle when resource no longer exists
-
-        case @object.resource
-        in Billing | Plan # special case singular routes
-          @url_helpers.polymorphic_path [:v1, @object.account, @object.resource_type.underscore.to_sym]
-        in Accountable
-          @url_helpers.polymorphic_path [:v1, @object.account, @object.resource]
-        else
-          @url_helpers.polymorphic_path [:v1, @object.resource]
-        end
+        Keygen.routing.path_for(@object.resource_type, id: @object.resource_id, account: @object.account)
       end
     end
   end
