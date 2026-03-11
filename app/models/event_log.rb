@@ -33,11 +33,15 @@ class EventLog < ApplicationRecord
         order(created_date: :desc).order('UUIDToNum(id) DESC')
       }
 
-      scope :for_event_type, -> event {
-        event_type_ids = EventType.where(event:)
-        .ids
+      scope :for_event_types, -> events {
+        event_type_ids = EventType.where(event: events)
+                                  .ids
 
         where(event_type_id: event_type_ids)
+      }
+
+      scope :for_event_type, -> event {
+        for_event_types(event)
       }
 
       # FIXME(ezekg) duplicated search scopes for clickhouse

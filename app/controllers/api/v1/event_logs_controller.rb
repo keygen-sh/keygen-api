@@ -7,6 +7,7 @@ module Api::V1
     has_scope(:resource, type: :any) { |c, s, v| s.search_resource(v) }
     has_scope(:request) { |c, s, v| s.search_request_id(v) }
     has_scope(:event) { |c, s, v| s.for_event_type(v) }
+    has_scope(:events, type: :array) { |c, s, v| s.for_event_types(v) }
 
     before_action :require_ee!
     before_action :scope_to_current_account!
