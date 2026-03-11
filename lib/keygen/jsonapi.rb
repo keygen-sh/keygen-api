@@ -19,8 +19,11 @@ module Keygen
       end
 
       def type_for(class_name)
-        class_name = class_name.to_s.constantize.model_name.name # respect model naming
-        serializer = "#{class_name}Serializer".safe_constantize
+        klass = class_name.to_s.safe_constantize
+        return if
+          klass.nil?
+
+        serializer = "#{klass.model_name.name}Serializer".safe_constantize
         return if
           serializer.nil?
 
