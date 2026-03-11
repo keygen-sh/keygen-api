@@ -52,12 +52,12 @@ module Api::V1
         SEARCH_MODELS.include?(model.name)
 
       raise UnsupportedSearchTypeError unless
-        current_account.associated_to?(type.underscore.pluralize)
+        model < Accountable
 
       authorize! model,
         with: SearchPolicy
 
-      scope = model.where(account: current_account)
+      base = model.for_account(current_account)
 
       # Special cases for certain models
       case
@@ -66,15 +66,17 @@ module Api::V1
         end_date   = Time.current
 
         # Limit request log searches to last 30 days to improve perf
-        scope = scope.where('request_logs.created_at >= :start_date AND request_logs.created_at <= :end_date', start_date: start_date, end_date: end_date)
+        base = base.where('request_logs.created_at >= :start_date AND request_logs.created_at <= :end_date', start_date:, end_date:)
       end
 
       Keygen.logger.info "[searches.search] account_id=#{current_account.id} search_type=#{type} search_query=#{query} search_op=#{op}"
 
+      search_scopes = []
+
       query.each do |key, value|
         attribute = key.to_s.underscore.parameterize(separator: '_')
 
-        unless scope.respond_to?("search_#{attribute}")
+        unless base.respond_to?("search_#{attribute}")
           return render_bad_request(
             detail: "search query '#{attribute.camelize(:lower)}' is not supported for resource type '#{type.camelize(:lower)}'",
             source: { pointer: "/meta/query/#{attribute.camelize(:lower)}" }
@@ -99,14 +101,7 @@ module Api::V1
             )
           end
 
-          case op
-          when :AND
-            scope = scope.search_metadata(value)
-          when :OR
-            scope = scope.or(scope.search_metadata(value))
-          else
-            scope = scope.none
-          end
+          search_scopes << base.search_metadata(value)
         else
           if value.is_a?(String) && value.size < SEARCH_MIN_QUERY_SIZE
             return render_bad_request(
@@ -115,14 +110,16 @@ module Api::V1
             )
           end
 
-          case op
-          when :AND
-            scope = scope.send("search_#{attribute}", value)
-          when :OR
-            scope = scope.or(scope.send("search_#{attribute}", value))
-          else
-            scope = scope.none
-          end
+          search_scopes << base.send("search_#{attribute}", value)
+        end
+      end
+
+      # reduce scopes into a single scope according to operator
+      scope = search_scopes.reduce do |res, scp|
+        case op
+        when :AND then res.merge(scp)
+        when :OR  then res.or(scp)
+        else           res.none
         end
       end
 

@@ -20,14 +20,18 @@ Feature: Search
   Scenario: Admin performs a search using the AND operator
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 10 "users"
-    And "users" 0...5 have the following attributes:
+    And the current account has 9 "users"
+    And "users" 0..2 have the following attributes:
       """
       { "firstName": "John", "lastName": "Doe" }
       """
-    And "users" 5...10 have the following attributes:
+    And "users" 3..5 have the following attributes:
       """
       { "firstName": "Jane", "lastName": "Doe" }
+      """
+    And "users" 6..8 have the following attributes:
+      """
+      { "firstName": "Jack", "lastName": "Sparrow" }
       """
     And I use an authentication token
     When I send a POST request to "/accounts/test1/search" with the following:
@@ -44,7 +48,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the response body should be an array with 5 "users"
+    And the response body should be an array with 3 "users"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -52,14 +56,18 @@ Feature: Search
   Scenario: Admin performs a search using the OR operator
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 10 "users"
-    And "users" 0...5 have the following attributes:
+    And the current account has 9 "users"
+    And "users" 0..2 have the following attributes:
       """
       { "firstName": "John", "lastName": "Doe" }
       """
-    And "users" 5...10 have the following attributes:
+    And "users" 3..5 have the following attributes:
       """
       { "firstName": "Jane", "lastName": "Doe" }
+      """
+    And "users" 6..8 have the following attributes:
+      """
+      { "firstName": "Jack", "lastName": "Sparrow" }
       """
     And I use an authentication token
     When I send a POST request to "/accounts/test1/search" with the following:
@@ -76,7 +84,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the response body should be an array with 10 "users"
+    And the response body should be an array with 6 "users"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
