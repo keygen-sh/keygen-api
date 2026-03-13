@@ -562,6 +562,8 @@ class ApplicationController < ActionController::API
     in PG::Error if e.message in /incomplete multibyte character/ | /invalid multibyte character/
       render_bad_request detail: 'The request could not be completed because it contains an invalid byte sequence (check encoding)', code: 'ENCODING_INVALID'
     in PG::UniqueViolation
+      Keygen.logger.warn { "[conflict] request_id=#{request.request_id} class=#{e.class} message=#{e.message}" }
+
       render_conflict
     else
       Keygen.logger.exception(e)
@@ -581,7 +583,9 @@ class ApplicationController < ActionController::API
   rescue ActiveRecord::RecordNotSaved,
          ActiveRecord::RecordInvalid => e
     render_unprocessable_resource e.record
-  rescue ActiveRecord::RecordNotUnique
+  rescue ActiveRecord::RecordNotUnique => e
+    Keygen.logger.warn { "[conflict] request_id=#{request.request_id} class=#{e.class} message=#{e.message}" }
+
     render_conflict # Race condition on unique index
   rescue ActiveRecord::NestedAttributes::TooManyRecords
     render_unprocessable_entity detail: 'too many records'
