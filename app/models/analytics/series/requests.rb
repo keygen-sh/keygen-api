@@ -12,19 +12,17 @@ module Analytics
       end
 
       def metrics = METRICS
-
       def count(start_date:, end_date:)
-        rows = RequestLog::Clickhouse.for_account(account)
-                                     .for_environment(environment)
-                                     .where(created_date: start_date..end_date)
-                                     .group(:created_date)
-                                     .pluck(
-                                       :created_date,
-                                       Arel.sql(%{countIf(status IN ('200', '201', '202', '204')) AS "2xx"}),
-                                       Arel.sql(%{countIf(status IN ('301', '302', '303', '304', '307', '308')) AS "3xx"}),
-                                       Arel.sql(%{countIf(status IN ('400', '401', '402', '403', '404', '405', '406', '409', '410', '413', '422', '429')) AS "4xx"}),
-                                       Arel.sql(%{countIf(status IN ('500', '501', '502', '503', '504')) AS "5xx"}),
-                                     )
+        rows = account.request_logs.for_environment(environment)
+                                   .where(created_date: start_date..end_date)
+                                   .group(:created_date)
+                                   .pluck(
+                                     :created_date,
+                                     Arel.sql(%{countIf(status IN ('200', '201', '202', '204')) AS "2xx"}),
+                                     Arel.sql(%{countIf(status IN ('301', '302', '303', '304', '307', '308')) AS "3xx"}),
+                                     Arel.sql(%{countIf(status IN ('400', '401', '402', '403', '404', '405', '406', '409', '410', '413', '422', '429')) AS "4xx"}),
+                                     Arel.sql(%{countIf(status IN ('500', '501', '502', '503', '504')) AS "5xx"}),
+                                   )
 
         # series expects [metric, date] => count
         rows.each_with_object({}) do |(date, *counts), hash|

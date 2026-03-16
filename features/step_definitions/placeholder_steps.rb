@@ -140,7 +140,7 @@ def parse_placeholders(str, account:, bearer:, crypt:)
                      [:[], index.to_i]
                    end
 
-            case resource.singularize
+            case resource.singularize.underscore
             when 'constraint'
               account.release_entitlement_constraints.all.send(*args)
             when 'component'
@@ -153,6 +153,10 @@ def parse_placeholders(str, account:, bearer:, crypt:)
               account.release_packages.all.send(*args)
             when 'engine'
               account.release_engines.all.send(*args)
+            when 'request_log'
+              account.request_logs.ordered(:asc).send(*args)
+            when 'event_log'
+              account.event_logs.ordered(:asc).send(*args)
             else
               account.send(resource.underscore).all.send(*args)
             end
@@ -228,8 +232,10 @@ def parse_path_placeholders(str, account:, bearer:, crypt:)
             account.release_packages.send(:[], index.to_i).id
           when "engines"
             account.release_engines.send(:[], index.to_i).id
-          when "request-logs"
-            account.request_logs.send(:[], index.to_i).id
+          when "request_logs"
+            account.request_logs.ordered(:asc).send(:[], index.to_i).id
+          when "event_logs"
+            account.event_logs.ordered(:asc).send(:[], index.to_i).id
           when "components"
             account.machine_components.send(:[], index.to_i).id
           when "processes"

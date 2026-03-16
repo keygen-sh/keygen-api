@@ -12,7 +12,7 @@ Feature: Show request logs
     Given the account "test1" is canceled
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "request-logs"
+    And the current account has 1 "request-log"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/request-logs/$0"
     Then the response status should be "403"

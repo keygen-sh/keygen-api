@@ -56,7 +56,7 @@ class BroadcastEventService < BaseService
               nil
             end
 
-          EventLogWorker2.perform_async(
+          EventLogWorker.perform_async(
             'id' => SecureRandom.uuid_v7,
             'event_type_id' => event_type_id,
             'account_id' => account_id,
@@ -70,7 +70,6 @@ class BroadcastEventService < BaseService
             'whodunnit_id' => bearer_id,
             'request_log_id' => request_id,
             'metadata' => metadata.as_json,
-            # NB(ezekg) this is only applicable to clickhouse (gets ignored by primary)
             'ttl' => account.event_log_retention_duration&.to_i,
           )
         end

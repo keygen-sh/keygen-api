@@ -35,14 +35,6 @@ prune_release_upgrade_links:
   cron: "30 2 * * *" # Every day at 2:30am (8:30pm CST)
   class: "PruneReleaseUpgradeLinksWorker"
 
-prune_request_logs:
-  cron: "0 3 * * *" # Every day at 3am (9pm CST)
-  class: "PruneRequestLogsWorker"
-
-prune_event_logs:
-  cron: "0 4 * * *" # Every day at 5am (10pm CST)
-  class: "PruneEventLogsWorker"
-
 prune_webhook_events:
   cron: "0 6 * * *" # Every day at 6am (12am CST)
   class: "PruneWebhookEventsWorker"

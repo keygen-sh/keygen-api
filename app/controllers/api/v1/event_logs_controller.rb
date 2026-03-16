@@ -19,7 +19,7 @@ module Api::V1
       authorize! with: EventLogPolicy
 
       json = Rails.cache.fetch(cache_key, expires_in: 1.minute, race_condition_ttl: 30.seconds) do
-        event_logs = apply_pagination(authorized_scope(apply_scopes(EventLog::Clickhouse.for_account(current_account))).ordered.preload(:event_type, :account))
+        event_logs = apply_pagination(authorized_scope(apply_scopes(current_account.event_logs.ordered)).preload(:event_type, :account))
         data = Keygen::JSONAPI.render(event_logs)
 
         data.tap do |d|
@@ -42,7 +42,7 @@ module Api::V1
     attr_reader :event_log
 
     def set_event_log
-      scoped_event_logs = authorized_scope(EventLog::Clickhouse.for_account(current_account))
+      scoped_event_logs = authorized_scope(current_account.event_logs)
 
       @event_log = scoped_event_logs.find_by!(id: params[:id])
 

@@ -20,7 +20,7 @@ class Account < ApplicationRecord
   has_many :environments, dependent: :destroy_async
   has_many :webhook_endpoints, dependent: :destroy_async
   has_many :webhook_events, dependent: :destroy_async
-  has_many :request_logs, dependent: :destroy_async
+  has_many :request_logs
   has_many :tokens, dependent: :destroy_async
   has_many :sessions, dependent: :destroy_async
   has_many :users, index_errors: true, dependent: :destroy_async
@@ -50,7 +50,7 @@ class Account < ApplicationRecord
   has_many :release_upgrade_links, dependent: :destroy_async
   has_many :release_upload_links, dependent: :destroy_async
   has_many :release_artifacts, dependent: :destroy_async
-  has_many :event_logs, dependent: :destroy_async
+  has_many :event_logs
   has_many :groups, dependent: :destroy_async
   has_many :group_owners, dependent: :destroy_async
 

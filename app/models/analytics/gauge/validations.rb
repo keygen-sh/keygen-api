@@ -16,15 +16,14 @@ module Analytics
         return {} if
           event_type_ids.empty?
 
-        scope = EventLog::Clickhouse.for_account(account)
-                                    .for_environment(environment)
-                                    .where(
-                                      event_type_id: event_type_ids,
-                                      created_date: Date.current,
-                                    )
-                                    .where(
-                                      'metadata.code IS NOT NULL',
-                                    )
+        scope = account.event_logs.for_environment(environment)
+                                  .where(
+                                    event_type_id: event_type_ids,
+                                    created_date: Date.current,
+                                  )
+                                  .where(
+                                    'metadata.code IS NOT NULL',
+                                  )
 
         unless license_id.nil?
           scope = scope.where(

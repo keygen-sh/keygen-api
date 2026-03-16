@@ -9,6 +9,13 @@ FactoryBot.define do
     requestor   { build(:admin, account:, environment:) }
     resource    { build(:artifact, account:, environment:) }
 
+    # NB(ezekg) clickhouse will default to a zeroed UUID if omitted
+    id { SecureRandom.uuid_v7 }
+
+    created_at   { Time.current }
+    created_date { created_at.to_date || Date.current }
+    updated_at   { created_at }
+
     # HACK(ezekg) sometimes we create logs in the past but that causes clickhouse
     #             to immediately throw out the records during merge because our
     #             table by default only keeps records for 30 days
