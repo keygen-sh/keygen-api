@@ -78,7 +78,7 @@ describe Analytics::Gauge do
     end
   end
 
-  describe 'machines' do
+  describe ':machines' do
     context 'with no machines' do
       it 'returns zero' do
         gauge = described_class.new(:machines, account:)
@@ -127,7 +127,7 @@ describe Analytics::Gauge do
     end
   end
 
-  describe 'licenses' do
+  describe ':licenses' do
     context 'with no licenses' do
       it 'returns zero' do
         gauge = described_class.new(:licenses, account:)
@@ -176,7 +176,7 @@ describe Analytics::Gauge do
     end
   end
 
-  describe 'users' do
+  describe ':users' do
     context 'with no users' do
       it 'returns zero' do
         gauge = described_class.new(:users, account:)
@@ -225,7 +225,7 @@ describe Analytics::Gauge do
     end
   end
 
-  describe 'active_licensed_users' do
+  describe ':alus' do
     context 'with no licenses' do
       it 'returns zero' do
         gauge = described_class.new(:alus, account:)
@@ -263,7 +263,89 @@ describe Analytics::Gauge do
     end
   end
 
-  describe 'validations', :only_clickhouse do
+  describe ':requests', :only_clickhouse do
+    before { Sidekiq::Testing.inline! }
+    after  { Sidekiq::Testing.fake! }
+
+    context 'with no requests' do
+      it 'returns zeroed measurements' do
+        gauge = described_class.new(:requests, account:)
+
+        expect(gauge.measurements).to satisfy do
+          it in [
+            Analytics::Gauge::Measurement(metric: 'requests.2xx', count: 0),
+            Analytics::Gauge::Measurement(metric: 'requests.3xx', count: 0),
+            Analytics::Gauge::Measurement(metric: 'requests.4xx', count: 0),
+            Analytics::Gauge::Measurement(metric: 'requests.5xx', count: 0),
+          ]
+        end
+      end
+    end
+
+    context 'with requests' do
+      before do
+        create_list(:request_log, 3, account:, status: 200)
+        create_list(:request_log, 2, account:, status: 404)
+        create_list(:request_log, 1, account:, status: 500)
+      end
+
+      it 'returns bucketed measurements' do
+        gauge = described_class.new(:requests, account:)
+
+        expect(gauge.measurements).to satisfy do
+          it in [
+            Analytics::Gauge::Measurement(metric: 'requests.2xx', count: 3),
+            Analytics::Gauge::Measurement(metric: 'requests.3xx', count: 0),
+            Analytics::Gauge::Measurement(metric: 'requests.4xx', count: 2),
+            Analytics::Gauge::Measurement(metric: 'requests.5xx', count: 1),
+          ]
+        end
+      end
+    end
+
+    context 'with multiple statuses in same bucket' do
+      before do
+        create_list(:request_log, 2, account:, status: 200)
+        create_list(:request_log, 1, account:, status: 201)
+        create_list(:request_log, 1, account:, status: 204)
+      end
+
+      it 'aggregates into single bucket' do
+        gauge = described_class.new(:requests, account:)
+
+        expect(gauge.measurements).to satisfy do
+          it in [Analytics::Gauge::Measurement(metric: 'requests.2xx', count: 4), *]
+        end
+      end
+    end
+
+    context 'with environment scoping' do
+      let(:environment) { create(:environment, account:) }
+
+      before do
+        create_list(:request_log, 3, account:, environment:,     status: 200)
+        create_list(:request_log, 2, account:, environment: nil, status: 200)
+      end
+
+      it 'returns only environment-scoped measurements' do
+        gauge = described_class.new(:requests, account:, environment:)
+
+        expect(gauge.measurements).to satisfy do
+          it in [Analytics::Gauge::Measurement(metric: 'requests.2xx', count: 3), *]
+        end
+      end
+
+      it 'returns only global measurements when no environment' do
+        gauge = described_class.new(:requests, account:)
+
+        expect(gauge.measurements).to satisfy do
+          it in [Analytics::Gauge::Measurement(metric: 'requests.2xx', count: 2), *]
+        end
+      end
+    end
+  end
+
+  describe ':validations', :only_clickhouse do
     before { Sidekiq::Testing.inline! }
     after  { Sidekiq::Testing.fake! }
 

@@ -13,6 +13,7 @@ module Analytics
       alus: ActiveLicensedUsers,
       licenses: Licenses,
       machines: Machines,
+      requests: Requests,
       users: Users,
       validations: Validations,
     }

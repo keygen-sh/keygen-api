@@ -8,9 +8,10 @@ module Analytics
 
     COUNTERS = {
       events: Events,
-      requests: Requests,
+      usage: Requests,
       sparks: Sparks,
       validations: Sparks::Validations,
+      requests: Sparks::Requests,
     }
 
     include ActiveModel::Model

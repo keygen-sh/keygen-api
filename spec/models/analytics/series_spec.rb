@@ -81,54 +81,203 @@ describe Analytics::Series, :only_clickhouse do
     end
   end
 
-  describe ':requests' do
+  describe ':usage' do
     it 'returns request counts grouped by status bucket' do
-      create_list(:request_log, 3, account:, status: '200', created_at: 2.days.ago)
-      create_list(:request_log, 2, account:, status: '404', created_at: 2.days.ago)
-      create_list(:request_log, 1, account:, status: '301', created_at: 1.day.ago)
-      create_list(:request_log, 2, account:, status: '500', created_at: 1.day.ago)
+      two_days_ago = 2.days.ago.to_date
+      one_day_ago  = 1.day.ago.to_date
 
-      three_days_ago = 3.days.ago.to_date
-      two_days_ago   = 2.days.ago.to_date
-      one_day_ago    = 1.day.ago.to_date
-      today          = Date.current
+      create_list(:request_log, 3, account:, status: 200, created_date: two_days_ago)
+      create_list(:request_log, 2, account:, status: 404, created_date: two_days_ago)
+      create_list(:request_log, 1, account:, status: 301, created_date: one_day_ago)
+      create_list(:request_log, 2, account:, status: 500, created_date: one_day_ago)
 
       series = described_class.new(
-        :requests,
+        :usage,
         account:,
-        start_date: three_days_ago,
-        end_date: today,
-      )
-
-      expect(series).to be_valid
-      expect(series.buckets).to satisfy do |buckets|
-        buckets in [
-          Analytics::Series::Bucket(metric: 'requests.2xx', date: ^two_days_ago, count: 3),
-          Analytics::Series::Bucket(metric: 'requests.3xx', date: ^one_day_ago, count: 1),
-          Analytics::Series::Bucket(metric: 'requests.4xx', date: ^two_days_ago, count: 2),
-          Analytics::Series::Bucket(metric: 'requests.5xx', date: ^one_day_ago, count: 2),
-        ]
-      end
-    end
-
-    it 'omits zero counts for days with no requests' do
-      create(:request_log, account:, status: '200', created_at: 3.days.ago)
-
-      three_days_ago = 3.days.ago.to_date
-
-      series = described_class.new(
-        :requests,
-        account:,
-        start_date: three_days_ago,
+        start_date: 3.days.ago.to_date,
         end_date: Date.current,
       )
 
       expect(series).to be_valid
       expect(series.buckets).to satisfy do |buckets|
         buckets in [
-          Analytics::Series::Bucket(metric: 'requests.2xx', date: ^three_days_ago, count: 1),
+          Analytics::Series::Bucket(metric: 'requests.2xx', date: ^two_days_ago, count: 3),
+          Analytics::Series::Bucket(metric: 'requests.3xx', date: ^one_day_ago,  count: 1),
+          Analytics::Series::Bucket(metric: 'requests.4xx', date: ^two_days_ago, count: 2),
+          Analytics::Series::Bucket(metric: 'requests.5xx', date: ^one_day_ago,  count: 2),
         ]
       end
+    end
+
+    it 'returns empty buckets with no request data' do
+      series = described_class.new(:usage, account:)
+
+      expect(series).to be_valid
+      expect(series.buckets).to be_empty
+    end
+  end
+
+  describe ':requests' do
+    it 'returns request counts grouped by status bucket' do
+      two_days_ago = 2.days.ago.to_date
+      one_day_ago  = 1.day.ago.to_date
+
+      RequestSpark.insert_all!([
+        { account_id: account.id, environment_id: nil, status: 200, count: 3, created_date: two_days_ago, created_at: Time.current },
+        { account_id: account.id, environment_id: nil, status: 404, count: 2, created_date: two_days_ago, created_at: Time.current },
+        { account_id: account.id, environment_id: nil, status: 301, count: 1, created_date: one_day_ago,  created_at: Time.current },
+        { account_id: account.id, environment_id: nil, status: 500, count: 2, created_date: one_day_ago,  created_at: Time.current },
+      ])
+
+      series = described_class.new(
+        :requests,
+        account:,
+        start_date: 3.days.ago.to_date,
+        end_date: Date.current,
+      )
+
+      expect(series).to be_valid
+      expect(series.buckets).to satisfy do |buckets|
+        buckets in [
+          Analytics::Series::Bucket(metric: 'requests.2xx', date: ^two_days_ago, count: 3),
+          Analytics::Series::Bucket(metric: 'requests.3xx', date: ^one_day_ago,  count: 1),
+          Analytics::Series::Bucket(metric: 'requests.4xx', date: ^two_days_ago, count: 2),
+          Analytics::Series::Bucket(metric: 'requests.5xx', date: ^one_day_ago,  count: 2),
+        ]
+      end
+    end
+
+    it 'aggregates multiple statuses into same bucket' do
+      two_days_ago = 2.days.ago.to_date
+
+      RequestSpark.insert_all!([
+        { account_id: account.id, environment_id: nil, status: 200, count: 3, created_date: two_days_ago, created_at: Time.current },
+        { account_id: account.id, environment_id: nil, status: 201, count: 2, created_date: two_days_ago, created_at: Time.current },
+        { account_id: account.id, environment_id: nil, status: 204, count: 1, created_date: two_days_ago, created_at: Time.current },
+      ])
+
+      series = described_class.new(
+        :requests,
+        account:,
+        start_date: 3.days.ago.to_date,
+        end_date: Date.current,
+      )
+
+      expect(series).to be_valid
+      expect(series.buckets).to satisfy do |buckets|
+        buckets in [
+          Analytics::Series::Bucket(metric: 'requests.2xx', date: ^two_days_ago, count: 6),
+        ]
+      end
+    end
+
+    it 'returns realtime counts for today from request logs' do
+      one_day_ago = 1.day.ago.to_date
+      today       = Date.current
+
+      RequestSpark.insert_all!([
+        { account_id: account.id, environment_id: nil, status: 200, count: 5, created_date: one_day_ago, created_at: Time.current },
+      ])
+
+      create_list(:request_log, 3, account:, status: 200)
+      create_list(:request_log, 2, account:, status: 404)
+
+      series = described_class.new(
+        :requests,
+        account:,
+        start_date: one_day_ago,
+        end_date: today,
+      )
+
+      expect(series).to be_valid
+      expect(series.buckets).to satisfy do
+        it in [
+          Analytics::Series::Bucket(metric: 'requests.2xx', date: ^one_day_ago, count: 5),
+          Analytics::Series::Bucket(metric: 'requests.2xx', date: ^today,       count: 3),
+          Analytics::Series::Bucket(metric: 'requests.4xx', date: ^today,       count: 2),
+        ]
+      end
+    end
+
+    it 'overwrites stale spark data for today with realtime count' do
+      today = Date.current
+
+      RequestSpark.insert_all!([
+        { account_id: account.id, environment_id: nil, status: 200, count: 2, created_date: today, created_at: Time.current },
+      ])
+
+      create_list(:request_log, 7, account:, status: 200)
+
+      series = described_class.new(
+        :requests,
+        account:,
+        start_date: today,
+        end_date: today,
+      )
+
+      expect(series).to be_valid
+      expect(series.buckets).to satisfy do |buckets|
+        buckets in [
+          Analytics::Series::Bucket(metric: 'requests.2xx', date: ^today, count: 7),
+        ]
+      end
+    end
+
+    it 'does not use realtime count when realtime is false' do
+      today = Date.current
+
+      RequestSpark.insert_all!([
+        { account_id: account.id, environment_id: nil, status: 200, count: 2, created_date: today, created_at: Time.current },
+      ])
+
+      create_list(:request_log, 7, account:, status: 200)
+
+      series = described_class.new(
+        :requests,
+        account:,
+        start_date: today,
+        end_date: today,
+        realtime: false,
+      )
+
+      expect(series).to be_valid
+      expect(series.buckets).to satisfy do |buckets|
+        buckets in [
+          Analytics::Series::Bucket(metric: 'requests.2xx', date: ^today, count: 2),
+        ]
+      end
+    end
+
+    it 'does not use realtime count when end_date is before today' do
+      two_days_ago = 2.days.ago.to_date
+      one_day_ago  = 1.day.ago.to_date
+
+      RequestSpark.insert_all!([
+        { account_id: account.id, environment_id: nil, status: 200, count: 5, created_date: two_days_ago, created_at: Time.current },
+      ])
+
+      create_list(:request_log, 10, account:, status: 200)
+
+      series = described_class.new(
+        :requests,
+        account:,
+        start_date: two_days_ago,
+        end_date: one_day_ago,
+      )
+
+      expect(series).to be_valid
+      expect(series.buckets).to satisfy do |buckets|
+        buckets in [
+          Analytics::Series::Bucket(metric: 'requests.2xx', date: ^two_days_ago, count: 5),
+        ]
+      end
+    end
+
+    it 'returns empty buckets with no request data' do
+      series = described_class.new(:requests, account:)
+
+      expect(series).to be_valid
+      expect(series.buckets).to be_empty
     end
   end
 
