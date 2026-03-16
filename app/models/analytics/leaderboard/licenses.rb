@@ -9,13 +9,12 @@ module Analytics
       end
 
       def count(start_date:, end_date:, limit:)
-        scope = RequestLog::Clickhouse.for_account(account)
-                                      .for_environment(environment)
-                                      .where(created_date: start_date..end_date)
-                                      .where(resource_type: 'License')
-                                      .where.not(resource_id: nil)
-                                      .order(Arel.sql('count_all DESC'))
-                                      .limit(limit)
+        scope = account.request_logs.for_environment(environment)
+                                    .where(created_date: start_date..end_date)
+                                    .where(resource_type: 'License')
+                                    .where.not(resource_id: nil)
+                                    .order(Arel.sql('count_all DESC'))
+                                    .limit(limit)
 
         scope.group(:resource_id)
              .count

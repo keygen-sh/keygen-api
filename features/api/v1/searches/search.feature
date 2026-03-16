@@ -1641,16 +1641,16 @@ Feature: Search
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 100 "request-logs"
-    And the first "request-log" has the following attributes:
+    And the current account has 10 "request-logs"
+    And the current account has 1 "request-log" with the following attributes:
       """
       { "id": "3307d9b3-59c8-4a78-b2e3-4cf95232a904" }
       """
-    And the second "request-log" has the following attributes:
+    And the current account has 1 "request-log" with the following attributes:
       """
       { "id": "3307d9b3-49f6-42df-ad1a-ac2ba1b0ae1b" }
       """
-    And the third "request-log" has the following attributes:
+    And the current account has 1 "request-log" with the following attributes:
       """
       { "id": "3307d9b3-da36-4a92-863d-68880c4cfea1" }
       """
@@ -1676,16 +1676,16 @@ Feature: Search
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 100 "request-logs"
-    And the first "request-log" has the following attributes:
+    And the current account has 10 "request-logs"
+    And the current account has 1 "request-log" with the following attributes:
       """
       { "id": "3307d9b3-59c8-4a78-b2e3-4cf95232a904" }
       """
-    And the second "request-log" has the following attributes:
+    And the current account has 1 "request-log" with the following attributes:
       """
       { "id": "3307d9b3-49f6-42df-ad1a-ac2ba1b0ae1b" }
       """
-    And the third "request-log" has the following attributes:
+    And the current account has 1 "request-log" with the following attributes:
       """
       { "id": "3307d9b3-da36-4a92-863d-68880c4cfea1" }
       """
@@ -1711,8 +1711,8 @@ Feature: Search
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 100 "request-logs"
-    And 9 "request-logs" have the following attributes:
+    And the current account has 10 "request-logs"
+    And the current account has 9 "request-logs" with the following attributes:
       """
       {
         "url": "/v1/accounts/test1/licenses/actions/validate-key",
@@ -1741,8 +1741,8 @@ Feature: Search
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 25 "request-logs"
-    And 3 "request-logs" have the following attributes:
+    And the current account has 10 "request-logs"
+    And the current account has 3 "request-logs" with the following attributes:
       """
       {
         "url": "/v1/accounts/test1/licenses/actions/validate-key",
@@ -1771,18 +1771,14 @@ Feature: Search
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 100 "request-logs"
-    And "request-logs" 0...4 have the following attributes:
+    And the current account has 10 "request-logs"
+    And the current account has 4 "request-logs" with the following attributes:
       """
-      {
-        "ip": "192.168.1.1"
-      }
+      { "ip": "192.168.1.1" }
       """
-    And "request-logs" 4...10 have the following attributes:
+    And the current account has 6 "request-logs" with the following attributes:
       """
-      {
-        "ip": "192.168.0.1"
-      }
+      { "ip": "192.168.0.1" }
       """
     And I use an authentication token
     When I send a POST request to "/accounts/test1/search" with the following:
@@ -1806,18 +1802,14 @@ Feature: Search
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 100 "request-logs"
-    And "request-logs" 0...4 have the following attributes:
+    And the current account has 10 "request-logs"
+    And the current account has 4 "request-logs" with the following attributes:
       """
-      {
-        "ip": "192.168.1.1"
-      }
+      { "ip": "192.168.1.1" }
       """
-    And "request-logs" 4...10 have the following attributes:
+    And the current account has 6 "request-logs" with the following attributes:
       """
-      {
-        "ip": "192.168.0.1"
-      }
+      { "ip": "192.168.0.1" }
       """
     And I use an authentication token
     When I send a POST request to "/accounts/test1/search" with the following:
@@ -1841,18 +1833,14 @@ Feature: Search
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 100 "request-logs"
-    And "request-logs" 0...2 have the following attributes:
+    And the current account has 10 "request-logs"
+    And the current account has 2 "request-logs" with the following attributes:
       """
-      {
-        "ip": "2600:1700:3e90:a450:89df:f64:4791:6a55"
-      }
+      { "ip": "2600:1700:3e90:a450:89df:f64:4791:6a55" }
       """
-    And "request-logs" 2...10 have the following attributes:
+    And the current account has 8 "request-logs" with the following attributes:
       """
-      {
-        "ip": "2600:1700:3e90:a450:89df:f91:7211:5c81"
-      }
+      { "ip": "2600:1700:3e90:a450:89df:f91:7211:5c81" }
       """
     And I use an authentication token
     When I send a POST request to "/accounts/test1/search" with the following:
@@ -1876,18 +1864,14 @@ Feature: Search
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 100 "request-logs"
-    And "request-logs" 0...7 have the following attributes:
+    And the current account has 10 "request-logs"
+    And the current account has 2 "request-logs" with the following attributes:
       """
-      {
-        "ip": "2600:1700:3e90:a450:89df:f64:4791:6a55"
-      }
+      { "ip": "2600:1700:3e90:a450:89df:f64:4791:6a55" }
       """
-    And "request-logs" 7...10 have the following attributes:
+    And the current account has 8 "request-logs" with the following attributes:
       """
-      {
-        "ip": "2600:1700:3e90:a450:89df:f91:7211:5c81"
-      }
+      { "ip": "2600:1700:3e90:a450:89df:f91:7211:5c81" }
       """
     And I use an authentication token
     When I send a POST request to "/accounts/test1/search" with the following:
@@ -1911,8 +1895,8 @@ Feature: Search
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 25 "request-logs"
-    And 8 "request-logs" have the following attributes:
+    And the current account has 10 "request-logs"
+    And the current account has 8 "request-logs" with the following attributes:
       """
       {
         "resourceId": "671b5c1e-df06-4479-b8b0-94303149a660",
@@ -1941,8 +1925,8 @@ Feature: Search
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 25 "request-logs"
-    And 8 "request-logs" have the following attributes:
+    And the current account has 10 "request-logs"
+    And the current account has 8 "request-logs" with the following attributes:
       """
       {
         "resourceId": "671b5c1e-df06-4479-b8b0-94303149a660",
@@ -1971,8 +1955,8 @@ Feature: Search
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 25 "request-logs"
-    And 8 "request-logs" have the following attributes:
+    And the current account has 10 "request-logs"
+    And the current account has 8 "request-logs" with the following attributes:
       """
       {
         "resourceId": "671b5c1e-df06-4479-b8b0-94303149a660",
@@ -2001,8 +1985,8 @@ Feature: Search
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 25 "request-logs"
-    And 8 "request-logs" have the following attributes:
+    And the current account has 10 "request-logs"
+    And the current account has 8 "request-logs" with the following attributes:
       """
       {
         "resourceId": "671b5c1e-df06-4479-b8b0-94303149a660",
@@ -2031,8 +2015,8 @@ Feature: Search
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 29 "request-logs"
-    And the first "request-log" has the following attributes:
+    And the current account has 10 "request-logs"
+    And the current account has 1 "request-log" with the following attributes:
       """
       {
         "requestorId": "a499bb93-9902-4b52-8a04-76944ad7f660",
@@ -2061,22 +2045,22 @@ Feature: Search
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 29 "request-logs"
-    And the first "request-log" has the following attributes:
+    And the current account has 10 "request-logs"
+    And the current account has 1 "request-log" with the following attributes:
       """
       {
         "requestorId": "a499bb93-9902-4b52-8a04-76944ad7f660",
         "requestorType": "User"
       }
       """
-    And the second "request-log" has the following attributes:
+    And the current account has 1 "request-log" with the following attributes:
       """
       {
         "requestorId": "a499bb93-5e1f-4937-9052-a934314c9671",
         "requestorType": "User"
       }
       """
-    And the third "request-log" has the following attributes:
+    And the current account has 1 "request-log" with the following attributes:
       """
       {
         "requestorId": "a499bb93-52a7-4dc6-b32a-17ae6f89477b",
@@ -2105,8 +2089,8 @@ Feature: Search
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 29 "request-logs"
-    And the first "request-log" has the following attributes:
+    And the current account has 10 "request-logs"
+    And the current account has 1 "request-log" with the following attributes:
       """
       {
         "requestorId": "a499bb93-9902-4b52-8a04-76944ad7f660",
@@ -2135,8 +2119,8 @@ Feature: Search
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 29 "request-logs"
-    And the first "request-log" has the following attributes:
+    And the current account has 10 "request-logs"
+    And the current account has 1 "request-log" with the following attributes:
       """
       {
         "requestorId": "a499bb93-9902-4b52-8a04-76944ad7f660",
@@ -2165,22 +2149,22 @@ Feature: Search
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 29 "request-logs"
-    And the first "request-log" has the following attributes:
+    And the current account has 10 "request-logs"
+    And the current account has 1 "request-log" with the following attributes:
       """
       {
         "requestorId": "a499bb93-9902-4b52-8a04-76944ad7f660",
         "requestorType": "User"
       }
       """
-    And the second "request-log" has the following attributes:
+    And the current account has 1 "request-log" with the following attributes:
       """
       {
         "requestorId": "a499bb93-9902-4b52-8a04-76944ad7f660",
         "requestorType": "User"
       }
       """
-    And the third "request-log" has the following attributes:
+    And the current account has 1 "request-log" with the following attributes:
       """
       {
         "requestorId": "a499bb93-9902-4b52-8a04-76944ad7f660",
@@ -2210,34 +2194,41 @@ Feature: Search
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 5 "request-logs"
-    And all "request-logs" have the following attributes:
+    And the current account has 2 "request-logs" with the following attributes:
       """
       {
         "url": "/v1/accounts/test1/licenses/actions/validate-key",
         "method": "POST",
-        "status": 200
+        "status": 200,
+        "ip": "192.168.1.1"
       }
       """
-    And the first "request-log" has the following attributes:
+    And the current account has 1 "request-log" with the following attributes:
       """
-      { "ip": "192.168.1.1" }
+      {
+        "url": "/v1/accounts/test1/licenses/actions/validate-key",
+        "method": "POST",
+        "status": 400,
+        "ip": "192.168.1.1"
+      }
       """
-    And the second "request-log" has the following attributes:
+    And the current account has 2 "request-logs" with the following attributes:
       """
-      { "ip": "192.168.1.1", "status": 400 }
+      {
+        "url": "/v1/accounts/test1/licenses/actions/validate-key",
+        "method": "POST",
+        "status": 200,
+        "ip": "192.168.0.1"
+      }
       """
-    And the third "request-log" has the following attributes:
+    And the current account has 1 "request-log" with the following attributes:
       """
-      { "ip": "192.168.0.1" }
-      """
-    And the fourth "request-log" has the following attributes:
-      """
-      { "ip": "192.168.0.1" }
-      """
-    And the fifth "request-log" has the following attributes:
-      """
-      { "ip": "192.168.1.1" }
+      {
+        "url": "/v1/accounts/test1/licenses/actions/validate-key",
+        "method": "POST",
+        "status": 200,
+        "ip": "192.168.0.0"
+      }
       """
     And I use an authentication token
     When I send a POST request to "/accounts/test1/search" with the following:

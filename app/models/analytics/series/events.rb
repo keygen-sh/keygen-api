@@ -12,12 +12,10 @@ module Analytics
       end
 
       def metrics = @metrics ||= event_types.collect(&:event)
-
       def count(start_date:, end_date:)
-        scope = EventLog::Clickhouse.for_account(account)
-                                    .for_environment(environment)
-                                    .where(created_date: start_date..end_date)
-                                    .where(event_type_id: event_type_ids)
+        scope = account.event_logs.for_environment(environment)
+                                  .where(created_date: start_date..end_date)
+                                  .where(event_type_id: event_type_ids)
 
         if resource_type.present? && resource_id.present?
           scope = scope.where(

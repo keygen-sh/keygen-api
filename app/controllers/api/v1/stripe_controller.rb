@@ -108,7 +108,8 @@ module Api::V1
         account = billing.account
         return if account.last_trial_will_end_sent_at.present?
 
-        request_count_for_week = account.request_logs.where('request_logs.created_at > ?', 1.week.ago).count
+        request_count_for_week = account.request_logs.ordered.where(created_date: 1.week.ago.to_date..Date.current)
+                                                             .count
 
         # Let the active account know that their trial is going to be ending
         if request_count_for_week > 0

@@ -57,26 +57,15 @@ module Api::V1
       authorize! model,
         with: SearchPolicy
 
-      base = model.for_account(current_account)
+      Keygen.logger.info { "[searches.search] account_id=#{current_account.id} search_type=#{type} search_query=#{query} search_op=#{op}" }
 
-      # Special cases for certain models
-      case
-      when model == RequestLog
-        start_date = 30.days.ago.beginning_of_day
-        end_date   = Time.current
-
-        # Limit request log searches to last 30 days to improve perf
-        base = base.where('request_logs.created_at >= :start_date AND request_logs.created_at <= :end_date', start_date:, end_date:)
-      end
-
-      Keygen.logger.info "[searches.search] account_id=#{current_account.id} search_type=#{type} search_query=#{query} search_op=#{op}"
-
+      base_scope    = model.for_account(current_account)
       search_scopes = []
 
       query.each do |key, value|
         attribute = key.to_s.underscore.parameterize(separator: '_')
 
-        unless base.respond_to?("search_#{attribute}")
+        unless base_scope.respond_to?("search_#{attribute}")
           return render_bad_request(
             detail: "search query '#{attribute.camelize(:lower)}' is not supported for resource type '#{type.camelize(:lower)}'",
             source: { pointer: "/meta/query/#{attribute.camelize(:lower)}" }
@@ -101,7 +90,7 @@ module Api::V1
             )
           end
 
-          search_scopes << base.search_metadata(value)
+          search_scopes << base_scope.search_metadata(value)
         else
           if value.is_a?(String) && value.size < SEARCH_MIN_QUERY_SIZE
             return render_bad_request(
@@ -110,7 +99,7 @@ module Api::V1
             )
           end
 
-          search_scopes << base.send("search_#{attribute}", value)
+          search_scopes << base_scope.send("search_#{attribute}", value)
         end
       end
 
@@ -127,7 +116,7 @@ module Api::V1
       authorize! search_results,
         to: :index?
 
-      Keygen.logger.info "[searches.search] account_id=#{current_account.id} search_results=#{search_results.count}"
+      Keygen.logger.info { "[searches.search] account_id=#{current_account.id} search_results=#{search_results.count}" }
 
       render jsonapi: search_results
     rescue UnsupportedSearchTypeError

@@ -106,15 +106,15 @@ Feature: List request logs
   Scenario: Admin retrieves a list of logs by requestor (string)
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 100 "request-logs"
-    And "request-logs" 0...25 have the following attributes:
+    And the current account has 60 "request-logs"
+    And the current account has 25 "request-logs" with the following:
       """
       {
         "requestorId": "8949a87d-c470-44f5-b1be-e22ae33647ae",
         "requestorType": "License"
       }
       """
-    And "request-logs" 25...40 have the following attributes:
+    And the current account has 15 "request-logs" with the following:
       """
       {
         "requestorId": "8949a87d-c470-44f5-b1be-e22ae33647ae",
@@ -129,15 +129,15 @@ Feature: List request logs
   Scenario: Admin retrieves a list of logs by requestor (array)
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 100 "request-logs"
-    And "request-logs" 0...25 have the following attributes:
+    And the current account has 60 "request-logs"
+    And the current account has 25 "request-logs" with the following:
       """
       {
         "requestorId": "8949a87d-c470-44f5-b1be-e22ae33647ae",
         "requestorType": "License"
       }
       """
-    And "request-logs" 25...40 have the following attributes:
+    And the current account has 15 "request-logs" with the following:
       """
       {
         "requestorId": "8949a87d-c470-44f5-b1be-e22ae33647ae",
@@ -152,15 +152,15 @@ Feature: List request logs
   Scenario: Admin retrieves a list of logs by requestor (hash)
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 100 "request-logs"
-    And "request-logs" 0...25 have the following attributes:
+    And the current account has 60 "request-logs"
+    And the current account has 25 "request-logs" with the following:
       """
       {
         "requestorId": "8949a87d-c470-44f5-b1be-e22ae33647ae",
         "requestorType": "License"
       }
       """
-    And "request-logs" 25...40 have the following attributes:
+    And the current account has 15 "request-logs" with the following:
       """
       {
         "requestorId": "8949a87d-c470-44f5-b1be-e22ae33647ae",

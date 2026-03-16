@@ -5,32 +5,30 @@ class RecordRequestSparkWorker < BaseWorker
                   cronitor_enabled: true
 
   def perform(account_id)
-    logs_cte = RequestLog::Clickhouse.where(account_id:, created_date: Date.yesterday)
-                                     .where(is_deleted: 0)
-                                     .where.not(status: nil)
-                                     .select(
-                                       :account_id,
-                                       :environment_id,
-                                       :created_date,
-                                       :created_at,
-                                       'toUInt16OrZero(status) AS status',
-                                     )
+    logs_cte = RequestLog.where(account_id:, created_date: Date.yesterday)
+                         .select(
+                           :account_id,
+                           :environment_id,
+                           :created_date,
+                           :created_at,
+                           'toUInt16OrZero(status) AS status',
+                         )
 
-    agg_cte = RequestLog::Clickhouse.from('request_log_logs')
-                                    .select(
-                                      :account_id,
-                                      :environment_id,
-                                      :created_date,
-                                      'max(created_at) AS created_at',
-                                      :status,
-                                      'count() AS count',
-                                    )
-                                    .group(
-                                      :account_id,
-                                      :environment_id,
-                                      :created_date,
-                                      :status,
-                                    )
+    agg_cte = RequestLog.from('request_log_logs')
+                        .select(
+                          :account_id,
+                          :environment_id,
+                          :created_date,
+                          'max(created_at) AS created_at',
+                          :status,
+                          'count() AS count',
+                        )
+                        .group(
+                          :account_id,
+                          :environment_id,
+                          :created_date,
+                          :status,
+                        )
 
     RequestSpark.connection.execute(<<~SQL.squish)
       WITH

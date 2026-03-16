@@ -329,6 +329,9 @@ loop do
         event_log = EventLog.create!(
           event_type_id: event_types.sample,
           idempotency_key: SecureRandom.hex,
+          created_date: request_time,
+          created_at: request_time,
+          updated_at: Time.current,
           whodunnit: requestor,
           environment:,
           resource:,

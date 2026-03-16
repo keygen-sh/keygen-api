@@ -84,7 +84,7 @@ module RequestLogger
       return unless
         log_request?
 
-      RequestLogWorker2.perform_async(
+      RequestLogWorker.perform_async(
         'id' => Current.request_id,
         'account_id' => Current.account.id,
         'environment_id' => Current.environment&.id,
@@ -106,7 +106,6 @@ module RequestLogger
         'status' => request_log_status,
         'queue_time' => request_log_request_queue_time,
         'run_time' => request_log_request_run_time,
-        # NB(ezekg) this is only applicable to clickhouse (gets ignored by primary)
         'ttl' => Current.account.request_log_retention_duration&.to_i,
       )
     rescue => e
