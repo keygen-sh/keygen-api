@@ -83,3 +83,8 @@ record_license_validation_sparks:
   cron: "0 0 * * *" # Every day at midnight (6pm CST)
   class: "RecordLicenseValidationSparksWorker"
   status: <%= ENV.true?('CLICKHOUSE_DATABASE_ENABLED') ? 'enabled' : 'disabled' %>
+
+record_request_sparks:
+  cron: "0 0 * * *" # Every day at midnight (6pm CST)
+  class: "RecordRequestSparksWorker"
+  status: <%= ENV.true?('CLICKHOUSE_DATABASE_ENABLED') ? 'enabled' : 'disabled' %>

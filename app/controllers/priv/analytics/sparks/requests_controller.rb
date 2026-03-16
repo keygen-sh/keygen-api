@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-module Priv::Analytics
-  class UsageController < BaseController
+module Priv::Analytics::Sparks
+  class RequestsController < Priv::Analytics::BaseController
     use_clickhouse
 
     CACHE_TTL      = 10.minutes
@@ -17,8 +17,8 @@ module Priv::Analytics
       authorize! with: Accounts::AnalyticsPolicy
 
       series = Analytics::Series.new(
-        :usage,
-        **usage_query,
+        :requests,
+        **request_query,
       )
 
       unless series.valid?

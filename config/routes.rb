@@ -479,6 +479,7 @@ Rails.application.routes.draw do
         get 'gauges/validations',        to: 'gauges/validations#show', as: :validation_gauge # specialized gauge
         get 'gauges/:metric',            to: 'gauges#show',             as: :gauge
         get 'sparks/validations',        to: 'sparks/validations#show', as: :validation_spark # specialized spark
+        get 'sparks/requests',           to: 'sparks/requests#show',    as: :request_spark
         get 'sparks/:metric',            to: 'sparks#show',             as: :spark
         get 'usage',                     to: 'usage#show',              as: :usage
       end
