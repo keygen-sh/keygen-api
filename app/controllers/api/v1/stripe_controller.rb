@@ -24,7 +24,21 @@ module Api::V1
         return unless
           billing.present?
 
-        # Update billing's subscription data
+        # NB(ezekg) customers may have multiple subscriptions (e.g. add-ons for
+        #           whitelabeling, support, etc.), but only one maps to a plan
+        #           record, i.e. we only want to update billing state for the
+        #           subscription that corresponds to the account's plan.
+        plan_sids = subscription.items.collect { it.plan.id }
+        plan      = Plan.find_by(plan_id: plan_sids)
+        account   = billing.account
+
+        unless plan.present?
+          Keygen.logger.warn("[stripe] action=skip_no_plan account_id=#{account.id} plan_id=#{account.plan.plan_id} event_id=#{event.id} customer_id=#{subscription.customer} subscription_id=#{subscription.id} plan_sids=#{plan_sids.join(',')}")
+
+          return
+        end
+
+        # update billing's subscription data
         billing.update(
           subscription_period_start: Time.at(subscription.current_period_start),
           subscription_period_end: Time.at(subscription.current_period_end),
@@ -32,27 +46,14 @@ module Api::V1
           subscription_status: subscription.status,
         )
 
-        # FIXME(ezekg) Remove begin/rescue block after we confirm working
-        # Update account plan if changed
-        begin
-          account = billing.account
-          plan_id = subscription.items.first.plan.id
+        # update account plan if changed
+        if account.plan.plan_id != plan.plan_id
+          Keygen.logger.warn("[stripe] action=change_plan event_id=#{event.id} account_id=#{account.id} plan_id=#{plan.id} old_plan_sid=#{account.plan.plan_id} new_plan_sid=#{plan.plan_id}")
 
-          if account.plan.plan_id != plan_id
-            plan = Plan.find_by(plan_id: plan_id)
-            if plan.present?
-              Keygen.logger.warn("[stripe] action=change_plan event_id=#{event.id} account_id=#{account.id} plan_id=#{plan.id} old_plan_sid=#{account.plan.plan_id} new_plan_sid=#{plan_id}")
-
-              account.update(plan: plan)
-            else
-              Keygen.logger.warn("[stripe] action=change_plan event_id=#{event.id} account_id=#{account.id} plan_id=N/A old_plan_sid=#{account.plan.plan_id} new_plan_sid=#{plan_id}")
-            end
-          end
-        rescue => e
-          Keygen.logger.exception(e)
+          account.update(plan:)
         end
 
-        # Update billing state machine
+        # update billing state machine
         if subscription.cancel_at_period_end
           billing.cancel_subscription_at_period_end unless billing.canceling?
         else

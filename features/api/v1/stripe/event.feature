@@ -67,6 +67,22 @@ Feature: Process Stripe webhook events
     Then the account should have a new plan
     And the response status should be "202"
 
+  Scenario: A subscribed account receives a "customer.subscription.updated" event for a canceling addon
+    Given there is an incoming "customer.subscription.updated" event for an addon set to cancel
+    And the account is in a "subscribed" state
+    When the event is received at "/stripe"
+    Then the account should be in an unchanged state
+    And the account should have an unchanged plan
+    And the response status should be "202"
+
+  Scenario: A subscribed account receives a "customer.subscription.updated" event for a canceled addon
+    Given there is an incoming "customer.subscription.updated" event for a "canceled" addon
+    And the account is in a "subscribed" state
+    When the event is received at "/stripe"
+    Then the account should be in an unchanged state
+    And the account should have an unchanged plan
+    And the response status should be "202"
+
   Scenario: We receive a "customer.subscription.deleted" event when trialing
     Given there is an incoming "customer.subscription.deleted" event
     And the account is in a "trialing" state

@@ -94,7 +94,7 @@ Given /^there is an incoming "([^\"]*)" event(?: with an? "([^\"]*)" status)?$/ 
   @customer = create :customer
   @subscription = create :subscription, customer: @customer.id, plan: @plan.plan_id
 
-  @account = create :account
+  @account = create :account, plan: @plan
   @billing = create :billing, {
     account: @account,
     customer_id: @customer.id,
@@ -115,7 +115,10 @@ Given /^there is an incoming "([^\"]*)" event(?: with an? "([^\"]*)" status)?$/ 
       when /^customer\.subscription\.(\w)+$/
         {
           customer: @customer.id,
-          id: @subscription.id
+          id: @subscription.id,
+          items: [{
+            plan: { id: @plan.plan_id }
+          }],
         }
       else
         {
@@ -135,7 +138,7 @@ Given /^there is an incoming "([^\"]*)" event with a new plan$/ do |event_type|
   @customer     = create :customer
   @subscription = create :subscription, customer: @customer.id, plan: @plan.plan_id
 
-  @account = create :account
+  @account = create :account, plan: @plan
   @billing = create :billing, {
     account: @account,
     customer_id: @customer.id,
@@ -151,6 +154,68 @@ Given /^there is an incoming "([^\"]*)" event with a new plan$/ do |event_type|
       id: @subscription.id,
       items: [{
         plan: { id: @plan.plan_id }
+      }],
+    }
+  }.call
+end
+
+Given /^there is an incoming "([^\"]*)" event for an? "([^\"]*)" addon$/ do |event_type, status|
+  @plan         = create :plan
+  @customer     = create :customer
+  @subscription = create :subscription, customer: @customer.id, plan: @plan.plan_id
+
+  addon_product = StripeHelper.create_product(id: SecureRandom.hex)
+  addon_plan    = StripeHelper.create_plan(id: SecureRandom.hex, amount: 99, trial_period_days: 1, product: addon_product.id)
+  addon_sub     = create :subscription, customer: @customer.id, plan: addon_plan.id
+
+  @account = create :account, plan: @plan
+  @billing = create :billing, {
+    account: @account,
+    customer_id: @customer.id,
+    subscription_id: @subscription.id,
+    subscription_status: @subscription.status,
+    subscription_period_start: Time.at(@subscription.current_period_start),
+    subscription_period_end: Time.at(@subscription.current_period_end),
+  }
+
+  @event = StripeMock.mock_webhook_event event_type, Proc.new {
+    {
+      customer: @customer.id,
+      id: addon_sub.id,
+      status:,
+      items: [{
+        plan: { id: addon_plan.id }
+      }],
+    }
+  }.call
+end
+
+Given /^there is an incoming "([^\"]*)" event for an addon set to cancel$/ do |event_type|
+  @plan         = create :plan
+  @customer     = create :customer
+  @subscription = create :subscription, customer: @customer.id, plan: @plan.plan_id
+
+  addon_product = StripeHelper.create_product(id: SecureRandom.hex)
+  addon_plan    = StripeHelper.create_plan(id: SecureRandom.hex, amount: 99, trial_period_days: 1, product: addon_product.id)
+  addon_sub     = create :subscription, customer: @customer.id, plan: addon_plan.id
+
+  @account = create :account, plan: @plan
+  @billing = create :billing, {
+    account: @account,
+    customer_id: @customer.id,
+    subscription_id: @subscription.id,
+    subscription_status: @subscription.status,
+    subscription_period_start: Time.at(@subscription.current_period_start),
+    subscription_period_end: Time.at(@subscription.current_period_end),
+  }
+
+  @event = StripeMock.mock_webhook_event event_type, Proc.new {
+    {
+      customer: @customer.id,
+      id: addon_sub.id,
+      cancel_at_period_end: true,
+      items: [{
+        plan: { id: addon_plan.id }
       }],
     }
   }.call
@@ -190,8 +255,16 @@ Then /^the account should be in a "([^\"]*)" state$/ do |state|
   expect(@billing.reload.state).to eq state
 end
 
+Then /^the account should be in an unchanged state$/ do
+  expect(@account.reload.billing.state).to eq @billing.state
+end
+
 Then /^the account should have a(?:n? (?:new|updated)) plan$/ do
   expect(@account.reload.plan.plan_id).to eq @event.data.object.items.first.plan.id
+end
+
+Then /^the account should have an unchanged plan$/ do
+  expect(@account.reload.plan.plan_id).to_not eq @event.data.object.items.first.plan.id
 end
 
 Then /^the account should have a(?:n? (?:new|updated)) card$/ do
