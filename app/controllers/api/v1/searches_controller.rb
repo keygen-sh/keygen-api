@@ -118,7 +118,7 @@ module Api::V1
       scope = search_scopes.reduce do |res, scp|
         case op
         when :AND then res.merge(scp)
-        when :OR  then res.or(scp)
+        when :OR  then res.union(scp)
         else           res.none
         end
       end

@@ -53,7 +53,7 @@ Feature: Search
     And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
-  Scenario: Admin performs a search using the OR operator
+  Scenario: Admin performs a search on users using the OR operator
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 9 "users"
@@ -85,6 +85,31 @@ Feature: Search
       """
     Then the response status should be "200"
     And the response body should be an array with 6 "users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "event-log" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search on licenses using the OR operator
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "users"
+    And the current account has 1 "license" for each "user" through "owner"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "licenses",
+          "op": "OR",
+          "query": {
+            "name": "$users[2].email",
+            "user": "$users[2].email"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 1 "licenses"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
