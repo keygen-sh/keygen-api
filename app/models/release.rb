@@ -561,7 +561,7 @@ class Release < ApplicationRecord
     scp = joins(constraints: :entitlement)
     scp = if strict
             scp.reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER)
-               .group(:id)
+               .group("#{table_name}.id")
                .having(<<~SQL.squish, codes:)
                  count(release_entitlement_constraints) = count(entitlements) filter (
                    where entitlements.code in (:codes)
