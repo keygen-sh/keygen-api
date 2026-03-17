@@ -432,7 +432,7 @@ class ReleaseArtifact < ApplicationRecord
     scp = joins(release: { constraints: :entitlement })
     scp = if strict
             agg = scp.reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER)
-                     .group(:id)
+                     .group("#{table_name}.id")
 
             agg.having(<<~SQL.squish, codes:)
               count(release_entitlement_constraints) = count(entitlements) filter (
