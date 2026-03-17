@@ -26,6 +26,29 @@ Given /^I am(?: (?:an?|(the (\w+))))? (admin|developer|read only|sales agent|sup
   raise 'failed to find bearer' if @bearer.nil?
 end
 
+Given /^I am an? (admin|developer|read only|sales agent|support agent|user|product|license|environment) (?:for|of) account "([^\"]*)" with the following attributes:$/ do |role, account_id, body|
+  account = FindByAliasService.call(Account, id: account_id, aliases: :slug)
+
+  @bearer =
+    case role
+    when 'admin', 'user', 'read only', 'developer', 'sales agent', 'support agent'
+      account.users.with_roles(role.parameterize.underscore).take
+    when 'product'
+      account.products.take
+    when 'license'
+      account.licenses.take
+    when 'environment'
+      account.environments.take
+    else
+      raise 'invalid role'
+    end
+
+  attrs = JSON.parse(body).deep_transform_keys!(&:underscore)
+  @bearer.update(**attrs)
+
+  raise 'failed to find bearer' if @bearer.nil?
+end
+
 Given /^I am(?: (?:an?|(the (\w+))))? (admin|developer|read only|sales agent|support agent|user|product|license|environment) (?:for|of) the (\w+) "account"$/ do |named_role_idx, role, named_account_idx|
   named_role_idx ||= :first
 

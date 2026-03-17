@@ -18,18 +18,22 @@ Feature: Search
     Then the response status should be "403"
 
   Scenario: Admin performs a search using the AND operator
-    Given I am an admin of account "test1"
+    Given I am an admin of account "test1" with the following attributes:
+      """
+      { "firstName": "Paul", "lastName": "Atreides" }
+      """
     And the current account is "test1"
     And the current account has 9 "users"
-    And "users" 0..2 have the following attributes:
+    # NB(ezekg) +1 for default admin user
+    And "users" 1..3 have the following attributes:
       """
       { "firstName": "John", "lastName": "Doe" }
       """
-    And "users" 3..5 have the following attributes:
+    And "users" 4..6 have the following attributes:
       """
       { "firstName": "Jane", "lastName": "Doe" }
       """
-    And "users" 6..8 have the following attributes:
+    And "users" 7..9 have the following attributes:
       """
       { "firstName": "Jack", "lastName": "Sparrow" }
       """
@@ -54,18 +58,22 @@ Feature: Search
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search on users using the OR operator
-    Given I am an admin of account "test1"
+    Given I am an admin of account "test1" with the following attributes:
+      """
+      { "firstName": "Paul", "lastName": "Atreides" }
+      """
     And the current account is "test1"
     And the current account has 9 "users"
-    And "users" 0..2 have the following attributes:
+    # NB(ezekg) +1 for default admin user
+    And "users" 1..3 have the following attributes:
       """
       { "firstName": "John", "lastName": "Doe" }
       """
-    And "users" 3..5 have the following attributes:
+    And "users" 4..6 have the following attributes:
       """
       { "firstName": "Jane", "lastName": "Doe" }
       """
-    And "users" 6..8 have the following attributes:
+    And "users" 7..9 have the following attributes:
       """
       { "firstName": "Jack", "lastName": "Sparrow" }
       """
