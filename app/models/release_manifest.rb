@@ -190,19 +190,24 @@ class ReleaseManifest < ApplicationRecord
     return without_constraints if
       codes.empty?
 
-    scp = joins(release: { constraints: :entitlement })
-    scp = if strict
-            agg = scp.reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER)
-                     .group("#{table_name}.id")
-
-            agg.having(<<~SQL.squish, codes:)
-              count(release_entitlement_constraints) = count(entitlements) filter (
-                where entitlements.code in (:codes)
-              )
-            SQL
-          else
-            scp.where(entitlements: { code: codes })
-          end
+    base = joins(release: { constraints: :entitlement })
+    scp  = if strict
+             # use a subquery to avoid GROUP BY issues when chained onto a UNION relation
+             where(
+               "#{table_name}.id": base.unordered
+                                       .select("#{table_name}.id")
+                                       .group("#{table_name}.id")
+                                       .having(<<~SQL.squish, codes:)
+                                         count(release_entitlement_constraints) = count(entitlements) filter (
+                                           where entitlements.code in (:codes)
+                                         )
+                                       SQL
+             ).reorder(
+               "#{table_name}.created_at": DEFAULT_SORT_ORDER,
+             )
+           else
+             base.where(entitlements: { code: codes })
+           end
 
     scp.union(without_constraints)
        .reorder(
