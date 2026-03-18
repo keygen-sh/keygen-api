@@ -16,7 +16,7 @@ class RecordRequestSparkWorker < BaseWorker
                                        'toUInt16OrZero(status) AS status',
                                      )
 
-    agg_cte = RequestLog::Clickhouse.from('request_logs')
+    agg_cte = RequestLog::Clickhouse.from('request_log_logs')
                                     .select(
                                       :account_id,
                                       :environment_id,
@@ -34,8 +34,8 @@ class RecordRequestSparkWorker < BaseWorker
 
     RequestSpark.connection.execute(<<~SQL.squish)
       WITH
-        request_logs    AS (#{logs_cte.to_sql}),
-        request_log_agg AS (#{agg_cte.to_sql})
+        request_log_logs AS (#{logs_cte.to_sql}),
+        request_log_agg  AS (#{agg_cte.to_sql})
       INSERT INTO request_sparks (
         account_id,
         environment_id,
