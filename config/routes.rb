@@ -477,9 +477,11 @@ Rails.application.routes.draw do
         get 'leaderboards/:leaderboard', to: 'leaderboards#show',       as: :leaderboard
         get 'heatmaps/:heatmap',         to: 'heatmaps#show',           as: :heatmap
         get 'gauges/validations',        to: 'gauges/validations#show', as: :validation_gauge # specialized gauge
+        get 'gauges/events/:event',      to: 'gauges/events#show',      as: :event_gauge,      constraints: { event: /.*/ }
         get 'gauges/:metric',            to: 'gauges#show',             as: :gauge
         get 'sparks/validations',        to: 'sparks/validations#show', as: :validation_spark # specialized spark
         get 'sparks/requests',           to: 'sparks/requests#show',    as: :request_spark
+        get 'sparks/events/:event',      to: 'sparks/events#show',      as: :event_spark,      constraints: { event: /.*/ }
         get 'sparks/:metric',            to: 'sparks#show',             as: :spark
         get 'usage',                     to: 'usage#show',              as: :usage
       end

@@ -81,6 +81,207 @@ describe Analytics::Series, :only_clickhouse do
     end
   end
 
+  describe ':events2' do
+    it 'returns event spark timeseries for a specific event' do
+      two_days_ago = 2.days.ago.to_date
+      one_day_ago  = 1.day.ago.to_date
+
+      license_created_id = EventType.find_by(event: 'license.created').id
+
+      EventSpark.insert_all!([
+        { account_id: account.id, environment_id: nil, event_type_id: license_created_id, count: 5, created_date: two_days_ago, created_at: Time.current },
+        { account_id: account.id, environment_id: nil, event_type_id: license_created_id, count: 3, created_date: one_day_ago,  created_at: Time.current },
+      ])
+
+      series = described_class.new(
+        :events2,
+        event: 'license.created',
+        account:,
+        start_date: 3.days.ago.to_date,
+        end_date: Date.current,
+      )
+
+      expect(series).to be_valid
+      expect(series.buckets).to satisfy do
+        it in [
+          Analytics::Series::Bucket(metric: 'events.license-created', date: ^two_days_ago, count: 5),
+          Analytics::Series::Bucket(metric: 'events.license-created', date: ^one_day_ago,  count: 3),
+        ]
+      end
+    end
+
+    it 'supports wildcard patterns' do
+      two_days_ago = 2.days.ago.to_date
+
+      license_created_id = EventType.find_by(event: 'license.created').id
+      license_updated_id = EventType.find_by(event: 'license.updated').id
+
+      EventSpark.insert_all!([
+        { account_id: account.id, environment_id: nil, event_type_id: license_created_id, count: 3, created_date: two_days_ago, created_at: Time.current },
+        { account_id: account.id, environment_id: nil, event_type_id: license_updated_id, count: 2, created_date: two_days_ago, created_at: Time.current },
+      ])
+
+      series = described_class.new(
+        :events2,
+        event: 'license.*',
+        account:,
+        start_date: 3.days.ago.to_date,
+        end_date: Date.current,
+      )
+
+      expect(series).to be_valid
+      expect(series.buckets).to satisfy do
+        it in [
+          Analytics::Series::Bucket(metric: 'events.license-created', date: ^two_days_ago, count: 3),
+          Analytics::Series::Bucket(metric: 'events.license-updated', date: ^two_days_ago, count: 2),
+        ]
+      end
+    end
+
+    it 'returns realtime counts for today from event logs' do
+      one_day_ago = 1.day.ago.to_date
+      today       = Date.current
+
+      license_created_id = EventType.find_by(event: 'license.created').id
+
+      EventSpark.insert_all!([
+        { account_id: account.id, environment_id: nil, event_type_id: license_created_id, count: 5, created_date: one_day_ago, created_at: Time.current },
+      ])
+
+      license = create(:license, account:)
+
+      create_list(:event_log, 3, :license_created, account:, resource: license)
+
+      series = described_class.new(
+        :events2,
+        event: 'license.created',
+        account:,
+        start_date: one_day_ago,
+        end_date: today,
+      )
+
+      expect(series).to be_valid
+      expect(series.buckets).to satisfy do
+        it in [
+          Analytics::Series::Bucket(metric: 'events.license-created', date: ^one_day_ago, count: 5),
+          Analytics::Series::Bucket(metric: 'events.license-created', date: ^today,       count: 3),
+        ]
+      end
+    end
+
+    it 'overwrites stale spark data for today with realtime count' do
+      today = Date.current
+
+      license_created_id = EventType.find_by(event: 'license.created').id
+
+      EventSpark.insert_all!([
+        { account_id: account.id, environment_id: nil, event_type_id: license_created_id, count: 2, created_date: today, created_at: Time.current },
+      ])
+
+      license = create(:license, account:)
+
+      create_list(:event_log, 7, :license_created, account:, resource: license)
+
+      series = described_class.new(
+        :events2,
+        event: 'license.created',
+        account:,
+        start_date: today,
+        end_date: today,
+      )
+
+      expect(series).to be_valid
+      expect(series.buckets).to satisfy do |buckets|
+        buckets in [
+          Analytics::Series::Bucket(metric: 'events.license-created', date: ^today, count: 7),
+        ]
+      end
+    end
+
+    it 'does not use realtime count when realtime is false' do
+      today = Date.current
+
+      license_created_id = EventType.find_by(event: 'license.created').id
+
+      EventSpark.insert_all!([
+        { account_id: account.id, environment_id: nil, event_type_id: license_created_id, count: 2, created_date: today, created_at: Time.current },
+      ])
+
+      license = create(:license, account:)
+
+      create_list(:event_log, 7, :license_created, account:, resource: license)
+
+      series = described_class.new(
+        :events2,
+        event: 'license.created',
+        account:,
+        start_date: today,
+        end_date: today,
+        realtime: false,
+      )
+
+      expect(series).to be_valid
+      expect(series.buckets).to satisfy do |buckets|
+        buckets in [
+          Analytics::Series::Bucket(metric: 'events.license-created', date: ^today, count: 2),
+        ]
+      end
+    end
+
+    it 'does not use realtime count when end_date is before today' do
+      two_days_ago = 2.days.ago.to_date
+      one_day_ago  = 1.day.ago.to_date
+
+      license_created_id = EventType.find_by(event: 'license.created').id
+
+      EventSpark.insert_all!([
+        { account_id: account.id, environment_id: nil, event_type_id: license_created_id, count: 5, created_date: two_days_ago, created_at: Time.current },
+      ])
+
+      license = create(:license, account:)
+
+      create_list(:event_log, 10, :license_created, account:, resource: license)
+
+      series = described_class.new(
+        :events2,
+        event: 'license.created',
+        account:,
+        start_date: two_days_ago,
+        end_date: one_day_ago,
+      )
+
+      expect(series).to be_valid
+      expect(series.buckets).to satisfy do |buckets|
+        buckets in [
+          Analytics::Series::Bucket(metric: 'events.license-created', date: ^two_days_ago, count: 5),
+        ]
+      end
+    end
+
+    it 'returns empty buckets with no event data' do
+      series = described_class.new(:events2, event: 'license.created', account:)
+
+      expect(series).to be_valid
+      expect(series.buckets).to be_empty
+    end
+
+    context 'with invalid pattern' do
+      it 'is invalid for unknown event' do
+        series = described_class.new(:events2, event: 'invalid.event', account:)
+
+        expect(series).not_to be_valid
+        expect(series.errors[:metrics]).to include('is invalid')
+      end
+
+      it 'is invalid for unknown wildcard' do
+        series = described_class.new(:events2, event: 'invalid.*', account:)
+
+        expect(series).not_to be_valid
+        expect(series.errors[:metrics]).to include('is invalid')
+      end
+    end
+  end
+
   describe ':usage' do
     it 'returns request counts grouped by status bucket' do
       two_days_ago = 2.days.ago.to_date

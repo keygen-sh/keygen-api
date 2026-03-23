@@ -11,6 +11,7 @@ module Analytics
 
     COUNTERS = {
       alus: ActiveLicensedUsers,
+      events: Events,
       licenses: Licenses,
       machines: Machines,
       requests: Requests,
