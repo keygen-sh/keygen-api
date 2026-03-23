@@ -36,6 +36,18 @@ Rails.application.routes.draw do
     end
   end
 
+  concern :electron do
+    # see: https://www.electronjs.org/docs/latest/tutorial/updates
+    scope module: :electron, constraints: { version: /[^\/]+/ } do
+      get ':package/:platform-:arch/:version/RELEASES', to: 'releases#show', as: :electron_releases,
+        constraints: MimeTypeConstraint.new(:text, :binary, raise_on_no_match: true),
+        defaults: { format: :text }
+      get ':package/:platform-:arch/:version', to: 'upgrades#show', as: :electron_upgrade_package,
+        constraints: MimeTypeConstraint.new(:binary, :json, raise_on_no_match: true),
+        defaults: { format: :json }
+    end
+  end
+
   concern :raw do
     scope module: :raw, defaults: { format: :binary } do
       get ':product(/@:package)/:release/:artifact', to: 'release_artifacts#show', as: :raw_download_artifact, constraints: {
@@ -455,6 +467,9 @@ Rails.application.routes.draw do
       scope :tauri do
         concerns :tauri
       end
+      scope :electron do
+        concerns :electron
+      end
       scope :raw do
         concerns :raw
       end
@@ -600,6 +615,17 @@ Rails.application.routes.draw do
         end
       when Keygen.singleplayer?
         concerns :tauri
+      end
+    end
+
+    scope module: 'api/v1/release_engines', constraints: { subdomain: 'electron.pkg' } do
+      case
+      when Keygen.multiplayer?
+        scope ':account_id', as: :account do
+          concerns :electron
+        end
+      when Keygen.singleplayer?
+        concerns :electron
       end
     end
 
