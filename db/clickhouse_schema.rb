@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_16_104304) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_23_160228) do
   # TABLE: active_licensed_user_sparks
   # SQL: CREATE TABLE active_licensed_user_sparks ( `account_id` UUID, `environment_id` Nullable(UUID), `count` UInt64 DEFAULT 0, `created_date` Date, `created_at` DateTime64(3), INDEX idx_environment environment_id TYPE bloom_filter GRANULARITY 4 ) ENGINE = MergeTree PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date) SETTINGS index_granularity = 8192
   create_table "active_licensed_user_sparks", id: false, options: "MergeTree PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date) SETTINGS index_granularity = 8192", force: :cascade do |t|
@@ -81,6 +81,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_16_104304) do
     t.index "environment_id", name: "idx_environment", type: "bloom_filter", granularity: 4
     t.index "idempotency_key", name: "idx_idempotency", type: "bloom_filter", granularity: 4
     t.index "id", name: "idx_id", type: "bloom_filter", granularity: 4
+  end
+
+  # TABLE: event_sparks
+  # SQL: CREATE TABLE event_sparks ( `account_id` UUID, `environment_id` Nullable(UUID), `event_type_id` UUID, `count` UInt64 DEFAULT 0, `created_date` Date, `created_at` DateTime64(3), INDEX idx_environment environment_id TYPE bloom_filter GRANULARITY 4, INDEX idx_event_type event_type_id TYPE bloom_filter GRANULARITY 4 ) ENGINE = MergeTree PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date) SETTINGS index_granularity = 8192
+  create_table "event_sparks", id: false, options: "MergeTree PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date) SETTINGS index_granularity = 8192", force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.uuid "environment_id"
+    t.uuid "event_type_id", null: false
+    t.integer "count", limit: 8, default: 0, null: false
+    t.date "created_date", null: false
+    t.datetime "created_at", precision: 3, null: false
+
+    t.index "environment_id", name: "idx_environment", type: "bloom_filter", granularity: 4
+    t.index "event_type_id", name: "idx_event_type", type: "bloom_filter", granularity: 4
   end
 
   # TABLE: license_sparks

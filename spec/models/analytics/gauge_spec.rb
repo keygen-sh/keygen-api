@@ -36,6 +36,13 @@ describe Analytics::Gauge do
         expect(gauge).to be_valid
       end
 
+      it 'returns gauge for events', :only_clickhouse do
+        gauge = described_class.new(:events, account:, event: 'license.created')
+
+        expect(gauge).to be_an Analytics::Gauge
+        expect(gauge).to be_valid
+      end
+
       it 'accepts string names' do
         gauge = described_class.new('machines', account:)
 
@@ -258,6 +265,75 @@ describe Analytics::Gauge do
 
         expect(gauge.measurements).to satisfy do
           it in [Analytics::Gauge::Measurement(metric: 'alus', count: 3)]
+        end
+      end
+    end
+  end
+
+  describe ':events', :only_clickhouse do
+    before { Sidekiq::Testing.inline! }
+    after  { Sidekiq::Testing.fake! }
+
+    context 'with no events' do
+      it 'returns empty measurements' do
+        gauge = described_class.new(:events, account:, event: 'license.created')
+
+        expect(gauge.measurements).to be_empty
+      end
+    end
+
+    context 'with events' do
+      before do
+        license = create(:license, account:)
+
+        create_list(:event_log, 3, :license_created,              account:, resource: license)
+        create_list(:event_log, 2, :license_validation_succeeded, account:, resource: license, metadata: { code: 'VALID' })
+      end
+
+      it 'returns measurements for a specific event' do
+        gauge = described_class.new(:events, account:, event: 'license.created')
+
+        expect(gauge.measurements).to satisfy do
+          it in [Analytics::Gauge::Measurement(metric: 'events.license-created', count: 3)]
+        end
+      end
+
+      it 'returns measurements for wildcard pattern' do
+        gauge = described_class.new(:events, account:, event: 'license.*')
+
+        expect(gauge.measurements).to satisfy do
+          it in [
+            Analytics::Gauge::Measurement(metric: 'events.license-created', count: 3),
+            Analytics::Gauge::Measurement(metric: 'events.license-validation-succeeded', count: 2),
+          ]
+        end
+      end
+    end
+
+    context 'with environment scoping' do
+      let(:environment) { create(:environment, account:) }
+
+      before do
+        scoped_license = create(:license, account:, environment:)
+        global_license = create(:license, account:, environment: nil)
+
+        create_list(:event_log, 3, :license_created, account:, resource: scoped_license, environment:)
+        create_list(:event_log, 2, :license_created, account:, resource: global_license, environment: nil)
+      end
+
+      it 'returns only environment-scoped measurements' do
+        gauge = described_class.new(:events, account:, environment:, event: 'license.created')
+
+        expect(gauge.measurements).to satisfy do
+          it in [Analytics::Gauge::Measurement(metric: 'events.license-created', count: 3)]
+        end
+      end
+
+      it 'returns only global measurements when no environment' do
+        gauge = described_class.new(:events, account:, event: 'license.created')
+
+        expect(gauge.measurements).to satisfy do
+          it in [Analytics::Gauge::Measurement(metric: 'events.license-created', count: 2)]
         end
       end
     end

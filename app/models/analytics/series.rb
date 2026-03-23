@@ -12,6 +12,7 @@ module Analytics
       sparks: Sparks,
       validations: Sparks::Validations,
       requests: Sparks::Requests,
+      events2: Sparks::Events, # FIXME(ezekg) replace events after backfill
     }
 
     include ActiveModel::Model
