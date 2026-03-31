@@ -18,9 +18,12 @@ class ApplicationRecord < ActiveRecord::Base
   before_destroy :mark_for_destruction,
     prepend: true
 
-  default_scope -> {
+  # FIXME(ezekg) would be great to eventually remove the default scope
+  default_scope -> { ordered }
+
+  scope :ordered, -> (dir = DEFAULT_SORT_ORDER) {
     # FIXME(ezekg) why do we need an explicit table_name everywhere?
-    order("#{table_name}.created_at": DEFAULT_SORT_ORDER)
+    reorder("#{table_name}.created_at": dir)
   }
 
   scope :without_order, -> {
