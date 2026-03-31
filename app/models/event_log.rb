@@ -30,9 +30,9 @@ class EventLog < ClickhouseRecord
   scope :ordered, -> (dir = :desc) {
     case dir
     in :desc
-      order(created_date: :desc).order('UUIDToNum(id) DESC')
+      reorder(created_date: :desc).order('UUIDToNum(id) DESC')
     in :asc
-      order(created_date: :asc).order('UUIDToNum(id) ASC')
+      reorder(created_date: :asc).order('UUIDToNum(id) ASC')
     end
   }
 
