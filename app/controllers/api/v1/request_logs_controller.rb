@@ -2,7 +2,7 @@
 
 module Api::V1
   class RequestLogsController < Api::V1::BaseController
-    has_scope(:date, type: :hash, using: [:start, :end], only: :index)
+    has_scope(:date, type: :hash, using: [:start, :end]) { |c, s, v| s.for_date_range(*v) }
     has_scope(:requestor, type: :any) { |c, s, v| s.search_requestor(v) }
     has_scope(:resource, type: :any) { |c, s, v| s.search_resource(v) }
     has_scope(:ip) { |c, s, v| s.search_ip(v) }

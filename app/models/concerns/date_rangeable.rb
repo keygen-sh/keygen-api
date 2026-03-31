@@ -7,7 +7,7 @@ module DateRangeable
   MIN_RANGE = 1
 
   included do
-    scope :date, -> (date_start, date_end) {
+    scope :for_date_range, -> (date_start, date_end) {
       begin
         date_start = date_start.to_datetime.beginning_of_day
         date_end = date_end.to_datetime.end_of_day
@@ -17,7 +17,12 @@ module DateRangeable
           raise Keygen::Error::InvalidParameterError.new(parameter: "date"), "date range must be between #{MIN_RANGE} and #{MAX_RANGE} days (got #{diff})"
         end
 
-        where created_at: (date_start..date_end)
+        # NB(ezekg) prefer created_date column if supported
+        if column_names.include?("created_date")
+          where(created_date: date_start..date_end)
+        else
+          where(created_at: date_start..date_end)
+        end
       rescue ArgumentError
         raise Keygen::Error::InvalidParameterError.new(parameter: "date"), "invalid date range"
       end

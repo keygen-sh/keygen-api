@@ -2,7 +2,7 @@
 
 module Api::V1
   class EventLogsController < Api::V1::BaseController
-    has_scope(:date, type: :hash, using: [:start, :end], only: :index)
+    has_scope(:date, type: :hash, using: [:start, :end]) { |c, s, v| s.for_date_range(*v) }
     has_scope(:whodunnit, type: :any) { |c, s, v| s.search_whodunnit(v) }
     has_scope(:resource, type: :any) { |c, s, v| s.search_resource(v) }
     has_scope(:request) { |c, s, v| s.search_request_id(v) }
