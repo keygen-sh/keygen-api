@@ -8,10 +8,10 @@ GIT
 
 GIT
   remote: https://github.com/keygen-sh/clickhouse-activerecord.git
-  revision: bbad22d10b7a1758d18f62a56d0443b7c8372715
-  ref: bbad22d10b7a1758d18f62a56d0443b7c8372715
+  revision: adeff17df2227e2f97d0c27b9aa4c2228da8a92a
+  ref: adeff17df2227e2f97d0c27b9aa4c2228da8a92a
   specs:
-    clickhouse-activerecord (1.6.6)
+    clickhouse-activerecord (1.6.7)
       activerecord (>= 7.1, < 9.0)
       bundler (>= 1.13.4)
 
