@@ -17,22 +17,14 @@ module Api::V1
     before_action :set_request_log, only: %i[show]
 
     def index
-      authorize! with: RequestLogPolicy
+      request_logs = apply_pagination(authorized_scope(apply_scopes(current_account.request_logs.ordered.without_blobs)).preload(:account))
+      authorize! request_logs
 
-      json = Rails.cache.fetch(cache_key, expires_in: 1.minute, race_condition_ttl: 30.seconds) do
-        request_logs = apply_pagination(authorized_scope(apply_scopes(current_account.request_logs.ordered.without_blobs)).preload(:account))
-        data = Keygen::JSONAPI.render(request_logs)
-
-        data.tap do |d|
-          d[:links] = pagination_links(request_logs)
-        end
-      end
-
-      render json: json
+      render jsonapi: request_logs
     end
 
     def show
-      authorize! with: RequestLogPolicy
+      authorize! request_log
 
       render jsonapi: request_log
     end
@@ -47,10 +39,6 @@ module Api::V1
       @request_log = scoped_request_logs.find_by!(id: params[:id])
 
       Current.resource = request_log
-    end
-
-    def cache_key
-      [:request_logs, current_account.id, Digest::SHA2.hexdigest(request.query_string), CACHE_KEY_VERSION].join ":"
     end
 
     def require_ee!

@@ -69,6 +69,104 @@ Feature: List request logs
       }
       """
 
+  Scenario: Admin retrieves a keyset-paginated list of request logs (first page)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 19 "request-logs"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/request-logs?page[size]=5&page[cursor]="
+    Then the response status should be "200"
+    And the response body should be an array with 5 "request-logs"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/request-logs?page[cursor]=&page[size]=5",
+        "next": "/v1/accounts/test1/request-logs?page[cursor]=$request_logs[-5]&page[size]=5"
+      }
+      """
+
+  Scenario: Admin retrieves a keyset-paginated list of request logs (next page)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 19 "request-logs"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/request-logs?page[size]=5&page[cursor]=$request_logs[-5]"
+    Then the response status should be "200"
+    And the response body should be an array with 5 "request-logs"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/request-logs?page[cursor]=$request_logs[-5]&page[size]=5",
+        "next": "/v1/accounts/test1/request-logs?page[cursor]=$request_logs[-10]&page[size]=5"
+      }
+      """
+
+  Scenario: Admin retrieves a keyset-paginated list of request logs (last page)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 19 "request-logs"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/request-logs?page[size]=5&page[cursor]=$request_logs[-15]"
+    Then the response status should be "200"
+    And the response body should be an array with 4 "request-logs"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/request-logs?page[cursor]=$request_logs[-15]&page[size]=5",
+        "next": null
+      }
+      """
+
+  Scenario: Admin retrieves a keyset-paginated list of request logs (no results)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/request-logs?page[size]=5&page[cursor]="
+    Then the response status should be "200"
+    And the response body should be an array with 0 "request-logs"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/request-logs?page[cursor]=&page[size]=5",
+        "next": null
+      }
+      """
+
+  Scenario: Admin retrieves a keyset-paginated list of request logs (nonexistent cursor)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 19 "request-logs"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/request-logs?page[size]=5&page[cursor]=db59a182-a078-47b6-be29-d2b73a849ef2"
+    Then the response status should be "200"
+    And the response body should be an array with 0 "request-logs"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/request-logs?page[cursor]=db59a182-a078-47b6-be29-d2b73a849ef2&page[size]=5",
+        "next": null
+      }
+      """
+
+  Scenario: Admin retrieves a keyset-paginated list of request logs (invalid cursor)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 19 "request-logs"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/request-logs?page[size]=5&page[cursor]=foo"
+    Then the response status should be "400"
+    And the response body should be an array of 1 errors
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "page cursor must be a valid UUID (got \"foo\")",
+        "source": {
+          "parameter": "page[cursor]"
+        }
+      }
+      """
+
   Scenario: Admin retrieves a list of logs within a date range that's full
     Given I am an admin of account "test1"
     And the current account is "test1"

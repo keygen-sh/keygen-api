@@ -126,6 +126,54 @@ Feature: List event logs
       }
       """
 
+  Scenario: Admin retrieves a keyset-paginated list of event logs (first page)
+    Given I am an admin of account "ent"
+    And the current account is "ent"
+    And the current account has 19 "event-logs"
+    And I use an authentication token
+    When I send a GET request to "/accounts/ent/event-logs?page[size]=5&page[cursor]="
+    Then the response status should be "200"
+    And the response body should be an array with 5 "event-logs"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/ent/event-logs?page[cursor]=&page[size]=5",
+        "next": "/v1/accounts/ent/event-logs?page[cursor]=$event_logs[-5]&page[size]=5"
+      }
+      """
+
+  Scenario: Admin retrieves a keyset-paginated list of event logs (next page)
+    Given I am an admin of account "ent"
+    And the current account is "ent"
+    And the current account has 19 "event-logs"
+    And I use an authentication token
+    When I send a GET request to "/accounts/ent/event-logs?page[size]=5&page[cursor]=$event_logs[-5]"
+    Then the response status should be "200"
+    And the response body should be an array with 5 "event-logs"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/ent/event-logs?page[cursor]=$event_logs[-5]&page[size]=5",
+        "next": "/v1/accounts/ent/event-logs?page[cursor]=$event_logs[-10]&page[size]=5"
+      }
+      """
+
+  Scenario: Admin retrieves a keyset-paginated list of event logs (last page)
+    Given I am an admin of account "ent"
+    And the current account is "ent"
+    And the current account has 19 "event-logs"
+    And I use an authentication token
+    When I send a GET request to "/accounts/ent/event-logs?page[size]=5&page[cursor]=$event_logs[-15]"
+    Then the response status should be "200"
+    And the response body should be an array with 4 "event-logs"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/ent/event-logs?page[cursor]=$event_logs[-15]&page[size]=5",
+        "next": null
+      }
+      """
+
   Scenario: Admin retrieves a list of logs within a date range that's full
     Given I am an admin of account "ent"
     And the current account is "ent"

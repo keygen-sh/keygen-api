@@ -66,7 +66,7 @@ Feature: List entitlements
     Then the response status should be "200"
     And the response body should be an array with 5 "entitlements"
 
-  Scenario: Admin retrieves a paginated list of entitlements
+  Scenario: Admin retrieves an offset-paginated list of entitlements
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 10 "entitlements"
@@ -87,7 +87,7 @@ Feature: List entitlements
       }
       """
 
-  Scenario: Admin retrieves a paginated list of entitlements with a page size that is too high
+  Scenario: Admin retrieves an offset-paginated list of entitlements with a page size that is too high
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 10 "entitlements"
@@ -95,7 +95,7 @@ Feature: List entitlements
     When I send a GET request to "/accounts/test1/entitlements?page[number]=1&page[size]=250"
     Then the response status should be "400"
 
-  Scenario: Admin retrieves a paginated list of entitlements with a page size that is too low
+  Scenario: Admin retrieves an offset-paginated list of entitlements with a page size that is too low
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "entitlements"
@@ -103,13 +103,61 @@ Feature: List entitlements
     When I send a GET request to "/accounts/test1/entitlements?page[number]=1&page[size]=-10"
     Then the response status should be "400"
 
-  Scenario: Admin retrieves a paginated list of entitlements with an invalid page number
+  Scenario: Admin retrieves an offset-paginated list of entitlements with an invalid page number
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 10 "entitlements"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/entitlements?page[number]=-1&page[size]=10"
     Then the response status should be "400"
+
+  Scenario: Admin retrieves a keyset-paginated list of entitlements (first page)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 19 "entitlements"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/entitlements?page[size]=5&page[cursor]="
+    Then the response status should be "200"
+    And the response body should be an array with 5 "entitlements"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/entitlements?page[cursor]=&page[size]=5",
+        "next": "/v1/accounts/test1/entitlements?page[cursor]=$entitlements[-5]&page[size]=5"
+      }
+      """
+
+  Scenario: Admin retrieves a keyset-paginated list of entitlements (next page)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 19 "entitlements"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/entitlements?page[size]=5&page[cursor]=$entitlements[-5]"
+    Then the response status should be "200"
+    And the response body should be an array with 5 "entitlements"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/entitlements?page[cursor]=$entitlements[-5]&page[size]=5",
+        "next": "/v1/accounts/test1/entitlements?page[cursor]=$entitlements[-10]&page[size]=5"
+      }
+      """
+
+  Scenario: Admin retrieves a keyset-paginated list of entitlements (last page)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 19 "entitlements"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/entitlements?page[size]=5&page[cursor]=$entitlements[-15]"
+    Then the response status should be "200"
+    And the response body should be an array with 4 "entitlements"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/entitlements?page[cursor]=$entitlements[-15]&page[size]=5",
+        "next": null
+      }
+      """
 
   Scenario: Admin retrieves all entitlements without a limit for their account
     Given I am an admin of account "test1"

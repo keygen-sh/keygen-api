@@ -16,23 +16,14 @@ module Api::V1
     before_action :set_event_log, only: %i[show]
 
     def index
-      authorize! with: EventLogPolicy
+      event_logs = apply_pagination(authorized_scope(apply_scopes(current_account.event_logs.ordered)).preload(:event_type, :account))
+      authorize! event_logs
 
-      json = Rails.cache.fetch(cache_key, expires_in: 1.minute, race_condition_ttl: 30.seconds) do
-        event_logs = apply_pagination(authorized_scope(apply_scopes(current_account.event_logs.ordered)).preload(:event_type, :account))
-        data = Keygen::JSONAPI.render(event_logs)
-
-        data.tap do |d|
-          d[:links] = pagination_links(event_logs)
-        end
-      end
-
-      render json: json
+      render jsonapi: event_logs
     end
 
     def show
-      authorize! event_log,
-        with: EventLogPolicy
+      authorize! event_log
 
       render jsonapi: event_log
     end
@@ -47,10 +38,6 @@ module Api::V1
       @event_log = scoped_event_logs.find_by!(id: params[:id])
 
       Current.resource = event_log
-    end
-
-    def cache_key
-      [:event_logs, current_account.id, Digest::SHA2.hexdigest(request.query_string), CACHE_KEY_VERSION].join ":"
     end
 
     def require_ee!

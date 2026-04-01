@@ -26,16 +26,8 @@ class ApplicationRecord < ActiveRecord::Base
     reorder("#{table_name}.created_at": dir)
   }
 
-  scope :without_order, -> {
-    reorder(nil)
-  }
-
   scope :unordered, -> {
-    without_order
-  }
-
-  scope :without_limit, -> {
-    limit(nil)
+    reorder(nil)
   }
 
   # sample returns a random record for the model.

@@ -6,7 +6,7 @@ require 'spec_helper'
 require_dependency Rails.root / 'lib' / 'read_your_own_writes'
 
 describe ReadYourOwnWrites do
-   around do |example|
+  around do |example|
     config_was, ReadYourOwnWrites.configuration = ReadYourOwnWrites.configuration, nil
 
     example.run

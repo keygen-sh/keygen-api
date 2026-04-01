@@ -34,26 +34,26 @@ Feature: List plans
     Then the response status should be "200"
     And the response body should be an array with 2 "plans"
 
-  Scenario: Anonymous retrieves a paginated list of plans
+  Scenario: Anonymous retrieves an offset-paginated list of plans
     Given there exists 20 "plans"
     When I send a GET request to "/plans?page[number]=2&page[size]=5"
     Then the response status should be "200"
     And the response body should be an array with 5 "plans"
     And sidekiq should have 0 "request-log" jobs
 
-  Scenario: Anonymous retrieves a paginated list of plans with a page size that is too high
+  Scenario: Anonymous retrieves an offset-paginated list of plans with a page size that is too high
     Given there exists 20 "plans"
     When I send a GET request to "/plans?page[number]=1&page[size]=250"
     Then the response status should be "400"
     And sidekiq should have 0 "request-log" jobs
 
-  Scenario: Anonymous retrieves a paginated list of plans with a page size that is too low
+  Scenario: Anonymous retrieves an offset-paginated list of plans with a page size that is too low
     Given there exists 20 "plans"
     When I send a GET request to "/plans?page[number]=1&page[size]=-10"
     Then the response status should be "400"
     And sidekiq should have 0 "request-log" jobs
 
-  Scenario: Anonymous retrieves a paginated list of plans with an invalid page number
+  Scenario: Anonymous retrieves an offset-paginated list of plans with an invalid page number
     Given there exists 20 "plans"
     When I send a GET request to "/plans?page[number]=-1&page[size]=10"
     Then the response status should be "400"

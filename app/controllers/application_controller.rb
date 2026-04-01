@@ -480,6 +480,8 @@ class ApplicationController < ActionController::API
       e.code.present?
 
     render_bad_request(**kwargs)
+  rescue KeysetPagination::InvalidParameterError => e
+    render_bad_request(detail: e.message, source: { parameter: e.parameter })
   rescue Keygen::Error::InvalidSingleSignOnError => e
     Keygen.logger.warn { "[sso] error=#{e.class.inspect} code=#{e.code.inspect} message=#{e.message.inspect}" }
 

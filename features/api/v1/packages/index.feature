@@ -85,7 +85,7 @@ Feature: List packages
     Then the response status should be "200"
     And the response body should be an array with 5 "packages"
 
-  Scenario: Admin retrieves a paginated list of packages
+  Scenario: Admin retrieves an offset-paginated list of packages
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "packages"
@@ -106,7 +106,7 @@ Feature: List packages
       }
       """
 
-  Scenario: Admin retrieves a paginated list of packages with a page size that is too high
+  Scenario: Admin retrieves an offset-paginated list of packages with a page size that is too high
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "packages"
@@ -114,7 +114,7 @@ Feature: List packages
     When I send a GET request to "/accounts/test1/packages?page[number]=1&page[size]=250"
     Then the response status should be "400"
 
-  Scenario: Admin retrieves a paginated list of packages with a page size that is too low
+  Scenario: Admin retrieves an offset-paginated list of packages with a page size that is too low
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "packages"
@@ -122,13 +122,61 @@ Feature: List packages
     When I send a GET request to "/accounts/test1/packages?page[number]=1&page[size]=-10"
     Then the response status should be "400"
 
-  Scenario: Admin retrieves a paginated list of packages with an invalid page number
+  Scenario: Admin retrieves an offset-paginated list of packages with an invalid page number
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "packages"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/packages?page[number]=-1&page[size]=10"
     Then the response status should be "400"
+
+  Scenario: Admin retrieves a keyset-paginated list of packages (first page)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 19 "packages"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/packages?page[size]=5&page[cursor]="
+    Then the response status should be "200"
+    And the response body should be an array with 5 "packages"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/packages?page[cursor]=&page[size]=5",
+        "next": "/v1/accounts/test1/packages?page[cursor]=$packages[-5]&page[size]=5"
+      }
+      """
+
+  Scenario: Admin retrieves a keyset-paginated list of packages (next page)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 19 "packages"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/packages?page[size]=5&page[cursor]=$packages[-5]"
+    Then the response status should be "200"
+    And the response body should be an array with 5 "packages"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/packages?page[cursor]=$packages[-5]&page[size]=5",
+        "next": "/v1/accounts/test1/packages?page[cursor]=$packages[-10]&page[size]=5"
+      }
+      """
+
+  Scenario: Admin retrieves a keyset-paginated list of packages (last page)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 19 "packages"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/packages?page[size]=5&page[cursor]=$packages[-15]"
+    Then the response status should be "200"
+    And the response body should be an array with 4 "packages"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/packages?page[cursor]=$packages[-15]&page[size]=5",
+        "next": null
+      }
+      """
 
   Scenario: Admin retrieves all packages without a limit for their account
     Given I am an admin of account "test1"

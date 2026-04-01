@@ -67,7 +67,7 @@ Feature: List license
     Then the response status should be "200"
     And the response body should be an array with 2 "licenses"
 
-  Scenario: Admin retrieves a paginated list of licenses
+  Scenario: Admin retrieves an offset-paginated list of licenses
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "licenses"
@@ -89,7 +89,7 @@ Feature: List license
       """
     And the response should contain a valid signature header for "test1"
 
-  Scenario: Admin retrieves a paginated list of licenses with a page size that is too high
+  Scenario: Admin retrieves an offset-paginated list of licenses with a page size that is too high
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "licenses"
@@ -97,7 +97,7 @@ Feature: List license
     When I send a GET request to "/accounts/test1/licenses?page[number]=1&page[size]=250"
     Then the response status should be "400"
 
-  Scenario: Admin retrieves a paginated list of licenses with a page size that is too low
+  Scenario: Admin retrieves an offset-paginated list of licenses with a page size that is too low
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "licenses"
@@ -105,7 +105,7 @@ Feature: List license
     When I send a GET request to "/accounts/test1/licenses?page[number]=1&page[size]=-250"
     Then the response status should be "400"
 
-  Scenario: Admin retrieves a paginated list of licenses with an invalid page number (negative)
+  Scenario: Admin retrieves an offset-paginated list of licenses with an invalid page number (negative)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "licenses"
@@ -113,13 +113,125 @@ Feature: List license
     When I send a GET request to "/accounts/test1/licenses?page[number]=-1&page[size]=10"
     Then the response status should be "400"
 
-  Scenario: Admin retrieves a paginated list of licenses with an invalid page number (type)
+  Scenario: Admin retrieves an offset-paginated list of licenses with an invalid page number (type)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "licenses"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?page%5Bnumber%5D%3D=0"
     Then the response status should be "400"
+
+  Scenario: Admin retrieves an offset-paginated list of licenses with a page number that is too high
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 20 "licenses"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?page[number]=101&page[size]=100"
+    Then the response status should be "400"
+
+  Scenario: Admin retrieves an offset-paginated list of licenses with a page number that is too low
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 20 "licenses"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?page[number]=0&page[size]=100"
+    Then the response status should be "400"
+
+  Scenario: Admin retrieves a keyset-paginated list of licenses (first page)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 19 "licenses"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?page[size]=5&page[cursor]="
+    Then the response status should be "200"
+    And the response body should be an array with 5 "licenses"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/licenses?page[cursor]=&page[size]=5",
+        "next": "/v1/accounts/test1/licenses?page[cursor]=$licenses[-5]&page[size]=5"
+      }
+      """
+
+  Scenario: Admin retrieves a keyset-paginated list of licenses (next page)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 19 "licenses"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?page[size]=5&page[cursor]=$licenses[-5]"
+    Then the response status should be "200"
+    And the response body should be an array with 5 "licenses"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/licenses?page[cursor]=$licenses[-5]&page[size]=5",
+        "next": "/v1/accounts/test1/licenses?page[cursor]=$licenses[-10]&page[size]=5"
+      }
+      """
+
+  Scenario: Admin retrieves a keyset-paginated list of licenses (last page)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 19 "licenses"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?page[size]=5&page[cursor]=$licenses[-15]"
+    Then the response status should be "200"
+    And the response body should be an array with 4 "licenses"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/licenses?page[cursor]=$licenses[-15]&page[size]=5",
+        "next": null
+      }
+      """
+
+  Scenario: Admin retrieves a keyset-paginated list of licenses (no results)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?page[size]=5&page[cursor]="
+    Then the response status should be "200"
+    And the response body should be an array with 0 "licenses"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/licenses?page[cursor]=&page[size]=5",
+        "next": null
+      }
+      """
+
+  Scenario: Admin retrieves a keyset-paginated list of licenses (nonexistent cursor)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?page[size]=5&page[cursor]=52a26820-0caa-4bac-9ff1-27bb6ec77ac4"
+    Then the response status should be "200"
+    And the response body should be an array with 0 "licenses"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/licenses?page[cursor]=52a26820-0caa-4bac-9ff1-27bb6ec77ac4&page[size]=5",
+        "next": null
+      }
+      """
+
+  Scenario: Admin retrieves a keyset-paginated list of licenses (invalid cursor)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?page[size]=5&page[cursor]=foo"
+    Then the response status should be "400"
+    And the response body should be an array of 1 errors
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "page cursor must be a valid UUID (got \"foo\")",
+        "source": {
+          "parameter": "page[cursor]"
+        }
+      }
+      """
 
   Scenario: Admin retrieves all licenses without a limit for their account
     Given I am an admin of account "test1"
