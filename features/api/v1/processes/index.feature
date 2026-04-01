@@ -63,7 +63,7 @@ Feature: List machine processes
     When I send a GET request to "/accounts/test1/processes"
     Then the response status should be "200"
 
-  Scenario: Admin retrieves a paginated list of processes
+  Scenario: Admin retrieves an offset-paginated list of processes
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "processes"
@@ -72,7 +72,7 @@ Feature: List machine processes
     Then the response status should be "200"
     And the response body should be an array with 5 "processes"
 
-  Scenario: Admin retrieves a paginated list of processes scoped to product
+  Scenario: Admin retrieves an offset-paginated list of processes scoped to product
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "products"
@@ -103,7 +103,7 @@ Feature: List machine processes
       }
       """
 
-  Scenario: Admin retrieves a paginated list of processes scoped to license
+  Scenario: Admin retrieves an offset-paginated list of processes scoped to license
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "products"
@@ -134,7 +134,7 @@ Feature: List machine processes
       }
       """
 
-  Scenario: Admin retrieves a paginated list of processes scoped to machine
+  Scenario: Admin retrieves an offset-paginated list of processes scoped to machine
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "products"
@@ -165,7 +165,7 @@ Feature: List machine processes
       }
       """
 
-  Scenario: Admin retrieves a paginated list of processes scoped to owner
+  Scenario: Admin retrieves an offset-paginated list of processes scoped to owner
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "products"
@@ -208,7 +208,7 @@ Feature: List machine processes
       }
       """
 
-  Scenario: Admin retrieves a paginated list of processes scoped to user
+  Scenario: Admin retrieves an offset-paginated list of processes scoped to user
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "products"
@@ -251,7 +251,7 @@ Feature: List machine processes
       }
       """
 
-  Scenario: Admin retrieves a paginated list of processes with a page size that is too high
+  Scenario: Admin retrieves an offset-paginated list of processes with a page size that is too high
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "processes"
@@ -259,7 +259,7 @@ Feature: List machine processes
     When I send a GET request to "/accounts/test1/processes?page[number]=1&page[size]=250"
     Then the response status should be "400"
 
-  Scenario: Admin retrieves a paginated list of processes with a page size that is too low
+  Scenario: Admin retrieves an offset-paginated list of processes with a page size that is too low
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "processes"
@@ -267,7 +267,7 @@ Feature: List machine processes
     When I send a GET request to "/accounts/test1/processes?page[number]=1&page[size]=0"
     Then the response status should be "400"
 
-  Scenario: Admin retrieves a paginated list of processes with an invalid page number
+  Scenario: Admin retrieves an offset-paginated list of processes with an invalid page number
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "processes"
@@ -275,13 +275,61 @@ Feature: List machine processes
     When I send a GET request to "/accounts/test1/processes?page[number]=-1&page[size]=10"
     Then the response status should be "400"
 
-  Scenario: Admin retrieves a paginated list of processes with an invalid page param
+  Scenario: Admin retrieves an offset-paginated list of processes with an invalid page param
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "processes"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes?page=1&size=100"
     Then the response status should be "400"
+
+  Scenario: Admin retrieves a keyset-paginated list of processes (first page)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 19 "processes"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/processes?page[size]=5&page[cursor]="
+    Then the response status should be "200"
+    And the response body should be an array with 5 "processes"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/processes?page[cursor]=&page[size]=5",
+        "next": "/v1/accounts/test1/processes?page[cursor]=$processes[-5]&page[size]=5"
+      }
+      """
+
+  Scenario: Admin retrieves a keyset-paginated list of processes (next page)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 19 "processes"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/processes?page[size]=5&page[cursor]=$processes[-5]"
+    Then the response status should be "200"
+    And the response body should be an array with 5 "processes"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/processes?page[cursor]=$processes[-5]&page[size]=5",
+        "next": "/v1/accounts/test1/processes?page[cursor]=$processes[-10]&page[size]=5"
+      }
+      """
+
+  Scenario: Admin retrieves a keyset-paginated list of processes (last page)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 19 "processes"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/processes?page[size]=5&page[cursor]=$processes[-15]"
+    Then the response status should be "200"
+    And the response body should be an array with 4 "processes"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/processes?page[cursor]=$processes[-15]&page[size]=5",
+        "next": null
+      }
+      """
 
   Scenario: Admin retrieves all processes without a limit for their account
     Given I am an admin of account "test1"

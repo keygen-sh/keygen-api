@@ -17,7 +17,7 @@ Feature: License machines relationship
     When I send a GET request to "/accounts/test1/licenses/$0/machines"
     Then the response status should be "403"
 
-  Scenario: Admin retrieves a paginated list of machines for a license with no other pages
+  Scenario: Admin retrieves an offset-paginated list of machines for a license with no other pages
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "license"
@@ -50,7 +50,7 @@ Feature: License machines relationship
       """
     And the response should contain a valid signature header for "test1"
 
-  Scenario: Admin retrieves a paginated list of machines for a license with other pages
+  Scenario: Admin retrieves an offset-paginated list of machines for a license with other pages
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "license"

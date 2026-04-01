@@ -28,7 +28,7 @@ Feature: List keys
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin retrieves a paginated list of keys
+  Scenario: Admin retrieves an offset-paginated list of keys
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "keys"
@@ -38,7 +38,7 @@ Feature: List keys
     And the response body should be an array with 5 "keys"
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin retrieves a paginated list of keys with a page size that is too high
+  Scenario: Admin retrieves an offset-paginated list of keys with a page size that is too high
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "keys"
@@ -47,7 +47,7 @@ Feature: List keys
     Then the response status should be "400"
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin retrieves a paginated list of keys with a page size that is too low
+  Scenario: Admin retrieves an offset-paginated list of keys with a page size that is too low
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "keys"
@@ -56,7 +56,7 @@ Feature: List keys
     Then the response status should be "400"
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin retrieves a paginated list of keys with an invalid page number
+  Scenario: Admin retrieves an offset-paginated list of keys with an invalid page number
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "keys"
@@ -64,6 +64,54 @@ Feature: List keys
     When I send a GET request to "/accounts/test1/keys?page[number]=-1&page[size]=10"
     Then the response status should be "400"
     And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin retrieves a keyset-paginated list of keys (first page)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 19 "keys"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/keys?page[size]=5&page[cursor]="
+    Then the response status should be "200"
+    And the response body should be an array with 5 "keys"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/keys?page[cursor]=&page[size]=5",
+        "next": "/v1/accounts/test1/keys?page[cursor]=$keys[-5]&page[size]=5"
+      }
+      """
+
+  Scenario: Admin retrieves a keyset-paginated list of keys (next page)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 19 "keys"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/keys?page[size]=5&page[cursor]=$keys[-5]"
+    Then the response status should be "200"
+    And the response body should be an array with 5 "keys"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/keys?page[cursor]=$keys[-5]&page[size]=5",
+        "next": "/v1/accounts/test1/keys?page[cursor]=$keys[-10]&page[size]=5"
+      }
+      """
+
+  Scenario: Admin retrieves a keyset-paginated list of keys (last page)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 19 "keys"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/keys?page[size]=5&page[cursor]=$keys[-15]"
+    Then the response status should be "200"
+    And the response body should be an array with 4 "keys"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/keys?page[cursor]=$keys[-15]&page[size]=5",
+        "next": null
+      }
+      """
 
   Scenario: Admin retrieves all keys without a limit for their account
     Given I am an admin of account "test1"

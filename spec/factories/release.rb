@@ -139,8 +139,24 @@ FactoryBot.define do
 
     trait :with_constraints do
       after :create do |release|
-        create_list(:release_entitlement_constraint, 10, account: release.account, release:)
+        # NB(ezekg) this matches licenses's with_entitlements trait to ease testing
+        %w[ALPHA BRAVO ZULU].each do |code|
+          create(:release_entitlement_constraint,
+            account: release.account,
+            environment: release.environment,
+            release:,
+            entitlement: build(:entitlement,
+              account: release.account,
+              environment: release.environment,
+              code:,
+            ),
+          )
+        end
       end
+    end
+
+    trait :constrained do
+      with_constraints
     end
 
     trait :in_isolated_environment do

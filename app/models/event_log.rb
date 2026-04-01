@@ -11,6 +11,28 @@ class EventLog < ClickhouseRecord
   include Orderable
   include Pageable
 
+  keyset_pagination do |scope, cursor:, size:, order:|
+    if cursor.present?
+      comparator = order == :desc ? '<' : '>'
+
+      # NB(ezekg) clickhouse raises if the keyset tuple is empty, i.e. the cursor
+      #           row doesn't exist, so we're joining on a CTE beforehand.
+      cursor_cte = scope.reselect(:created_date, :id)
+                        .where(id: cursor)
+                        .ordered(order)
+                        .limit(1)
+
+      scope = scope.with(cursor: cursor_cte)
+                   .joins('JOIN cursor ON TRUE')
+                   .where(
+                     "(#{table_name}.created_date, UUIDToNum(#{table_name}.id)) #{comparator} (cursor.created_date, UUIDToNum(cursor.id))",
+                   )
+    end
+
+    scope.ordered(order)
+         .limit(size)
+  end
+
   belongs_to :event_type
   belongs_to :resource,    polymorphic: true, optional: true
   belongs_to :whodunnit,   polymorphic: true, optional: true

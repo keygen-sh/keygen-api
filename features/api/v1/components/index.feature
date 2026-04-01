@@ -62,7 +62,7 @@ Feature: List machine components
     When I send a GET request to "/accounts/test1/components"
     Then the response status should be "200"
 
-  Scenario: Admin retrieves a paginated list of components
+  Scenario: Admin retrieves an offset-paginated list of components
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "components"
@@ -71,7 +71,7 @@ Feature: List machine components
     Then the response status should be "200"
     And the response body should be an array with 5 "components"
 
-  Scenario: Admin retrieves a paginated list of components scoped to product
+  Scenario: Admin retrieves an offset-paginated list of components scoped to product
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "products"
@@ -102,7 +102,7 @@ Feature: List machine components
       }
       """
 
-  Scenario: Admin retrieves a paginated list of components scoped to license
+  Scenario: Admin retrieves an offset-paginated list of components scoped to license
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "products"
@@ -133,7 +133,7 @@ Feature: List machine components
       }
       """
 
-  Scenario: Admin retrieves a paginated list of components scoped to machine
+  Scenario: Admin retrieves an offset-paginated list of components scoped to machine
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "products"
@@ -164,7 +164,7 @@ Feature: List machine components
       }
       """
 
-  Scenario: Admin retrieves a paginated list of components scoped to owner
+  Scenario: Admin retrieves an offset-paginated list of components scoped to owner
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "products"
@@ -207,7 +207,7 @@ Feature: List machine components
       }
       """
 
-  Scenario: Admin retrieves a paginated list of components scoped to user
+  Scenario: Admin retrieves an offset-paginated list of components scoped to user
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "products"
@@ -250,7 +250,7 @@ Feature: List machine components
       }
       """
 
-  Scenario: Admin retrieves a paginated list of components with a page size that is too high
+  Scenario: Admin retrieves an offset-paginated list of components with a page size that is too high
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "components"
@@ -258,7 +258,7 @@ Feature: List machine components
     When I send a GET request to "/accounts/test1/components?page[number]=1&page[size]=250"
     Then the response status should be "400"
 
-  Scenario: Admin retrieves a paginated list of components with a page size that is too low
+  Scenario: Admin retrieves an offset-paginated list of components with a page size that is too low
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "components"
@@ -266,7 +266,7 @@ Feature: List machine components
     When I send a GET request to "/accounts/test1/components?page[number]=1&page[size]=0"
     Then the response status should be "400"
 
-  Scenario: Admin retrieves a paginated list of components with an invalid page number
+  Scenario: Admin retrieves an offset-paginated list of components with an invalid page number
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "components"
@@ -274,13 +274,61 @@ Feature: List machine components
     When I send a GET request to "/accounts/test1/components?page[number]=-1&page[size]=10"
     Then the response status should be "400"
 
-  Scenario: Admin retrieves a paginated list of components with an invalid page param
+  Scenario: Admin retrieves an offset-paginated list of components with an invalid page param
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "components"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/components?page=1&size=100"
     Then the response status should be "400"
+
+  Scenario: Admin retrieves a keyset-paginated list of components (first page)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 19 "components"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/components?page[size]=5&page[cursor]="
+    Then the response status should be "200"
+    And the response body should be an array with 5 "components"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/components?page[cursor]=&page[size]=5",
+        "next": "/v1/accounts/test1/components?page[cursor]=$components[-5]&page[size]=5"
+      }
+      """
+
+  Scenario: Admin retrieves a keyset-paginated list of components (next page)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 19 "components"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/components?page[size]=5&page[cursor]=$components[-5]"
+    Then the response status should be "200"
+    And the response body should be an array with 5 "components"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/components?page[cursor]=$components[-5]&page[size]=5",
+        "next": "/v1/accounts/test1/components?page[cursor]=$components[-10]&page[size]=5"
+      }
+      """
+
+  Scenario: Admin retrieves a keyset-paginated list of components (last page)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 19 "components"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/components?page[size]=5&page[cursor]=$components[-15]"
+    Then the response status should be "200"
+    And the response body should be an array with 4 "components"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/components?page[cursor]=$components[-15]&page[size]=5",
+        "next": null
+      }
+      """
 
   Scenario: Admin retrieves all components without a limit for their account
     Given I am an admin of account "test1"

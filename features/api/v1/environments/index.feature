@@ -66,7 +66,7 @@ Feature: List environments
     Then the response status should be "200"
     And the response body should be an array with 5 "environments"
 
-  Scenario: Admin retrieves a paginated list of environments
+  Scenario: Admin retrieves an offset-paginated list of environments
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 10 "environments"
@@ -87,7 +87,7 @@ Feature: List environments
       }
       """
 
-  Scenario: Admin retrieves a paginated list of environments with a page size that is too high
+  Scenario: Admin retrieves an offset-paginated list of environments with a page size that is too high
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 10 "environments"
@@ -95,7 +95,7 @@ Feature: List environments
     When I send a GET request to "/accounts/test1/environments?page[number]=1&page[size]=250"
     Then the response status should be "400"
 
-  Scenario: Admin retrieves a paginated list of environments with a page size that is too low
+  Scenario: Admin retrieves an offset-paginated list of environments with a page size that is too low
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "environments"
@@ -103,13 +103,61 @@ Feature: List environments
     When I send a GET request to "/accounts/test1/environments?page[number]=1&page[size]=-10"
     Then the response status should be "400"
 
-  Scenario: Admin retrieves a paginated list of environments with an invalid page number
+  Scenario: Admin retrieves an offset-paginated list of environments with an invalid page number
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 10 "environments"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/environments?page[number]=-1&page[size]=10"
     Then the response status should be "400"
+
+  Scenario: Admin retrieves a keyset-paginated list of environments (first page)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 19 "environments"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/environments?page[size]=5&page[cursor]="
+    Then the response status should be "200"
+    And the response body should be an array with 5 "environments"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/environments?page[cursor]=&page[size]=5",
+        "next": "/v1/accounts/test1/environments?page[cursor]=$environments[-5]&page[size]=5"
+      }
+      """
+
+  Scenario: Admin retrieves a keyset-paginated list of environments (next page)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 19 "environments"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/environments?page[size]=5&page[cursor]=$environments[-5]"
+    Then the response status should be "200"
+    And the response body should be an array with 5 "environments"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/environments?page[cursor]=$environments[-5]&page[size]=5",
+        "next": "/v1/accounts/test1/environments?page[cursor]=$environments[-10]&page[size]=5"
+      }
+      """
+
+  Scenario: Admin retrieves a keyset-paginated list of environments (last page)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 19 "environments"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/environments?page[size]=5&page[cursor]=$environments[-15]"
+    Then the response status should be "200"
+    And the response body should be an array with 4 "environments"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/environments?page[cursor]=$environments[-15]&page[size]=5",
+        "next": null
+      }
+      """
 
   Scenario: Admin retrieves all environments without a limit for their account
     Given I am an admin of account "test1"

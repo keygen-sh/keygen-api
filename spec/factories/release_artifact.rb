@@ -70,7 +70,7 @@ FactoryBot.define do
       arch     { nil }
     end
 
-    trait :with_smanifest do
+    trait :with_manifest do
       after :create do |artifact|
         next if artifact.engine.nil?
 

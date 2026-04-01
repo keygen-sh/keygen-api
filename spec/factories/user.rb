@@ -93,12 +93,12 @@ FactoryBot.define do
 
     trait :with_entitled_licenses do
       after :create do |user|
-        licenses = create_list(:license, 3, account: user.account, environment: user.environment, owner: user)
-
-        licenses.each do |license|
-          create_list(:license_entitlement, 10, account: license.account, environment: license.environment, license:)
-        end
+        create_list(:license, 3, :with_entitlements, account: user.account, environment: user.environment, owner: user)
       end
+    end
+
+    trait :entitled do
+      with_entitled_licenses
     end
 
     trait :with_grouped_licenses do

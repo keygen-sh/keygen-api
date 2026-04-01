@@ -68,7 +68,7 @@ Feature: List webhook events
     And the response should contain a valid signature header for "test1"
     And the response body should be an array with 6 "webhook-events"
 
-  Scenario: Admin retrieves a paginated list of webhook events
+  Scenario: Admin retrieves an offset-paginated list of webhook events
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "webhook-events"
@@ -86,7 +86,7 @@ Feature: List webhook events
       """
     And sidekiq should have 0 "request-log" jobs
 
-  Scenario: Admin retrieves the first page a paginated list of webhook events
+  Scenario: Admin retrieves the first page an offset-paginated list of webhook events
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 17 "webhook-events"
@@ -104,7 +104,7 @@ Feature: List webhook events
       """
     And sidekiq should have 0 "request-log" jobs
 
-  Scenario: Admin retrieves the last page of a paginated list of webhook events
+  Scenario: Admin retrieves the last page of an offset-paginated list of webhook events
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 22 "webhook-events"
@@ -122,7 +122,7 @@ Feature: List webhook events
       """
     And sidekiq should have 0 "request-log" jobs
 
-  Scenario: Admin retrieves a paginated list of webhook events with a page size that is too high
+  Scenario: Admin retrieves an offset-paginated list of webhook events with a page size that is too high
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "webhook-events"
@@ -130,7 +130,7 @@ Feature: List webhook events
     When I send a GET request to "/accounts/test1/webhook-events?page[number]=1&page[size]=250"
     Then the response status should be "400"
 
-  Scenario: Admin retrieves a paginated list of webhook events with a page size that is too low
+  Scenario: Admin retrieves an offset-paginated list of webhook events with a page size that is too low
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "webhook-events"
@@ -138,13 +138,61 @@ Feature: List webhook events
     When I send a GET request to "/accounts/test1/webhook-events?page[number]=1&page[size]=-10"
     Then the response status should be "400"
 
-  Scenario: Admin retrieves a paginated list of webhook events with an invalid page number
+  Scenario: Admin retrieves an offset-paginated list of webhook events with an invalid page number
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "webhook-events"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/webhook-events?page[number]=-1&page[size]=10"
     Then the response status should be "400"
+
+  Scenario: Admin retrieves a keyset-paginated list of webhook events (first page)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 19 "webhook-events"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/webhook-events?page[size]=5&page[cursor]="
+    Then the response status should be "200"
+    And the response body should be an array with 5 "webhook-events"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/webhook-events?page[cursor]=&page[size]=5",
+        "next": "/v1/accounts/test1/webhook-events?page[cursor]=$webhook_events[-5]&page[size]=5"
+      }
+      """
+
+  Scenario: Admin retrieves a keyset-paginated list of webhook events (next page)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 19 "webhook-events"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/webhook-events?page[size]=5&page[cursor]=$webhook_events[-5]"
+    Then the response status should be "200"
+    And the response body should be an array with 5 "webhook-events"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/webhook-events?page[cursor]=$webhook_events[-5]&page[size]=5",
+        "next": "/v1/accounts/test1/webhook-events?page[cursor]=$webhook_events[-10]&page[size]=5"
+      }
+      """
+
+  Scenario: Admin retrieves a keyset-paginated list of webhook events (last page)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 19 "webhook-events"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/webhook-events?page[size]=5&page[cursor]=$webhook_events[-15]"
+    Then the response status should be "200"
+    And the response body should be an array with 4 "webhook-events"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/webhook-events?page[cursor]=$webhook_events[-15]&page[size]=5",
+        "next": null
+      }
+      """
 
   Scenario: Admin retrieves all webhook events without a limit for their account
     Given I am an admin of account "test1"

@@ -1,86 +1,198 @@
 # frozen_string_literal: true
 
 module Pagination
-  DEFAULT_SORT_ORDER = 'desc'
+  DEFAULT_PAGE_ORDER = :desc
   DEFAULT_PAGE_SIZE  = 10
 
   extend ActiveSupport::Concern
 
   included do
-    # Overload render method to append pagination links to JSONAPI responses
     def render(*args, &)
       return super unless args in [Hash(jsonapi:) => options]
 
-      super(options.merge(links: pagination_links(jsonapi)), &)
+      resource = options.delete(:jsonapi)
+      links    = resource.pagination_links if resource.respond_to?(:pagination_links)
+
+      super(options.merge(jsonapi: resource, links:), &)
     end
 
     private
 
     def apply_pagination(scope)
-      query = request.query_parameters
+      paged = Paginator.new(scope, request:).call
 
-      scope = scope.with_order(query.fetch(:order, DEFAULT_SORT_ORDER)) if
-        scope.model < Orderable
-
-      if query.key?(:page)
-        raise Keygen::Error::InvalidParameterError.new(parameter: 'page'), 'page must be an object' unless
-          query[:page].is_a?(Hash)
-
-        scope = scope.with_pagination(query.dig(:page, :number), query.dig(:page, :size)) if
-          scope.model < Pageable
-      else
-        scope = scope.with_limit(query.fetch(:limit, DEFAULT_PAGE_SIZE)) if
-          scope.model < Limitable
-      end
-
-      scope
+      # decorate records with pagination links for later use
+      paged.records.extending(
+        Page.new(paged:),
+      )
     end
   end
 
-  private
+  class Page < Module
+    def initialize(paged:)
+      super()
 
-  def pagination_links(resource)
-    return {} unless resource.respond_to?(:total_pages)
+      define_method(:pagination_links) { paged.links }
+    end
+  end
 
-    {}.tap do |links|
-      # This will raise if the paginated model is not countable (see pageable model concern)
-      count = resource.total_count rescue nil
+  class Paginator
+    attr_reader :request
 
-      if !count.nil?
-        links[:self]  = pagination_link resource.current_page, resource.limit_value
-        links[:prev]  = pagination_link resource.prev_page, resource.limit_value
-        links[:next]  = pagination_link resource.next_page, resource.limit_value
-        links[:first] = pagination_link 1, resource.limit_value
-        links[:last]  = pagination_link resource.total_pages, resource.limit_value
-        links[:meta]  = {
-          pages: resource.total_pages,
-          count: resource.total_count
+    def initialize(scope, request:)
+      @scope   = scope
+      @request = request
+    end
+
+    def call
+      params = Params.new(request.query_parameters)
+
+      case pagination_type_for(params)
+      when :keyset
+        paginate_with_keyset(cursor: params.cursor, size: params.size, order: params.order)
+      when :offset
+        paginate_with_offset(number: params.number, size: params.size, order: params.order)
+      else
+        paginate_with_limit(limit: params.limit, order: params.order)
+      end
+    end
+
+    private
+
+    attr_reader :scope
+
+    def pagination_type_for(params)
+      if params.paginated?
+        return :keyset if params.cursor?
+        return :offset if params.offset?
+      end
+
+      :limit
+    end
+
+    def paginate_with_keyset(cursor:, size:, order:)
+      records = scope.with_keyset_pagination(
+        cursor:,
+        size:,
+        order:,
+      )
+
+      KeysetResult.new(records:, request:)
+    end
+
+    def paginate_with_offset(number:, size:, order:)
+      records = scope.with_order(order)
+                     .with_offset_pagination(number:, size:)
+
+      OffsetResult.new(records:, request:)
+    end
+
+    def paginate_with_limit(limit:, order:)
+      records = scope.with_order(order)
+                     .with_limit(limit)
+
+      LimitResult.new(records:, request:)
+    end
+  end
+
+  class Params
+    attr_reader :order, :limit, :number, :size, :cursor
+
+    def initialize(query)
+      @query = query
+      @page  = @query.fetch(:page, {})
+
+      unless @page in { number: Integer | String, size: Integer | String } |
+                      { cursor: String, size: Integer | String } |
+                      { **nil }
+        raise Keygen::Error::InvalidParameterError.new(parameter: 'page'), 'page must be an object of number and size or cursor and size'
+      end
+
+      @order  = @query.fetch(:order, DEFAULT_PAGE_ORDER)
+      @limit  = @query.fetch(:limit, DEFAULT_PAGE_SIZE).to_i
+      @number = @page.fetch(:number, 0).to_i
+      @size   = @page.fetch(:size, DEFAULT_PAGE_SIZE).to_i
+      @cursor = @page.fetch(:cursor, nil)
+    end
+
+    def paginated? = query.key?(:page)
+    def offset?    = page.key?(:number)
+    def cursor?    = page.key?(:cursor)
+
+    private
+
+    attr_reader :query, :page
+  end
+
+  class AbstractResult
+    attr_reader :records, :request
+
+    def initialize(records:, request:)
+      @records = records
+      @request = request
+    end
+
+    def links = raise NotImplementedError
+
+    private
+
+    def build_link(**page)
+      page = page.compact
+      return nil if
+        page.blank?
+
+      params = request.query_parameters.except(:token, :auth)
+                                       .merge(page: {
+                                         size: records.limit_value,
+                                         **page,
+                                       })
+
+      "#{request.path}?#{params.to_query}"
+    end
+  end
+
+  class KeysetResult < AbstractResult
+    def links
+      {
+        self: build_link(cursor: records.current_cursor.to_s), # retain empty cursor
+        next: if records.has_more?
+                build_link(cursor: records.next_cursor)
+              else
+                nil
+              end,
+      }
+    end
+  end
+
+  class OffsetResult < AbstractResult
+    def links
+      count = records.total_count unless
+        records.singleton_class < Kaminari::PaginatableWithoutCount
+
+      if count
+        {
+          self: build_link(number: records.current_page),
+          prev: build_link(number: records.prev_page),
+          next: build_link(number: records.next_page),
+          first: build_link(number: 1),
+          last: build_link(number: records.total_pages),
+          meta: { pages: records.total_pages, count: count },
         }
       else
-        current_page = resource.current_page
-        prev_page = current_page == 1 ? nil : current_page - 1
-        next_page = resource.length < resource.limit_value ? nil : current_page + 1
+        current_page = records.current_page
+        prev_page    = current_page > 1 ? current_page - 1 : nil
+        next_page    = records.length < records.limit_value ? nil : current_page + 1
 
-        links[:self] = pagination_link current_page, resource.limit_value
-        links[:prev] = pagination_link prev_page, resource.limit_value
-        links[:next] = pagination_link next_page, resource.limit_value
+        {
+          self: build_link(number: current_page),
+          prev: build_link(number: prev_page),
+          next: build_link(number: next_page),
+        }
       end
     end
   end
 
-  def pagination_link(number, size)
-    return if number.nil?
-
-    "#{pagination_resource_path}?#{pagination_query_params(number, size)}"
-  end
-
-  def pagination_query_params(number, size)
-    request.query_parameters.except(:token, :auth)
-                            .merge(page: { number: number || 1, size: size })
-                            .to_query
-  end
-
-  def pagination_resource_path
-    request.path
+  class LimitResult < AbstractResult
+    def links = {}
   end
 end

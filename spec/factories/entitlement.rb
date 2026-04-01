@@ -9,11 +9,12 @@ FactoryBot.define do
     account     { NIL_ACCOUNT }
     environment { NIL_ENVIRONMENT }
 
-    # Our entitlement codes cycle in sets of 10, so we can do things like
-    # constrain a release with 10 entitlements via the :with_constraints
-    # trait, and subsequently entitle a license with the same 10
-    # entitlements via the :with_entitlements trait.
-    sequence :code, %w[ALPHA BRAVO CHARLIE DELTA ECHO FOXTROT GOLF HOTEL INDIA JULIETT].cycle
+    sequence :code, %w[
+      ALPHA BRAVO CHARLIE DELTA ECHO FOXTROT GOLF HOTEL INDIA JULIETT
+      KILO LIMA MIKE NOVEMBER OSCAR PAPA QUEBEC ROMEO SIERRA TANGO
+      UNIFORM VICTOR WHISKEY XRAY YANKEE ZULU
+    ].cycle
+
     name { code.humanize }
 
     trait :in_isolated_environment do

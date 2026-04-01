@@ -79,7 +79,7 @@ Feature: List users
     Then the response status should be "200"
     And the response body should be an array with 3 "users"
 
-  Scenario: Admin retrieves a paginated list of users
+  Scenario: Admin retrieves an offset-paginated list of users
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 21 "users"
@@ -103,7 +103,7 @@ Feature: List users
       """
     And the response should contain a valid signature header for "test1"
 
-  Scenario: Admin retrieves a paginated list of users with a page size that is too high
+  Scenario: Admin retrieves an offset-paginated list of users with a page size that is too high
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "users"
@@ -111,7 +111,7 @@ Feature: List users
     When I send a GET request to "/accounts/test1/users?page[number]=1&page[size]=250"
     Then the response status should be "400"
 
-  Scenario: Admin retrieves a paginated list of users with a page size that is too low
+  Scenario: Admin retrieves an offset-paginated list of users with a page size that is too low
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "users"
@@ -119,13 +119,61 @@ Feature: List users
     When I send a GET request to "/accounts/test1/users?page[number]=1&page[size]=-10"
     Then the response status should be "400"
 
-  Scenario: Admin retrieves a paginated list of users with an invalid page number
+  Scenario: Admin retrieves an offset-paginated list of users with an invalid page number
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "users"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users?page[number]=-1&page[size]=10"
     Then the response status should be "400"
+
+  Scenario: Admin retrieves a keyset-paginated list of users (first page)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 19 "users"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users?page[size]=5&page[cursor]="
+    Then the response status should be "200"
+    And the response body should be an array with 5 "users"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/users?page[cursor]=&page[size]=5",
+        "next": "/v1/accounts/test1/users?page[cursor]=$users[-5]&page[size]=5"
+      }
+      """
+
+  Scenario: Admin retrieves a keyset-paginated list of users (next page)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 19 "users"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users?page[size]=5&page[cursor]=$users[-5]"
+    Then the response status should be "200"
+    And the response body should be an array with 5 "users"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/users?page[cursor]=$users[-5]&page[size]=5",
+        "next": "/v1/accounts/test1/users?page[cursor]=$users[-10]&page[size]=5"
+      }
+      """
+
+  Scenario: Admin retrieves a keyset-paginated list of users (last page)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 19 "users"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users?page[size]=5&page[cursor]=$users[-15]"
+    Then the response status should be "200"
+    And the response body should be an array with 4 "users"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/users?page[cursor]=$users[-15]&page[size]=5",
+        "next": null
+      }
+      """
 
   Scenario: Admin retrieves all users without a limit for their account
     Given I am an admin of account "test1"

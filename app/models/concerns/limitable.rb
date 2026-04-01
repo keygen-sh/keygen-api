@@ -16,5 +16,9 @@ module Limitable
 
       limit(num)
     }
+
+    scope :without_limit, -> {
+      limit(nil)
+    }
   end
 end

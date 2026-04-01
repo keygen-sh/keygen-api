@@ -14,5 +14,9 @@ module Orderable
         raise Keygen::Error::InvalidParameterError.new(parameter: 'order'), 'order is invalid'
       end
     }
+
+    scope :without_order, -> {
+      unordered
+    }
   end
 end

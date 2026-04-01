@@ -17,7 +17,7 @@ Feature: Machine processes relationship
     Then the response status should be "403"
 
   # Index
-  Scenario: Admin retrieves a paginated list of processes for a machine with no other pages
+  Scenario: Admin retrieves an offset-paginated list of processes for a machine with no other pages
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "machine"
@@ -42,7 +42,7 @@ Feature: Machine processes relationship
       """
     And the response should contain a valid signature header for "test1"
 
-  Scenario: Admin retrieves a paginated list of processes for a machine with other pages
+  Scenario: Admin retrieves an offset-paginated list of processes for a machine with other pages
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "machine"
