@@ -137,6 +137,29 @@ Feature: List license
     When I send a GET request to "/accounts/test1/licenses?page[number]=0&page[size]=100"
     Then the response status should be "400"
 
+  Scenario: Admin retrieves an offset-paginated list of licenses with a default page size
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 15 "licenses"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?page[number]=1"
+    Then the response status should be "200"
+    And the response body should be an array with 10 "licenses"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/licenses?page[number]=1&page[size]=10",
+        "prev": null,
+        "next": "/v1/accounts/test1/licenses?page[number]=2&page[size]=10",
+        "first": "/v1/accounts/test1/licenses?page[number]=1&page[size]=10",
+        "last": "/v1/accounts/test1/licenses?page[number]=2&page[size]=10",
+        "meta": {
+          "pages": 2,
+          "count": 15
+        }
+      }
+      """
+
   Scenario: Admin retrieves a keyset-paginated list of licenses (first page)
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -230,6 +253,22 @@ Feature: List license
         "source": {
           "parameter": "page[cursor]"
         }
+      }
+      """
+
+  Scenario: Admin retrieves a keyset-paginated list of licenses with a default page size
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 15 "licenses"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?page[cursor]="
+    Then the response status should be "200"
+    And the response body should be an array with 10 "licenses"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/licenses?page[cursor]=&page[size]=10",
+        "next": "/v1/accounts/test1/licenses?page[cursor]=$licenses[-10]&page[size]=10"
       }
       """
 

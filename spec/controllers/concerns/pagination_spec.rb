@@ -75,6 +75,7 @@ describe Pagination, type: :concern do
       params = Pagination::Params.new(order: :asc)
 
       expect(params.order).to eq :asc
+      expect(params).not_to be_paginated
     end
 
     it 'should use default limit' do
@@ -87,6 +88,7 @@ describe Pagination, type: :concern do
       params = Pagination::Params.new(limit: 42)
 
       expect(params.limit).to eq 42
+      expect(params).not_to be_paginated
     end
 
     it 'should use default size when page has no size' do
@@ -101,15 +103,27 @@ describe Pagination, type: :concern do
       }.to raise_error(Keygen::Error::InvalidParameterError, /page must be an object/)
     end
 
-    it 'should raise for page with only cursor (no size)' do
-      expect {
-        Pagination::Params.new(page: { cursor: 'abc' })
-      }.to raise_error(Keygen::Error::InvalidParameterError, /page must be an object/)
+    it 'should parse cursor without size using default' do
+      params = Pagination::Params.new(page: { cursor: 'abc' })
+
+      expect(params.cursor).to eq 'abc'
+      expect(params.size).to eq Pagination::DEFAULT_PAGE_SIZE
+      expect(params).to be_paginated
+      expect(params).to be_cursor
     end
 
-    it 'should raise for page with only number (no size)' do
+    it 'should parse number without size using default' do
+      params = Pagination::Params.new(page: { number: 1 })
+
+      expect(params.number).to eq 1
+      expect(params.size).to eq Pagination::DEFAULT_PAGE_SIZE
+      expect(params).to be_paginated
+      expect(params).to be_offset
+    end
+
+    it 'should raise for page without cursor or number' do
       expect {
-        Pagination::Params.new(page: { number: 1 })
+        Pagination::Params.new(page: { size: 25 })
       }.to raise_error(Keygen::Error::InvalidParameterError, /page must be an object/)
     end
   end
