@@ -113,7 +113,7 @@ module Pagination
       @order  = @query.fetch(:order, DEFAULT_PAGE_ORDER)
       @limit  = @query.fetch(:limit, DEFAULT_PAGE_SIZE).to_i
       @number = @page.fetch(:number, 0).to_i
-      @size   = @page.fetch(:size, DEFAULT_PAGE_SIZE).to_i
+      @size   = @page.fetch(:size, limit).to_i # use limit if set, default otherwise
       @cursor = @page.fetch(:cursor, nil)
     end
 
