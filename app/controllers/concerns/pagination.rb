@@ -103,9 +103,11 @@ module Pagination
       @page  = @query.fetch(:page, {})
 
       unless @page in { number: Integer | String, size: Integer | String } |
+                      { number: Integer | String } |
                       { cursor: String, size: Integer | String } |
+                      { cursor: String } |
                       { **nil }
-        raise Keygen::Error::InvalidParameterError.new(parameter: 'page'), 'page must be an object of number and size or cursor and size'
+        raise Keygen::Error::InvalidParameterError.new(parameter: 'page'), 'page must be an object containing a cursor or number and optional size'
       end
 
       @order  = @query.fetch(:order, DEFAULT_PAGE_ORDER)
