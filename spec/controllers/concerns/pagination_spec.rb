@@ -112,11 +112,29 @@ describe Pagination, type: :concern do
       expect(params).to be_cursor
     end
 
+    it 'should parse cursor without size using limit' do
+      params = Pagination::Params.new(limit: 5, page: { cursor: 'abc' })
+
+      expect(params.cursor).to eq 'abc'
+      expect(params.size).to eq 5
+      expect(params).to be_paginated
+      expect(params).to be_cursor
+    end
+
     it 'should parse number without size using default' do
       params = Pagination::Params.new(page: { number: 1 })
 
       expect(params.number).to eq 1
       expect(params.size).to eq Pagination::DEFAULT_PAGE_SIZE
+      expect(params).to be_paginated
+      expect(params).to be_offset
+    end
+
+    it 'should parse number without size using limit' do
+      params = Pagination::Params.new(limit: 5, page: { number: 1 })
+
+      expect(params.number).to eq 1
+      expect(params.size).to eq 5
       expect(params).to be_paginated
       expect(params).to be_offset
     end
