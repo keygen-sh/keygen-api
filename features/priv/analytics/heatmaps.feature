@@ -118,6 +118,7 @@ Feature: Heatmaps analytics
       | 09d7a1f9-3c4a-401f-b6a9-839f4e35d493 |                                      | 07b5b667-9d09-4f0b-a433-9cfff4111b61 | 2026-03-10T00:00:00.000Z |
       | d1e6f594-7bcb-455f-971b-1e8b3ea63fd7 | bf20fe24-351d-47d0-b3c3-2c576a63d22f | 8667e7b1-3567-4ff0-8143-bd8f10dc7a21 | 2026-03-10T00:00:00.000Z |
     And the current account has 1 isolated "admin"
+    And time is frozen at "2026-03-15T00:00:00.000Z"
     And I am the last admin of account "test1"
     And I use an authentication token
     And I send the following headers:
@@ -137,6 +138,7 @@ Feature: Heatmaps analytics
       """
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
+    And time is unfrozen
 
   @ee
   Scenario: Admin retrieves heatmap for a shared environment
@@ -164,6 +166,7 @@ Feature: Heatmaps analytics
       | 31e30cc1-d454-40dc-b4ae-93ad683ddf33 | 60e7f35f-5401-4cc2-abd3-999b2a758ee1 | e44ba43d-a052-4d4c-b039-8b46a05ca4be | 2026-03-10T00:00:00.000Z |
       | 09d7a1f9-3c4a-401f-b6a9-839f4e35d493 |                                      | 07b5b667-9d09-4f0b-a433-9cfff4111b61 | 2026-03-10T00:00:00.000Z |
       | d1e6f594-7bcb-455f-971b-1e8b3ea63fd7 | bf20fe24-351d-47d0-b3c3-2c576a63d22f | 8667e7b1-3567-4ff0-8143-bd8f10dc7a21 | 2026-03-10T00:00:00.000Z |
+    And time is frozen at "2026-03-15T00:00:00.000Z"
     And I am an admin of account "test1"
     And I use an authentication token
     And I send the following headers:
@@ -183,6 +186,7 @@ Feature: Heatmaps analytics
       """
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
+    And time is unfrozen
 
   Scenario: Product attempts to retrieve heatmap for their account
     Given the current account is "test1"
