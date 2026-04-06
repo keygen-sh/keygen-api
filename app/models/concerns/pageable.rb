@@ -39,9 +39,9 @@ module Pageable
 
       if number < PAGE_LOWER || number > PAGE_UPPER
         message = if number > PAGE_UPPER
-                    "page number must be a number greater between #{PAGE_LOWER} and #{PAGE_UPPER} (got #{number}, please use cursor-based pagination instead)"
+                    "page number must be a number between #{PAGE_LOWER} and #{PAGE_UPPER} (got #{number}, please use cursor-based pagination instead)"
                   else
-                    "page number must be a number greater between #{PAGE_LOWER} and #{PAGE_UPPER} (got #{number})"
+                    "page number must be a number between #{PAGE_LOWER} and #{PAGE_UPPER} (got #{number})"
                   end
 
         raise Keygen::Error::InvalidParameterError.new(parameter: 'page[number]'), message
