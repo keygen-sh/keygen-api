@@ -58,7 +58,7 @@ module Keygen
     def ee?    = ENV['KEYGEN_EDITION'] == 'EE'
     def ce?    = !ee?
 
-    def cloud?       = ee? && multiplayer? && ENV['KEYGEN_HOST'] == 'api.keygen.sh'
+    def cloud?       = ee? && multiplayer? && (ENV['KEYGEN_HOST'] in 'api.keygen.sh' | 'api.keygen.dev')
     def self_hosted? = !cloud?
 
     def mode    = multiplayer? ? 'multiplayer' : 'singleplayer'
