@@ -27,6 +27,10 @@
 /.env*
 !.env.sample
 
+# Ignore LLM configs
+/.claude/*
+!/.claude/CLAUDE.md
+
 # Ignore Redis/DB dumps
 /*.dump
 /*.rdb
