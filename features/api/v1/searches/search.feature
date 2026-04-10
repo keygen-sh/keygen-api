@@ -1637,6 +1637,7 @@ Feature: Search
     And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  @clickhouse
   Scenario: Admin performs a search by request log type on ID (full)
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -1672,6 +1673,7 @@ Feature: Search
     And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  @clickhouse
   Scenario: Admin performs a search by request log type on ID (partial)
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -1707,6 +1709,7 @@ Feature: Search
     And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  @clickhouse
   Scenario: Admin performs a search by request log type on the url attribute (full)
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -1737,6 +1740,7 @@ Feature: Search
     And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  @clickhouse
   Scenario: Admin performs a search by request log type on the url attribute (partial)
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -1767,6 +1771,7 @@ Feature: Search
     And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  @clickhouse
   Scenario: Admin performs a search by request log type on the IP attribute (full, IPv4)
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -1798,6 +1803,7 @@ Feature: Search
     And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  @clickhouse
   Scenario: Admin performs a search by request log type on the IP attribute (partial, IPv4)
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -1829,6 +1835,7 @@ Feature: Search
     And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  @clickhouse
   Scenario: Admin performs a search by request log type on the IP attribute (full, IPv6)
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -1860,6 +1867,7 @@ Feature: Search
     And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  @clickhouse
   Scenario: Admin performs a search by request log type on the IP attribute (partial, IPv6)
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -1891,6 +1899,7 @@ Feature: Search
     And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  @clickhouse
   Scenario: Admin performs a search by request log type on resource (full)
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -1921,6 +1930,7 @@ Feature: Search
     And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  @clickhouse
   Scenario: Admin performs a search by request log type on resource (partial)
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -1951,6 +1961,7 @@ Feature: Search
     And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  @clickhouse
   Scenario: Admin performs a search by request log type on resource ID (full)
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -1981,6 +1992,7 @@ Feature: Search
     And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  @clickhouse
   Scenario: Admin performs a search by request log type on resource ID (partial)
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -2011,6 +2023,7 @@ Feature: Search
     And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  @clickhouse
   Scenario: Admin performs a search by request log type on requestor (full)
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -2041,6 +2054,7 @@ Feature: Search
     And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  @clickhouse
   Scenario: Admin performs a search by request log type on requestor (partial)
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -2085,6 +2099,7 @@ Feature: Search
     And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  @clickhouse
   Scenario: Admin performs a search by request log type on requestor ID (full)
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -2115,6 +2130,7 @@ Feature: Search
     And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  @clickhouse
   Scenario: Admin performs a search by request log type on requestor ID (partial)
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -2145,6 +2161,7 @@ Feature: Search
     And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  @clickhouse
   Scenario: Admin performs a search by request log type on requestor ID and type
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -2190,6 +2207,7 @@ Feature: Search
     And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  @clickhouse
   Scenario: Admin performs a search by request log type on multiple attributes
     Given I am an admin of account "test1"
     And the current account is "test1"
