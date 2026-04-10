@@ -3,6 +3,7 @@
 module Api::V1
   class SearchesController < Api::V1::BaseController
     use_read_replica
+    use_clickhouse if: :clickhouse_query?
 
     class UnsupportedSearchTypeError < StandardError; end
     class EmptyQueryError < StandardError; end
@@ -10,15 +11,15 @@ module Api::V1
     SEARCH_MIN_QUERY_SIZE = 3.freeze
     SEARCH_OPS            = %i[AND OR].freeze
     SEARCH_MODELS         = [
-      Entitlement.name,
-      RequestLog.name,
-      Product.name,
-      Policy.name,
-      License.name,
-      Machine.name,
-      User.name,
-      Release.name,
-      Group.name,
+      'Entitlement',
+      'RequestLog',
+      'Product',
+      'Policy',
+      'License',
+      'Machine',
+      'User',
+      'Release',
+      'Group',
     ].freeze
 
     before_action :scope_to_current_account!
@@ -123,6 +124,12 @@ module Api::V1
       render_bad_request(detail: "search type '#{type.camelize(:lower)}' is not supported", source: { pointer: "/meta/type" })
     rescue EmptyQueryError
       render_bad_request(detail: "search query is required", source: { pointer: "/meta/query" })
+    end
+
+    def clickhouse_query?
+      type = params.dig(:meta, :type)
+
+      type in 'request-log'
     end
   end
 end
