@@ -1832,7 +1832,7 @@ Feature: Create license
     And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a license for a user of their account with a key that contains a null byte
+  Scenario: Admin creates a license for a user of their account with a name that contains a null byte
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -1845,7 +1845,7 @@ Feature: Create license
         "data": {
           "type": "licenses",
           "attributes": {
-            "key": "$null_byte"
+            "name": "Foo$null_byte"
           },
           "relationships": {
             "policy": {

@@ -97,8 +97,8 @@ module Keygen
     config.active_record.encryption.hash_digest_class                             = OpenSSL::Digest::SHA256
     config.active_record.encryption.support_sha1_for_non_deterministic_encryption = true
 
-    config.active_record.encryption.support_unencrypted_data = true
-    config.active_record.encryption.extend_queries           = true
+    config.active_record.encryption.support_unencrypted_data = ENV.true?('ENCRYPTION_SUPPORT_UNENCRYPTED_DATA')
+    config.active_record.encryption.extend_queries           = ENV.true?('ENCRYPTION_SUPPORT_UNENCRYPTED_DATA')
 
     # FIXME(ezekg) Remove after we upgrade to Rails 7.1.4.
     # See: https://github.com/rails/rails/issues/50604
