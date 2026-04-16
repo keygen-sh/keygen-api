@@ -82,7 +82,7 @@ module Roleable
 
   class_methods do
     def has_default_role(name)
-      define_roleable_association_and_delgate
+      define_roleable_association_and_delegate
 
       # Set default role for new objects unless already set
       after_initialize -> { assign_role(name) },
@@ -90,7 +90,7 @@ module Roleable
     end
 
     def has_role(name)
-      define_roleable_association_and_delgate
+      define_roleable_association_and_delegate
 
       # Set role for new objects
       after_initialize -> { assign_role(name) },
@@ -99,7 +99,7 @@ module Roleable
 
     private
 
-    def define_roleable_association_and_delgate
+    def define_roleable_association_and_delegate
       include Permissible
       include Dirtyable
 

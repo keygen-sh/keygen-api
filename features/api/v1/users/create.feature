@@ -1336,15 +1336,14 @@ Feature: Create user
       """
     Then the response status should be "403"
 
-  Scenario: Admin creates an admin for their account (default permissions)
+  Scenario: Admin creates an admin for their account (for default permissions, with default permissions)
     Given the current account is "test1"
-    And the current account has 3 "webhook-endpoints"
-    And all "webhook-endpoints" have the following attributes:
+    And the current account has 3 "webhook-endpoints" with the following attributes:
       """
       { "subscriptions": ["user.created"] }
       """
     And the current account has 2 "admins"
-    And I am an admin of account "test1"
+    And I am the last admin of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users" with the following:
       """
@@ -1365,19 +1364,90 @@ Feature: Create user
     And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates an admin for their account (has permissions)
+  @ee
+  Scenario: Admin creates an admin for their account (for wildcard permissions, with default permissions)
     Given the current account is "test1"
-    And the current account has 3 "webhook-endpoints"
-    And all "webhook-endpoints" have the following attributes:
+    And the current account has 3 "webhook-endpoints" with the following attributes:
       """
       { "subscriptions": ["user.created"] }
       """
     And the current account has 2 "admins"
-    And the first "admin" has the following permissions:
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users" with the following:
       """
-      ["admin.create", "user.create"]
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "email": "ironman@keygen.sh",
+            "password": "secret123",
+            "permissions": ["*"],
+            "role": "admin"
+          }
+        }
+      }
       """
-    And I am an admin of account "test1"
+    Then the response status should be "201"
+    And the response body should be a "user" with the role "admin"
+    And sidekiq should have 3 "webhook" jobs
+    And sidekiq should have 1 "event-log" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin creates an admin for their account (for limited permissions, with default permissions)
+    Given the current account is "test1"
+    And the current account has 3 "webhook-endpoints" with the following:
+      """
+      { "subscriptions": ["user.created"] }
+      """
+    And the current account has 2 "admins"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "email": "ironman@keygen.sh",
+            "password": "secret123",
+            "permissions": [
+              "admin.read",
+              "user.read",
+              "license.read",
+              "license.validate"
+            ],
+            "role": "admin"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response body should be a "user" with the following attributes:
+      """
+      {
+        "permissions": ["admin.read", "license.read", "license.validate", "user.read"],
+        "role": "admin"
+      }
+      """
+    And sidekiq should have 3 "webhook" jobs
+    And sidekiq should have 1 "event-log" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin creates an admin for their account (for default permissions, with limited permissions)
+    Given the current account is "test1"
+    And the current account has 3 "webhook-endpoints" with the following attributes:
+      """
+      { "subscriptions": ["user.created"] }
+      """
+    And the current account has 2 "admins"
+    And the last "admin" has the following permissions:
+      """
+      ["admin.create", "admin.read", "user.create", "user.read"]
+      """
+    And I am the last admin of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users" with the following:
       """
@@ -1392,16 +1462,54 @@ Feature: Create user
         }
       }
       """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "event-log" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin creates an admin for their account (for limited permissions, with limited permissions)
+    Given the current account is "test1"
+    And the current account has 3 "webhook-endpoints" with the following attributes:
+      """
+      { "subscriptions": ["user.created"] }
+      """
+    And the current account has 2 "admins"
+    And the last "admin" has the following permissions:
+      """
+      ["admin.create", "admin.read", "user.create", "user.read"]
+      """
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "email": "ironman@keygen.sh",
+            "password": "secret123",
+            "permissions": ["user.create", "user.read"],
+            "role": "admin"
+          }
+        }
+      }
+      """
     Then the response status should be "201"
-    And the response body should be a "user" with the role "admin"
+    And the response body should be a "user" with the following attributes:
+      """
+      {
+        "permissions": ["user.create", "user.read"],
+        "role": "admin"
+      }
+      """
     And sidekiq should have 3 "webhook" jobs
     And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates an admin for their account (no permissions)
     Given the current account is "test1"
-    And the current account has 3 "webhook-endpoints"
-    And all "webhook-endpoints" have the following attributes:
+    And the current account has 3 "webhook-endpoints" with the following attributes:
       """
       { "subscriptions": ["user.created"] }
       """

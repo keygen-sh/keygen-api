@@ -108,7 +108,7 @@ class Role < ApplicationRecord
   # permissions overrides association reader to include pending permission changes
   def permissions
     return pending_permissions if
-      role_permissions_attributes_assigned?
+      role_permissions_attributes_assigned? || new_record?
 
     super
   end
@@ -117,8 +117,12 @@ class Role < ApplicationRecord
   # pending_permissions permissions returns the role's pending permissions,
   # via the :role_permissions nested attributes.
   def pending_permissions
-    return Permission.none unless
-      role_permissions_attributes_assigned?
+    unless role_permissions_attributes_assigned?
+      return Permission.where(id: default_permission_ids) if
+        new_record?
+
+      return Permission.none
+    end
 
     Permission.where(
       id: role_permissions_attributes.collect { it[:permission_id] },
