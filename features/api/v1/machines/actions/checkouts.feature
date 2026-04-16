@@ -1939,12 +1939,28 @@ Feature: Machine checkout actions
     And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: License performs a machine checkout without checkout permission (POST)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license" with the following:
+      """
+      { "permissions": ["machine.read"] }
+      """
+    And the current account has 1 "machine" for the last "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out"
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "event-log" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: License performs a machine checkout including policy without permission (POST)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "license" with the following:
       """
-      { "permissions": ["license.read", "license.validate"] }
+      { "permissions": ["machine.check-out", "machine.read", "license.read", "license.validate"] }
       """
     And the current account has 1 "machine" for the last "license"
     And I am a license of account "test1"
@@ -1955,12 +1971,12 @@ Feature: Machine checkout actions
     And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: License performs a machine checkout including owner without permission (POST)
+  Scenario: License performs a machine checkout including license owner without permission (POST)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "license" with the following:
       """
-      { "permissions": ["license.read", "license.validate"] }
+      { "permissions": ["machine.check-out", "machine.read", "license.read", "license.validate"] }
       """
     And the current account has 1 "machine" for the last "license"
     And I am a license of account "test1"
@@ -1971,12 +1987,12 @@ Feature: Machine checkout actions
     And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: License performs a machine checkout including users without permission (POST)
+  Scenario: License performs a machine checkout including license users without permission (POST)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "license" with the following:
       """
-      { "permissions": ["license.read", "license.validate"] }
+      { "permissions": ["machine.check-out", "machine.read", "license.read", "license.validate"] }
       """
     And the current account has 1 "machine" for the last "license"
     And I am a license of account "test1"
@@ -1987,12 +2003,28 @@ Feature: Machine checkout actions
     And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: License performs a machine checkout including owner without permission (POST)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license" with the following:
+      """
+      { "permissions": ["machine.check-out", "machine.read", "license.read", "license.validate"] }
+      """
+    And the current account has 1 "machine" for the last "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out?include=owner"
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "event-log" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: License performs a machine checkout including product without permission (GET)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "license" with the following:
       """
-      { "permissions": ["license.read", "license.validate"] }
+      { "permissions": ["machine.check-out", "machine.read", "license.read", "license.validate"] }
       """
     And the current account has 1 "machine" for the last "license"
     And I am a license of account "test1"
@@ -2035,7 +2067,24 @@ Feature: Machine checkout actions
     And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: License performs a machine checkout with permissions (POST)
+   Scenario: License performs a machine checkout with checkout permission (POST)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license" with the following:
+      """
+      { "permissions": ["machine.check-out", "machine.read"] }
+      """
+    And the current account has 1 "machine" for the last "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out"
+    Then the response status should be "200"
+    And the response body should be a "machine-file"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "event-log" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License performs a machine checkout including resources with permissions (POST)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "license" with the following:
@@ -2069,7 +2118,7 @@ Feature: Machine checkout actions
     And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: License performs a machine checkout including owner with permission (GET)
+  Scenario: License performs a machine checkout including license owner with permission (GET)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "license" with the following:
@@ -2086,7 +2135,7 @@ Feature: Machine checkout actions
     And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: License performs a machine checkout including users with permission (GET)
+  Scenario: License performs a machine checkout including license users with permission (GET)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "license" with the following:
@@ -2097,6 +2146,23 @@ Feature: Machine checkout actions
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/actions/check-out?include=license.users"
+    Then the response status should be "200"
+    And the response should be a "MACHINE" certificate
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "event-log" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License performs a machine checkout including owner with permission (GET)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license" with the following:
+      """
+      { "permissions": ["machine.check-out", "machine.read", "license.read", "user.read"] }
+      """
+    And the current account has 1 "machine" for the last "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out?include=owner"
     Then the response status should be "200"
     And the response should be a "MACHINE" certificate
     And sidekiq should have 1 "webhook" job
