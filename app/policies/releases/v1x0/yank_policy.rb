@@ -7,7 +7,7 @@ module Releases::V1x0
       verify_environment!
 
       case bearer
-      in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
+      in role: Role(:admin | :developer | :environment)
         allow!
       in role: Role(:product) if record.product == bearer
         allow!
