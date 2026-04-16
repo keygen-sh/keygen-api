@@ -32,6 +32,7 @@ class LicenseFilePolicy < ApplicationPolicy
     perms << 'environment.read' if record.includes.include?('environment')
     perms << 'group.read'       if record.includes.include?('group')
     perms << 'user.read'        if record.includes.include?('owner')
+    perms << 'user.read'        if record.includes.include?('users')
     perms << 'product.read'     if record.includes.include?('product')
     perms << 'policy.read'      if record.includes.include?('policy')
 

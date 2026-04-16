@@ -30,6 +30,7 @@ class MachineFilePolicy < ApplicationPolicy
 
     perms << 'entitlement.read' if record.includes.include?('license.entitlements')
     perms << 'user.read'        if record.includes.include?('license.owner')
+    perms << 'user.read'        if record.includes.include?('license.users')
     perms << 'product.read'     if record.includes.include?('license.product')
     perms << 'policy.read'      if record.includes.include?('license.policy')
     perms << 'environment.read' if record.includes.include?('environment')
