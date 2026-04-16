@@ -38,14 +38,16 @@ class SecondFactor < ApplicationRecord
   end
 
   def verify(otp)
-    totp = ROTP::TOTP.new(secret, issuer: SECOND_FACTOR_ISSUER)
-    ts   = totp.verify(otp.to_s, drift_behind: SECOND_FACTOR_DRIFT, after: last_verified_at.to_i)
+    with_lock do
+      totp = ROTP::TOTP.new(secret, issuer: SECOND_FACTOR_ISSUER)
+      ts   = totp.verify(otp.to_s, drift_behind: SECOND_FACTOR_DRIFT, after: last_verified_at.to_i)
 
-    if ts.present?
-      update(last_verified_at: Time.at(ts))
+      if ts.present?
+        update(last_verified_at: Time.at(ts))
+      end
+
+      ts
     end
-
-    ts
   end
 
   private
