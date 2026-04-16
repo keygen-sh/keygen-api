@@ -1998,6 +1998,22 @@ Feature: License checkout actions
     And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: License performs a license checkout with checkout permission (POST)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license" with the following:
+      """
+      { "permissions": ["license.check-out", "license.read"] }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out"
+    Then the response status should be "200"
+    And the response body should be a "license-file"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "event-log" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: License performs a license checkout including product with permission (POST)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
