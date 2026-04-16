@@ -1667,6 +1667,39 @@ Feature: Release artifact relationship
     When I send a PUT request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "404"
 
+  Scenario: Sales agent uploads an artifact for a release
+    Given the current account is "test1"
+    And the current account has 1 "sales-agent"
+    And I am a sales agent of account "test1"
+    And the current account has 3 draft "releases"
+    And the current account has 1 waiting "artifact" for the first "release"
+    And I use an authentication token
+    And I use API version "1.0"
+    When I send a PUT request to "/accounts/test1/releases/$0/artifact"
+    Then the response status should be "403"
+
+  Scenario: Support agent uploads an artifact for a release
+    Given the current account is "test1"
+    And the current account has 1 "support-agent"
+    And I am a support agent of account "test1"
+    And the current account has 3 draft "releases"
+    And the current account has 1 waiting "artifact" for the first "release"
+    And I use an authentication token
+    And I use API version "1.0"
+    When I send a PUT request to "/accounts/test1/releases/$0/artifact"
+    Then the response status should be "403"
+
+  Scenario: Read-only uploads an artifact for a release
+    Given the current account is "test1"
+    And the current account has 1 "read-only"
+    And I am a read only of account "test1"
+    And the current account has 3 draft "releases"
+    And the current account has 1 waiting "artifact" for the first "release"
+    And I use an authentication token
+    And I use API version "1.0"
+    When I send a PUT request to "/accounts/test1/releases/$0/artifact"
+    Then the response status should be "403"
+
   Scenario: Admin uploads an artifact with a binary request body (binary content type)
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -1886,6 +1919,42 @@ Feature: Release artifact relationship
     And I use API version "1.0"
     When I send a DELETE request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "404"
+    And the first "release" should not be yanked
+
+  Scenario: Sales agent yanks an artifact for a release
+    Given the current account is "test1"
+    And the current account has 1 "sales-agent"
+    And I am a sales agent of account "test1"
+    And the current account has 3 "releases"
+    And the current account has 1 "artifact" for the first "release"
+    And I use an authentication token
+    And I use API version "1.0"
+    When I send a DELETE request to "/accounts/test1/releases/$0/artifact"
+    Then the response status should be "403"
+    And the first "release" should not be yanked
+
+  Scenario: Support agent yanks an artifact for a release
+    Given the current account is "test1"
+    And the current account has 1 "support-agent"
+    And I am a support agent of account "test1"
+    And the current account has 3 "releases"
+    And the current account has 1 "artifact" for the first "release"
+    And I use an authentication token
+    And I use API version "1.0"
+    When I send a DELETE request to "/accounts/test1/releases/$0/artifact"
+    Then the response status should be "403"
+    And the first "release" should not be yanked
+
+  Scenario: Read-only yanks an artifact for a release
+    Given the current account is "test1"
+    And the current account has 1 "read-only"
+    And I am a read only of account "test1"
+    And the current account has 3 "releases"
+    And the current account has 1 "artifact" for the first "release"
+    And I use an authentication token
+    And I use API version "1.0"
+    When I send a DELETE request to "/accounts/test1/releases/$0/artifact"
+    Then the response status should be "403"
     And the first "release" should not be yanked
 
   # Expiration basis
