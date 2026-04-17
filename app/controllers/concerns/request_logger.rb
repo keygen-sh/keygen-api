@@ -171,13 +171,15 @@ module RequestLogger
     end
 
     def request_log_request_body
-      params = request.filtered_parameters.slice(:meta, :data)
-      if params.present?
-        params.deep_transform_keys { |k| k.to_s.camelize(:lower) }
+      params = request.request_parameters.slice(:meta, :data)
+      return nil unless
+        params.present?
+
+      filterer = HashFilter.new(FILTER_KEYS)
+      filtered = filterer.filter(params)
+
+      filtered.deep_transform_keys { it.to_s.camelize(:lower) }
               .to_json
-      else
-        nil
-      end
     rescue => e
       Keygen.logger.exception(e)
     end
