@@ -30,7 +30,7 @@ Then /^sidekiq should (?:have|process) (\d+) "([^\"]*)" jobs?(?: queued in ([.\d
     PerformBulk::Processor.drain # process and queue bulk jobs
     PerformBulk::Runner.drain
   when "webhook_worker"
-    CreateWebhookEventsWorker2.drain
+    CreateWebhookEventsWorker.drain
   end
 
   # Count queued jobs

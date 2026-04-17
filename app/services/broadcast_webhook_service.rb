@@ -55,7 +55,7 @@ class BroadcastWebhookService < BaseService
     resource_payload = renderer.render(resource, renderer_options)
                                .as_json
 
-    CreateWebhookEventsWorker2.perform_async(
+    CreateWebhookEventsWorker.perform_async(
       event,
       selected_endpoint_ids,
       resource_payload,
