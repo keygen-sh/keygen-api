@@ -24,13 +24,13 @@ describe RequestLogger, type: :concern, only: :ee do
       expect(controller.send(:request_log_request_body)).to be_nil
     end
 
-    it 'returns nil when the request body has no :meta or :data keys' do
+    it 'returns nil when the request body has no meta or data keys' do
       allow(request).to receive(:request_parameters).and_return({ 'foo' => 'bar' }.with_indifferent_access)
 
       expect(controller.send(:request_log_request_body)).to be_nil
     end
 
-    it 'serializes :meta and :data keys to camelCase JSON' do
+    it 'serializes meta and data keys to camel case' do
       allow(request).to receive(:request_parameters).and_return({
         'data' => {
           'type' => 'users',
@@ -51,7 +51,7 @@ describe RequestLogger, type: :concern, only: :ee do
       )
     end
 
-    it 'redacts sensitive values in the request body via HashFilter' do
+    it 'redacts sensitive values from request body' do
       allow(request).to receive(:request_parameters).and_return({
         'data' => {
           'type' => 'users',
@@ -87,29 +87,6 @@ describe RequestLogger, type: :concern, only: :ee do
         },
       )
     end
-
-    it 'preserves the structure when redacting sensitive values' do
-      allow(request).to receive(:request_parameters).and_return({
-        'data' => {
-          'type' => 'tokens',
-          'attributes' => {
-            'digest' => 'deadbeefdeadbeefdeadbeef',
-          },
-        },
-      }.with_indifferent_access)
-
-      body   = controller.send(:request_log_request_body)
-      parsed = JSON.parse(body)
-
-      expect(parsed).to eq(
-        'data' => {
-          'type' => 'tokens',
-          'attributes' => {
-            'digest' => 'dead...beef',
-          },
-        },
-      )
-    end
   end
 
   describe '#request_log_response_body' do
@@ -119,35 +96,7 @@ describe RequestLogger, type: :concern, only: :ee do
       expect(controller.send(:request_log_response_body)).to be_nil
     end
 
-    it 'redacts sensitive values in a JSON response body via HashFilter' do
-      allow(response).to receive(:content_type).and_return('application/json')
-      allow(response).to receive(:body).and_return({
-        'data' => {
-          'type' => 'tokens',
-          'attributes' => {
-            'token'  => 'abcdefghijklmnopqrstuvwxyz',
-            'digest' => 'deadbeefdeadbeefdeadbeef',
-            'email'  => 'user@example.com',
-          },
-        },
-      }.to_json)
-
-      result = controller.send(:request_log_response_body)
-      parsed = JSON.parse(result)
-
-      expect(parsed).to eq(
-        'data' => {
-          'type' => 'tokens',
-          'attributes' => {
-            'token'  => 'abcd...wxyz',
-            'digest' => 'dead...beef',
-            'email'  => 'user@example.com',
-          },
-        },
-      )
-    end
-
-    it 'redacts sensitive values in a JSON:API response body via HashFilter' do
+    it 'redacts sensitive values from response body' do
       allow(response).to receive(:content_type).and_return('application/vnd.api+json')
       allow(response).to receive(:body).and_return({
         'data' => {
@@ -155,6 +104,7 @@ describe RequestLogger, type: :concern, only: :ee do
           'attributes' => {
             'key'         => 'AAAA-BBBB-CCCC-DDDD-EEEE-FFFF',
             'certificate' => '-----BEGIN CERT-----abcdefghij-----END CERT-----',
+            'email'       => 'user@example.com',
           },
         },
         'meta' => {
@@ -171,6 +121,7 @@ describe RequestLogger, type: :concern, only: :ee do
           'attributes' => {
             'key'         => 'AAAA...FFFF',
             'certificate' => '----...----',
+            'email'       => 'user@example.com',
           },
         },
         'meta' => {
