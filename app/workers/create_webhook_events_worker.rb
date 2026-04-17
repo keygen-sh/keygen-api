@@ -1,10 +1,15 @@
 # frozen_string_literal: true
 
-# FIXME(ezekg) remove after migrating to new webhook worker and queue is drained
 class CreateWebhookEventsWorker < BaseWorker
   sidekiq_options queue: :webhooks
 
-  def perform(event, account_id, payload, environment_id = nil)
+  def perform(
+    event,
+    webhook_endpoint_ids,
+    resource_payload,
+    account_id,
+    environment_id
+  )
     account = Rails.cache.fetch(Account.cache_key(account_id), skip_nil: true, expires_in: 15.minutes) do
       Account.find(account_id)
     end
@@ -13,7 +18,7 @@ class CreateWebhookEventsWorker < BaseWorker
       EventType.find_or_create_by!(event:)
     end
 
-    webhook_endpoints = account.webhook_endpoints.for_environment(
+    webhook_endpoints = account.webhook_endpoints.where(id: webhook_endpoint_ids).for_environment(
       environment_id,
       strict: true,
     )
@@ -22,22 +27,23 @@ class CreateWebhookEventsWorker < BaseWorker
       next unless
         webhook_endpoint.subscribed?(event)
 
-      # Create a partial event (we'll complete it after the job is fired)
+      # create a partial event (we'll complete it after the job is fired)
       webhook_event = account.webhook_events.create!(
         api_version: webhook_endpoint.api_version,
-        endpoint: webhook_endpoint.url,
+        endpoint: webhook_endpoint.url, # FIXME(ezekg) remove this in favor of association?
         event_type: event_type,
         status: 'DELIVERING',
+        webhook_endpoint:,
         environment_id:,
       )
 
-      # Serialize the event and decode so we can use in webhook job
+      # serialize the event and decode so we can use in webhook job
       webhook = Keygen::JSONAPI::Renderer.new(account:, api_version: webhook_endpoint.api_version, context: :webhook)
                                          .render(webhook_event)
 
-      # Migrate the resource payload (right now it's for the current API version and it needs
+      # migrate the resource payload (right now it's for the current API version and it needs
       # to be migrated to the endpoint's API version)
-      data     = JSON.parse(payload, symbolize_names: true)
+      data     = resource_payload.deep_symbolize_keys
       migrator = RequestMigrations::Migrator.new(
         from: CURRENT_API_VERSION,
         to: webhook_endpoint.api_version ||
@@ -48,10 +54,10 @@ class CreateWebhookEventsWorker < BaseWorker
         data:,
       )
 
-      # Set the webhook's payload (since it's incomplete at the moment)
+      # set the webhook's payload (since it's incomplete at the moment)
       webhook[:data][:attributes][:payload] = data.to_json
 
-      # Enqueue the worker, which will fire off the webhook
+      # enqueue the worker and fire off the webhook
       jid = WebhookWorker.perform_async(
         account.id,
         webhook_event.id,
@@ -59,7 +65,7 @@ class CreateWebhookEventsWorker < BaseWorker
         webhook.to_json,
       )
 
-      # Update the event to contain the payload and job identifier
+      # update the event to contain the payload and job identifier
       webhook_event.update!(
         payload: data.to_json,
         jid:,
@@ -67,3 +73,6 @@ class CreateWebhookEventsWorker < BaseWorker
     end
   end
 end
+
+# FIXME(ezekg) remove after old webhook worker queue is drained
+CreateWebhookEventsWorker2 = CreateWebhookEventsWorker
