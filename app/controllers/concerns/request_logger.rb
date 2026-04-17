@@ -200,7 +200,7 @@ module RequestLogger
       mime_type, * = Mime::Type.parse(response.content_type.to_s)
       filtered     = case mime_type
                      in symbol: :jsonapi | :json
-                       filterer = ActiveSupport::ParameterFilter.new(%i[password digest token secret otp redirect auth])
+                       filterer = HashFilter.new(FILTER_KEYS)
                        params   = JSON.parse(body)
 
                        filterer.filter(params).to_json
