@@ -3,15 +3,14 @@
 module Diffable
   extend ActiveSupport::Concern
 
-  DIFFABLE_FILTER = %i[password token private key digest]
-
   included do
     def to_diff
-      changeset = previous_changes
-      filterer  = ActiveSupport::ParameterFilter.new(DIFFABLE_FILTER, mask: ['[FILTERED]', '[FILTERED]'])
-      filtered  = filterer.filter(changeset)
+      filterer  = HashFilter.new(FILTER_KEYS)
+      filtered  = filterer.filter(
+        previous_changes,
+      )
 
-      # Remove '_at' and other suffixes from keys (to match serializers)
+      # FIXME(ezekg) remove '_at' and other suffixes from keys (to match serializers)
       filtered.transform_keys! do |key|
         case
         when key.ends_with?('_digest')
