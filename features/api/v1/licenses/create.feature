@@ -6143,7 +6143,7 @@ Feature: Create license
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "event-log" jobs
-    And sidekiq should have 0 "request-log" jobs
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin uses an invalid token while attempting to create a license
     Given the current account is "test1"

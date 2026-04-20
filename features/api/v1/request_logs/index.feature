@@ -26,6 +26,19 @@ Feature: List request logs
     Then the response status should be "200"
     And the response body should be an array with 3 "request-logs"
 
+  Scenario: Admin retrieves logs with internal logs filtered out
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "request-logs"
+    And the current account has 3 "request-logs" with the following:
+      """
+      { "origin": "ui" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/request-logs"
+    Then the response status should be "200"
+    And the response body should be an array with 2 "request-logs"
+
   Scenario: Admin retrieves a list of logs that is automatically limited
     Given I am an admin of account "test1"
     And the current account is "test1"

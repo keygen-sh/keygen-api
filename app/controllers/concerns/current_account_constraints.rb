@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module CurrentAccountConstraints
-  CURRENT_ACCOUNT_IGNORED_ORIGINS = %w[https://app.keygen.sh https://dist.keygen.sh].freeze
-
   extend ActiveSupport::Concern
 
   def require_active_subscription!
@@ -13,7 +11,7 @@ module CurrentAccountConstraints
         detail: "must have an active subscription to access this resource"
       )
       return false
-    when !CURRENT_ACCOUNT_IGNORED_ORIGINS.include?(request.headers['origin']) &&
+    when external_request? &&
          current_account.trialing_or_free? &&
          current_account.daily_request_limit_exceeded?
       render_payment_required(

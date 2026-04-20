@@ -93,4 +93,19 @@ describe RecordRequestSparkWorker, :only_clickhouse do
 
     expect(sparks.count).to eq(1)
   end
+
+  it 'should not record sparks for internal request logs' do
+    create_list(:request_log, 3, :external, account:, status: 200)
+    create_list(:request_log, 2, :internal, account:, status: 200)
+
+    travel_to 1.day.from_now do
+      described_class.perform_async(account.id)
+    end
+
+    sparks = RequestSpark.for_account(account)
+
+    expect(sparks).to satisfy do
+      it in [RequestSpark(status: 200, count: 3)]
+    end
+  end
 end

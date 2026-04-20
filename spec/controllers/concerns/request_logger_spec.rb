@@ -6,6 +6,8 @@ require 'spec_helper'
 describe RequestLogger, type: :concern, only: :ee do
   controller_class = Class.new(ActionController::API) do
     include RequestLogger
+
+    def internal_request? = false
   end
 
   let(:controller) { controller_class.new }
@@ -142,6 +144,65 @@ describe RequestLogger, type: :concern, only: :ee do
       allow(response).to receive(:body).and_return('binarydata')
 
       expect(controller.send(:request_log_response_body)).to be_nil
+    end
+  end
+
+  describe '#log_request?' do
+    let(:account) { build(:account) }
+    let(:session) { build(:session, account:) }
+
+    before do
+      allow(request).to receive(:path_parameters).and_return(controller: 'api/v1/licenses')
+    end
+
+    after do
+      Current.reset
+    end
+
+    it 'returns false when there is no account' do
+      Current.account = nil
+
+      expect(controller.send(:log_request?)).to be false
+    end
+
+    it 'returns true when there is an account' do
+      Current.account = account
+
+      expect(controller.send(:log_request?)).to be true
+    end
+
+    it 'returns true when there is no session' do
+      Current.account = account
+      Current.session = nil
+
+      expect(controller.send(:log_request?)).to be true
+    end
+
+    it 'returns true when there is a session' do
+      Current.account = account
+      Current.session = session
+
+      expect(controller.send(:log_request?)).to be true
+    end
+
+    it 'returns false for an ignored resource' do
+      allow(request).to receive(:path_parameters).and_return(controller: 'api/v1/webhook_endpoints')
+
+      expect(controller.send(:log_request?)).to be false
+    end
+  end
+
+  describe '#request_log_origin' do
+    it 'returns "api" for an external request' do
+      allow(controller).to receive(:internal_request?).and_return(false)
+
+      expect(controller.send(:request_log_origin)).to eq 'api'
+    end
+
+    it 'returns "ui" for an internal request' do
+      allow(controller).to receive(:internal_request?).and_return(true)
+
+      expect(controller.send(:request_log_origin)).to eq 'ui'
     end
   end
 end

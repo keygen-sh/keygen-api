@@ -39,6 +39,9 @@ class RequestLog < ClickhouseRecord
   has_environment
   has_account
 
+  scope :external, -> { where(origin: :api) }
+  scope :internal, -> { where(origin: :ui) }
+
   # NB(ezekg) this is based on the clickhouse table's ordering key
   scope :ordered, -> (dir = :desc) {
     case dir

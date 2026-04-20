@@ -6,6 +6,7 @@ class RecordRequestSparkWorker < BaseWorker
 
   def perform(account_id)
     logs_cte = RequestLog.where(account_id:, created_date: Date.yesterday)
+                         .external
                          .select(
                            :account_id,
                            :environment_id,

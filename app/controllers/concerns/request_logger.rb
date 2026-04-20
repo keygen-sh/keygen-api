@@ -3,8 +3,6 @@
 module RequestLogger
   extend ActiveSupport::Concern
 
-  REQUEST_LOG_IGNORED_ORIGINS   = %w[https://app.keygen.sh https://dist.keygen.sh].freeze
-  REQUEST_LOG_IGNORED_HOSTS     = %w[get.keygen.sh bin.keygen.sh].freeze
   REQUEST_LOG_IGNORED_RESOURCES = %w[
     webhook_endpoints
     webhook_events
@@ -64,12 +62,6 @@ module RequestLogger
     end
 
     def log_request?
-      return false if
-        REQUEST_LOG_IGNORED_ORIGINS.include?(request.headers['Origin'])
-
-      return false if
-        REQUEST_LOG_IGNORED_HOSTS.include?(request.host)
-
       controller = request.path_parameters[:controller]
       return false if
         REQUEST_LOG_IGNORED_RESOURCES.any? { controller&.include?(it) }
@@ -98,6 +90,7 @@ module RequestLogger
         'ip' => request_log_ip,
         'method' => request_log_method,
         'url' => request_log_url,
+        'origin' => request_log_origin,
         'request_headers' => request_log_request_headers,
         'request_body' => request_log_request_body,
         'response_signature' => request_log_signature,
@@ -106,7 +99,7 @@ module RequestLogger
         'status' => request_log_status,
         'queue_time' => request_log_request_queue_time,
         'run_time' => request_log_request_run_time,
-        'ttl' => Current.account.request_log_retention_duration&.to_i,
+        'ttl' => request_log_ttl,
       )
     rescue => e
       Keygen.logger.exception(e)
@@ -158,6 +151,10 @@ module RequestLogger
       else
         request.original_fullpath
       end
+    end
+
+    def request_log_origin
+      internal_request? ? 'ui' : 'api'
     end
 
     def request_log_request_headers
@@ -225,6 +222,11 @@ module RequestLogger
 
     def request_log_signature
       response.headers['Keygen-Signature']
+    end
+
+    # TODO(ezekg) expire internal requests daily?
+    def request_log_ttl
+      Current.account.request_log_retention_duration&.to_i
     end
   end
 end

@@ -19,7 +19,7 @@ module Api::V1
     before_action :set_request_log, only: %i[show]
 
     def index
-      request_logs = apply_pagination(authorized_scope(apply_scopes(current_account.request_logs.ordered.without_blobs)).preload(:account))
+      request_logs = apply_pagination(authorized_scope(apply_scopes(current_account.request_logs.external.ordered.without_blobs)).preload(:account))
       authorize! request_logs
 
       render jsonapi: request_logs
@@ -36,7 +36,7 @@ module Api::V1
     attr_reader :request_log
 
     def set_request_log
-      scoped_request_logs = authorized_scope(current_account.request_logs)
+      scoped_request_logs = authorized_scope(current_account.request_logs.external)
 
       @request_log = scoped_request_logs.find_by!(id: params[:id])
 

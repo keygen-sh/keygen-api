@@ -81,6 +81,10 @@ class ApplicationController < ActionController::API
     RequestMigrations.config.request_version_resolver.call(request)
   end
 
+  # NB(ezekg) an internal request is one authenticated via session cookie (i.e. from Portal)
+  def internal_request? = has_cookie_credentials?
+  def external_request? = !internal_request?
+
   private
 
   # NOTE(ezekg) Remove memoization of authorization context. This allows us
