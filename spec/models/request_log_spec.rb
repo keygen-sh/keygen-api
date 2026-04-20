@@ -10,4 +10,24 @@ describe RequestLog, type: :model do
 
   it_behaves_like :environmental
   it_behaves_like :accountable
+
+  describe '.external' do
+    it 'excludes internal origins' do
+      api = create(:request_log, :external, account:)
+      ui  = create(:request_log, :internal, account:)
+
+      expect(RequestLog.external).to     include(api)
+      expect(RequestLog.external).not_to include(ui)
+    end
+  end
+
+  describe '.internal' do
+    it 'excludes external origins' do
+      api = create(:request_log, :external, account:)
+      ui  = create(:request_log, :internal, account:)
+
+      expect(RequestLog.internal).not_to include(api)
+      expect(RequestLog.internal).to     include(ui)
+    end
+  end
 end

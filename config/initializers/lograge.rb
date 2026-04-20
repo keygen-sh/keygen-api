@@ -90,6 +90,7 @@ Rails.application.configure do
       db_name: ReadYourOwnWrites.current_database,
       db_role: ReadYourOwnWrites.current_role,
       host: req.host,
+      request_type: controller.internal_request? ? 'ui' : 'api',
       request_id: req.request_id,
       api_revision: api_revision || 'N/A',
       api_version: api_version || 'N/A',

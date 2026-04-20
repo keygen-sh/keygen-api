@@ -44,5 +44,13 @@ FactoryBot.define do
     trait :global do
       in_nil_environment
     end
+
+    trait :external do
+      origin { 'api' }
+    end
+
+    trait :internal do
+      origin { 'ui' }
+    end
   end
 end

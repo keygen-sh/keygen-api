@@ -3,8 +3,6 @@
 module RequestCounter
   extend ActiveSupport::Concern
 
-  REQUEST_COUNT_IGNORED_ORIGINS = %w[https://app.keygen.sh https://dist.keygen.sh].freeze
-
   included do
     prepend_around_action :count_request!
 
@@ -18,7 +16,7 @@ module RequestCounter
 
     def count_request?
       return false if
-        REQUEST_COUNT_IGNORED_ORIGINS.include?(request.headers['Origin'])
+        internal_request?
 
       Current.account.present?
     end
