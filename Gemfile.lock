@@ -208,7 +208,7 @@ GEM
     ed25519 (1.3.0)
     email_check (1.0.2)
     encryptor (3.0.0)
-    erb (5.1.3)
+    erb (6.0.1.1)
     erubi (1.13.1)
     et-orbi (1.2.7)
       tzinfo
@@ -527,6 +527,7 @@ DEPENDENCIES
   dotenv-rails
   ed25519
   email_check
+  erb (~> 6.0.1.1)
   factory_bot_rails (~> 6.5)
   faker (~> 2.20.0)
   haikunator
