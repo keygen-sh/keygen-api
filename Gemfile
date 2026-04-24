@@ -32,6 +32,9 @@ gem 'oj'
 gem 'nokogiri', '~> 1.16.5'
 gem 'msgpack', '~> 1.7'
 
+# Templates
+gem 'erb', '~> 6.0.1.1'
+
 # Billing and subscriptions
 gem 'stripe', '~> 5.43'
 
