@@ -144,9 +144,6 @@ class UserPolicy < ApplicationPolicy
 
   def me?
     verify_permissions!('user.read')
-    verify_environment!(
-      strict: false,
-    )
 
     record == bearer
   end

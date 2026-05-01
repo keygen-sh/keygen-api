@@ -643,6 +643,8 @@ describe LicensePolicy, type: :policy do
   with_role_authorization :license do
     with_scenarios %i[accessing_itself] do
       with_license_authentication do
+        allows :me
+
         with_permissions %w[license.read] do
           allows :show
         end
@@ -675,6 +677,8 @@ describe LicensePolicy, type: :policy do
       end
 
       with_token_authentication do
+        allows :me
+
         with_permissions %w[license.read] do
           without_token_permissions { denies :show }
 
@@ -747,6 +751,8 @@ describe LicensePolicy, type: :policy do
 
     with_scenarios %i[accessing_a_license] do
       with_license_authentication do
+        denies :me
+
         with_permissions %w[license.read] do
           denies :show
         end
@@ -777,6 +783,8 @@ describe LicensePolicy, type: :policy do
       end
 
       with_token_authentication do
+        denies :me
+
         with_permissions %w[license.read] do
           denies :show
         end

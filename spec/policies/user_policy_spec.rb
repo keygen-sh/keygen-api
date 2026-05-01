@@ -1343,6 +1343,8 @@ describe UserPolicy, type: :policy do
   with_role_authorization :user do
     with_scenarios %i[accessing_itself] do
       with_token_authentication do
+        allows :me
+
         with_permissions %w[user.read] do
           without_token_permissions { denies :show }
 
@@ -1481,6 +1483,8 @@ describe UserPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_user] do
       with_token_authentication do
+        denies :me
+
         with_permissions %w[user.read] do
           denies :show
         end

@@ -215,15 +215,7 @@ class LicensePolicy < ApplicationPolicy
 
   def me?
     verify_permissions!('license.read')
-    verify_environment!(
-      strict: false,
-    )
 
-    case bearer
-    in role: Role(:license) if record == bearer
-      allow!
-    else
-      deny!
-    end
+    record == bearer
   end
 end

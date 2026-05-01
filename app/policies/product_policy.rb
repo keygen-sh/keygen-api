@@ -99,15 +99,7 @@ class ProductPolicy < ApplicationPolicy
 
   def me?
     verify_permissions!('product.read')
-    verify_environment!(
-      strict: false,
-    )
 
-    case bearer
-    in role: Role(:product) if record == bearer
-      allow!
-    else
-      deny!
-    end
+    record == bearer
   end
 end

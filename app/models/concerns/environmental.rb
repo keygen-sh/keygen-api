@@ -61,7 +61,10 @@ module Environmental
     #
     # Use :default to automatically configure a default environment for the model.
     # Accepts a proc that resolves into an Environment or environment ID.
-    def has_environment(default: nil, **kwargs)
+    #
+    # Use :skip_verify_associations to skip asserting environment compatibility
+    # for particular associations that are allowed to be e.g. cross-env.
+    def has_environment(default: nil, skip_verify_associations: nil, **kwargs)
       belongs_to :environment, optional: true, **kwargs
 
       tracks_attributes :environment_id,
@@ -145,6 +148,9 @@ module Environmental
           # assert the :belongs_to has an :environment association to assert against.
           next unless
             (reflection.options in polymorphic: true) || reflection.klass < Environmental
+
+          next if
+            skip_verify_associations&.include?(reflection.name)
 
           # Perform asserts on create and update.
           validate on: %i[create update] do

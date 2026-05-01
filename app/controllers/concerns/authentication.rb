@@ -67,7 +67,7 @@ module Authentication
   end
 
   def authenticate_with_http_cookie(&auth_procedure)
-    session_id = cookies.encrypted[:session_id]
+    session_id = cookies.encrypted[session_id_cookie_for(current_environment)]
 
     auth_procedure.call(session_id)
   end
@@ -416,7 +416,7 @@ module Authentication
   #
   #             see: https://scotthelme.co.uk/csrf-is-dead/
   def has_cookie_credentials?
-    request.origin == Keygen::Portal::ORIGIN && cookies.key?(:session_id)
+    request.origin == Keygen::Portal::ORIGIN && cookies.key?(session_id_cookie_for(current_environment))
   end
 
   def has_bearer_credentials?

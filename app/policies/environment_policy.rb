@@ -69,15 +69,7 @@ class EnvironmentPolicy < ApplicationPolicy
 
   def me?
     verify_permissions!('environment.read')
-    verify_environment!(
-      strict: false,
-    )
 
-    case bearer
-    in role: Role(:environment) if record == bearer
-      allow!
-    else
-      deny!
-    end
+    record == bearer
   end
 end

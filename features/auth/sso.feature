@@ -95,7 +95,7 @@ Feature: SSO
     And the response headers should contain "Location" with "https://portal.keygen.sh/ecorp-example?env=isolated"
     And the response headers should contain "Set-Cookie" with an encrypted cookie:
       """
-      session_id=$sessions[0]; domain=keygen.sh; path=/; expires=Mon, 28 Feb 2552 12:00:00 GMT; secure; httponly; samesite=None; partitioned;
+      session_id.$environments[0]=$sessions[0]; domain=keygen.sh; path=/; expires=Mon, 28 Feb 2552 12:00:00 GMT; secure; httponly; samesite=None; partitioned;
       """
     And the account "ecorp-example" should have 2 "admins"
     And the last "admin" of account "ecorp-example" should have the following attributes:
@@ -156,7 +156,7 @@ Feature: SSO
     And the response headers should contain "Location" with "https://portal.keygen.sh/ecorp-example?env=isolated"
     And the response headers should contain "Set-Cookie" with an encrypted cookie:
       """
-      session_id=$sessions[0]; domain=keygen.sh; path=/; expires=Mon, 28 Feb 2552 12:00:00 GMT; secure; httponly; samesite=None; partitioned;
+      session_id.$environments[0]=$sessions[0]; domain=keygen.sh; path=/; expires=Mon, 28 Feb 2552 12:00:00 GMT; secure; httponly; samesite=None; partitioned;
       """
     And the account "ecorp-example" should have 1 "admin"
     And the last "admin" of account "ecorp-example" should have the following attributes:
@@ -218,7 +218,7 @@ Feature: SSO
     And the response headers should contain "Location" with "https://portal.keygen.sh/ecorp-example?env=shared"
     And the response headers should contain "Set-Cookie" with an encrypted cookie:
       """
-      session_id=$sessions[0]; domain=keygen.sh; path=/; expires=Mon, 28 Feb 2552 12:00:00 GMT; secure; httponly; samesite=None; partitioned;
+      session_id.$environments[0]=$sessions[0]; domain=keygen.sh; path=/; expires=Mon, 28 Feb 2552 12:00:00 GMT; secure; httponly; samesite=None; partitioned;
       """
     And the account "ecorp-example" should have 2 "admins"
     And the last "admin" of account "ecorp-example" should have the following attributes:
@@ -279,7 +279,7 @@ Feature: SSO
     And the response headers should contain "Location" with "https://portal.keygen.sh/ecorp-example?env=shared"
     And the response headers should contain "Set-Cookie" with an encrypted cookie:
       """
-      session_id=$sessions[0]; domain=keygen.sh; path=/; expires=Mon, 28 Feb 2552 12:00:00 GMT; secure; httponly; samesite=None; partitioned;
+      session_id.$environments[0]=$sessions[0]; domain=keygen.sh; path=/; expires=Mon, 28 Feb 2552 12:00:00 GMT; secure; httponly; samesite=None; partitioned;
       """
     And the account "ecorp-example" should have 1 "admin"
     And the last "admin" of account "ecorp-example" should have the following attributes:
@@ -665,7 +665,7 @@ Feature: SSO
     And the response headers should contain "Location" with "https://portal.keygen.sh/lumon-example?env=isolated"
     And the response headers should contain "Set-Cookie" with an encrypted cookie:
       """
-      session_id=$sessions[0]; domain=keygen.sh; path=/; expires=Mon, 28 Feb 2552 08:00:00 GMT; secure; httponly; samesite=None; partitioned;
+      session_id.$environments[0]=$sessions[0]; domain=keygen.sh; path=/; expires=Mon, 28 Feb 2552 08:00:00 GMT; secure; httponly; samesite=None; partitioned;
       """
     And the account "lumon-example" should have 1 "admin"
     And the account "lumon-example" should have 1 "read-only" admin

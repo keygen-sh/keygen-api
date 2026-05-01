@@ -30,6 +30,7 @@
 # Ignore LLM configs
 /.claude/*
 !/.claude/CLAUDE.md
+/.codex
 
 # Ignore Redis/DB dumps
 /*.dump

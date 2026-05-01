@@ -214,23 +214,50 @@ Given /^I authenticate with (?:a|my)(?: valid)? session$/ do
     ip: '127.0.0.1',
   )
 
-  app       = Rails.application
-  config    = app.config
-  keygen    = app.key_generator
-  salt      = config.action_dispatch.authenticated_encrypted_cookie_salt
-  cipher    = config.action_dispatch.encrypted_cookie_cipher
-  key_len   = ActiveSupport::MessageEncryptor.key_len(cipher)
-  key       = keygen.generate_key(salt, key_len)
-  encryptor = ActiveSupport::MessageEncryptor.new(key,
-    serializer: ActiveSupport::MessageEncryptor::NullSerializer,
-    cipher:,
+  authenticate_with_session(@session, environment: nil)
+end
+
+Given /^I authenticate with (?:(?:a|my)|the (first|second|third|fourth|fifth|last)) session for "([^\"]+)"$/ do |index_in_words, environment_code|
+  environment = @account.environments.find_by!(code: environment_code)
+  @session    = if index_in_words.present?
+                  @account.sessions.send(index_in_words)
+                else
+                  token = @bearer.tokens.first_or_create!(account: @bearer.account, bearer: @bearer)
+
+                  token.sessions.create!(
+                    account: @bearer.account,
+                    environment:,
+                    expiry: 10.hours.from_now,
+                    user_agent: 'keygen/test',
+                    ip: '127.0.0.1',
+                  )
+                end
+
+  authenticate_with_session(@session, environment:)
+end
+
+Given /^I have a session for "([^\"]+)" with a child session$/ do |environment_code|
+  environment        = @account.environments.find_by!(code: environment_code)
+  parent_environment = @bearer.is_a?(Environment) ? environment : nil
+  parent_token       = @bearer.tokens.create!(account: @bearer.account, bearer: @bearer, environment: parent_environment)
+  child_token        = @bearer.tokens.create!(account: @bearer.account, bearer: @bearer, environment:)
+
+  parent_session = parent_token.sessions.create!(
+    account: @bearer.account,
+    environment: parent_environment,
+    expiry: 10.hours.from_now,
+    user_agent: 'keygen/test',
+    ip: '127.0.0.1',
   )
 
-  dec = JSON.dump(@session.id)
-  enc = encryptor.encrypt_and_sign(dec, purpose: 'cookie.session_id')
-  esc = CGI.escape(enc)
-
-  header "Cookie", %(session_id=#{esc})
+  child_token.sessions.create!(
+    account: @bearer.account,
+    environment:,
+    parent: parent_session,
+    expiry: parent_session.expiry,
+    user_agent: 'keygen/test',
+    ip: '127.0.0.1',
+  )
 end
 
 Given /^I authenticate with an expiring session$/ do
@@ -241,23 +268,7 @@ Given /^I authenticate with an expiring session$/ do
     ip: '127.0.0.1',
   )
 
-  app       = Rails.application
-  config    = app.config
-  keygen    = app.key_generator
-  salt      = config.action_dispatch.authenticated_encrypted_cookie_salt
-  cipher    = config.action_dispatch.encrypted_cookie_cipher
-  key_len   = ActiveSupport::MessageEncryptor.key_len(cipher)
-  key       = keygen.generate_key(salt, key_len)
-  encryptor = ActiveSupport::MessageEncryptor.new(key,
-    serializer: ActiveSupport::MessageEncryptor::NullSerializer,
-    cipher:,
-  )
-
-  dec = JSON.dump(@session.id)
-  enc = encryptor.encrypt_and_sign(dec, purpose: 'cookie.session_id')
-  esc = CGI.escape(enc)
-
-  header "Cookie", %(session_id=#{esc})
+  authenticate_with_session(@session)
 end
 
 Given /^I authenticate with an expired session$/ do
@@ -268,45 +279,13 @@ Given /^I authenticate with an expired session$/ do
     ip: '127.0.0.1',
   )
 
-  app       = Rails.application
-  config    = app.config
-  keygen    = app.key_generator
-  salt      = config.action_dispatch.authenticated_encrypted_cookie_salt
-  cipher    = config.action_dispatch.encrypted_cookie_cipher
-  key_len   = ActiveSupport::MessageEncryptor.key_len(cipher)
-  key       = keygen.generate_key(salt, key_len)
-  encryptor = ActiveSupport::MessageEncryptor.new(key,
-    serializer: ActiveSupport::MessageEncryptor::NullSerializer,
-    cipher:,
-  )
-
-  dec = JSON.dump(@session.id)
-  enc = encryptor.encrypt_and_sign(dec, purpose: 'cookie.session_id')
-  esc = CGI.escape(enc)
-
-  header "Cookie", %(session_id=#{esc})
+  authenticate_with_session(@session)
 end
 
 Given /^I authenticate with an invalid session$/ do
   @token   = @bearer.tokens.first_or_create!(account: @bearer.account, bearer: @bearer)
 
-  app       = Rails.application
-  config    = app.config
-  keygen    = app.key_generator
-  salt      = config.action_dispatch.authenticated_encrypted_cookie_salt
-  cipher    = config.action_dispatch.encrypted_cookie_cipher
-  key_len   = ActiveSupport::MessageEncryptor.key_len(cipher)
-  key       = keygen.generate_key(salt, key_len)
-  encryptor = ActiveSupport::MessageEncryptor.new(key,
-    serializer: ActiveSupport::MessageEncryptor::NullSerializer,
-    cipher:,
-  )
-
-  dec = JSON.dump(SecureRandom.uuid)
-  enc = encryptor.encrypt_and_sign(dec, purpose: 'cookie.session_id')
-  esc = CGI.escape(enc)
-
-  header "Cookie", %(session_id=#{esc})
+  set_session_cookie_header(:session_id, SecureRandom.uuid)
 end
 
 Given /^the SSO callback code "([^\"]*)" returns the following profile:$/ do |code, body|

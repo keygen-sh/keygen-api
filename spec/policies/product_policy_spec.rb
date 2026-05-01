@@ -360,6 +360,8 @@ describe ProductPolicy, type: :policy do
 
     with_scenarios %i[accessing_itself] do
       with_token_authentication do
+        allows :me
+
         with_permissions %w[product.read] do
           allows :show
         end
@@ -386,6 +388,8 @@ describe ProductPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_product] do
       with_token_authentication do
+        denies :me
+
         with_permissions %w[product.read] do
           denies :show
         end

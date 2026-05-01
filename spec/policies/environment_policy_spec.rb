@@ -126,6 +126,8 @@ describe EnvironmentPolicy, type: :policy do
 
       with_scenarios %i[accessing_an_environment] do
         with_token_authentication do
+          denies :me
+
           with_wildcard_permissions do
             without_token_permissions do
               denies :show, :create, :update, :destroy
@@ -150,6 +152,8 @@ describe EnvironmentPolicy, type: :policy do
 
       with_scenarios %i[accessing_itself] do
         with_token_authentication do
+          allows :me
+
           with_wildcard_permissions do
             without_token_permissions do
               denies :show, :create, :update, :destroy

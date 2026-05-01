@@ -5,6 +5,7 @@ class Token < ApplicationRecord
 
   TOKEN_DURATION = 2.weeks
 
+  include AsyncDestroyable
   include Environmental
   include Accountable
   include Tokenable
@@ -19,7 +20,7 @@ class Token < ApplicationRecord
 
   # FIXME(ezekg) sessions must come before permissions otherwise autosave breaks
   has_many :sessions,
-    dependent: :delete_all,
+    dependent: :destroy_async,
     autosave: true
 
   has_many :token_permissions,
@@ -281,20 +282,22 @@ class Token < ApplicationRecord
     self.expiry = Time.current + TOKEN_DURATION if expiry.present?
 
     transaction do
-      sessions.delete_all # expire all of the token's sessions
+      sessions.destroy_all # expire all of the token's sessions
 
       # rebuild the session if its token matches the regenerated token
-      sesh = if session.present? && session.token == self
-               sessions.build(
-                 expiry: session.expiry, # don't implicitly extend session
-                 user_agent: session.user_agent,
-                 ip: session.ip,
-               )
-             end
+      new_session = if session.present? && session.token == self
+                      sessions.build(
+                        environment: session.environment,
+                        parent: session,
+                        expiry: session.expiry, # don't implicitly extend session
+                        user_agent: session.user_agent,
+                        ip: session.ip,
+                      )
+                    end
 
-      generate!(**)
+      generate!(**) # implicit save!
 
-      sesh
+      new_session
     end
   end
 

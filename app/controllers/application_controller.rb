@@ -103,7 +103,7 @@ class ApplicationController < ActionController::API
 
     # expire session cookie on certain terminal authz error codes
     if error in code: 'SESSION_NOT_ALLOWED' | 'USER_BANNED'
-      reset_session_id_cookie
+      unset_session_id_cookies
     end
 
     respond_to do |format|
@@ -141,7 +141,7 @@ class ApplicationController < ActionController::API
     response.headers['WWW-Authenticate'] = challenge
 
     # expire session cookie on invalid authn
-    reset_session_id_cookie
+    unset_session_id_cookies
 
     respond_to do |format|
       format.any {

@@ -77,7 +77,9 @@ module Api::V1
       session = if request.origin == Keygen::Portal::ORIGIN
                   # TODO(ezekg) make default session expiry configurable
                   token.sessions.build(
-                    expiry: token.expiry.presence || 1.week.from_now,
+                    environment: token.environment,
+                    parent: current_session,
+                    expiry: token.expiry.presence || current_session&.expiry || 1.week.from_now,
                     user_agent: request.user_agent,
                     ip: request.remote_ip,
                   )
@@ -146,8 +148,10 @@ module Api::V1
       )
 
       # expire current session if we're revoking its token
-      unless current_session.nil?
-        reset_session_id_cookie if current_session.token == token
+      if current_session.present? && current_session.token == token
+        unset_session_cookie(
+          session_id_cookie_for(current_session.environment),
+        )
       end
 
       token.destroy

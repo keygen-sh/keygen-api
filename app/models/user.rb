@@ -504,13 +504,14 @@ class User < ApplicationRecord
   end
 
   def revoke_tokens!(except: nil)
-    s = if except.present?
-          tokens.where.not(id: except)
-        else
-          tokens
-        end
+    scope = if except.present?
+              tokens.where.not(id: except)
+            else
+              tokens
+            end
 
-    s.destroy_all
+    scope.preload(:sessions)
+         .destroy_all
   end
 
   def revoke_tokens(...)
