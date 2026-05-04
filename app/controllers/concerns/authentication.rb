@@ -67,7 +67,7 @@ module Authentication
   end
 
   def authenticate_with_http_cookie(&auth_procedure)
-    session_id = cookies.encrypted[session_id_cookie_for(current_environment)]
+    session_id = cookies.encrypted[session_cookie_name_for(current_environment)]
 
     auth_procedure.call(session_id)
   end
@@ -148,7 +148,7 @@ module Authentication
         ip: request.remote_ip,
       )
 
-      set_session_id_cookie(session) if session.expiry_changed?
+      set_session_cookie(session) if session.expiry_changed?
     end
 
     # FIXME(ezekg) use Current everywhere instead of current ivars
@@ -416,7 +416,7 @@ module Authentication
   #
   #             see: https://scotthelme.co.uk/csrf-is-dead/
   def has_cookie_credentials?
-    request.origin == Keygen::Portal::ORIGIN && cookies.key?(session_id_cookie_for(current_environment))
+    request.origin == Keygen::Portal::ORIGIN && cookies.key?(session_cookie_name_for(current_environment))
   end
 
   def has_bearer_credentials?

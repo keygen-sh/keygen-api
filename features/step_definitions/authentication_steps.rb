@@ -217,21 +217,35 @@ Given /^I authenticate with (?:a|my)(?: valid)? session$/ do
   authenticate_with_session(@session, environment: nil)
 end
 
-Given /^I authenticate with (?:(?:a|my)|the (first|second|third|fourth|fifth|last)) session for "([^\"]+)"$/ do |index_in_words, environment_code|
-  environment = @account.environments.find_by!(code: environment_code)
-  @session    = if index_in_words.present?
-                  @account.sessions.send(index_in_words)
-                else
-                  token = @bearer.tokens.first_or_create!(account: @bearer.account, bearer: @bearer)
+Given /^I authenticate with the (first|second|third|fourth|fifth|last) session$/ do |index_in_words|
+  @session = @account.sessions.send(index_in_words)
+  @token   = @session.token
+  @bearer  = @session.bearer
 
-                  token.sessions.create!(
-                    account: @bearer.account,
-                    environment:,
-                    expiry: 10.hours.from_now,
-                    user_agent: 'keygen/test',
-                    ip: '127.0.0.1',
-                  )
-                end
+  authenticate_with_session(@session, environment: nil)
+end
+
+Given /^I authenticate with a session for "([^\"]+)"$/ do |environment_code|
+  environment = @account.environments.find_by!(code: environment_code)
+
+  @token   = @bearer.tokens.first_or_create!(account: @bearer.account, bearer: @bearer)
+  @session = @token.sessions.create!(
+    account: @bearer.account,
+    environment:,
+    expiry: 10.hours.from_now,
+    user_agent: 'keygen/test',
+    ip: '127.0.0.1',
+  )
+
+  authenticate_with_session(@session, environment:)
+end
+
+Given /^I authenticate with the (first|second|third|fourth|fifth|last) session for "([^\"]+)"$/ do |index_in_words, environment_code|
+  environment = @account.environments.find_by!(code: environment_code)
+
+  @session = @account.sessions.for_environment(environment).send(index_in_words)
+  @token   = @session.token
+  @bearer  = @session.bearer
 
   authenticate_with_session(@session, environment:)
 end
@@ -245,6 +259,29 @@ Given /^I have a session for "([^\"]+)" with a child session$/ do |environment_c
   parent_session = parent_token.sessions.create!(
     account: @bearer.account,
     environment: parent_environment,
+    expiry: 10.hours.from_now,
+    user_agent: 'keygen/test',
+    ip: '127.0.0.1',
+  )
+
+  child_token.sessions.create!(
+    account: @bearer.account,
+    environment:,
+    parent: parent_session,
+    expiry: parent_session.expiry,
+    user_agent: 'keygen/test',
+    ip: '127.0.0.1',
+  )
+end
+
+Given /^I have a session with a child session for "([^\"]+)"$/ do |environment_code|
+  environment  = @account.environments.find_by!(code: environment_code)
+  parent_token = @bearer.tokens.create!(account: @bearer.account, bearer: @bearer, environment: nil)
+  child_token  = @bearer.tokens.create!(account: @bearer.account, bearer: @bearer, environment:)
+
+  parent_session = parent_token.sessions.create!(
+    account: @bearer.account,
+    environment: nil,
     expiry: 10.hours.from_now,
     user_agent: 'keygen/test',
     ip: '127.0.0.1',
@@ -283,9 +320,9 @@ Given /^I authenticate with an expired session$/ do
 end
 
 Given /^I authenticate with an invalid session$/ do
-  @token   = @bearer.tokens.first_or_create!(account: @bearer.account, bearer: @bearer)
+  @token = @bearer.tokens.first_or_create!(account: @bearer.account, bearer: @bearer)
 
-  set_session_cookie_header(:session_id, SecureRandom.uuid)
+  authenticate_with_session_id(SecureRandom.uuid)
 end
 
 Given /^the SSO callback code "([^\"]*)" returns the following profile:$/ do |code, body|

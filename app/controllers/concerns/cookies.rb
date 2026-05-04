@@ -5,28 +5,11 @@ module Cookies
 
   include ActionController::Cookies
 
-  def set_session_id_cookie(session, **)
-    set_session_cookie(session_id_cookie_for(session.environment), session:, **)
-  end
-
-  def unset_session_id_cookies(**)
-    unset_session_cookie(session_id_cookie_for(nil), **)
-    unset_session_cookie(session_id_cookie_for(current_environment), **)
-  end
-
-  private
-
-  def session_id_cookie_for(environment)
-    if environment.present?
-      :"session_id.#{environment.id}"
-    else
-      :session_id
-    end
-  end
-
-  def set_session_cookie(name, session:, skip_verify_origin: false)
+  def set_session_cookie(session, skip_verify_origin: false)
     return unless
       skip_verify_origin || request.origin == Keygen::Portal::ORIGIN
+
+    name = session_cookie_name_for(session.environment)
 
     cookies.encrypted[name] = {
       value: session.id,
@@ -39,6 +22,20 @@ module Cookies
     }
   end
 
+  def unset_session_cookies(session, skip_verify_origin: false)
+    return unless
+      skip_verify_origin || request.origin == Keygen::Portal::ORIGIN
+
+    names = [
+      session_cookie_name_for(session&.environment),
+      *child_cookie_names_for(session),
+    ].uniq
+
+    names.map do |name|
+      unset_session_cookie(name, skip_verify_origin:)
+    end
+  end
+
   def unset_session_cookie(name, skip_verify_origin: false)
     return unless
       skip_verify_origin || request.origin == Keygen::Portal::ORIGIN
@@ -49,5 +46,21 @@ module Cookies
       partitioned: true,
       secure: true,
     )
+  end
+
+  private
+
+  def session_cookie_name_for(environment)
+    if environment.present?
+      :"session_id.#{environment.id}"
+    else
+      :session_id
+    end
+  end
+
+  def child_cookie_names_for(session)
+    return [] if session.nil?
+
+    session.children.map { session_cookie_name_for(it.environment) }
   end
 end

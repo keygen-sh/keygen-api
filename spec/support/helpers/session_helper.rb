@@ -3,16 +3,33 @@
 module SessionHelper
   module WorldMethods
     def authenticate_with_session(session, environment: session.environment)
-      set_session_cookie_header(session_cookie_name_for(environment), session.id)
+      cookies = session_cookie_pairs_for(session, environment:)
+
+      header "Cookie", cookies.join("; ")
     end
 
-    def set_session_cookie_header(name, value)
-      enc = encrypted_cookie_value(name, value)
+    def authenticate_with_session_id(session_id, environment: nil)
+      name = session_cookie_name_for(environment)
+      enc  = encrypted_cookie_value(name, session_id)
 
       header "Cookie", %(#{name}=#{enc})
     end
 
     private
+
+    def session_cookie_pairs_for(session, environment: session.environment)
+      [
+        session_cookie_pair_for(session),
+        *session.children.flat_map { session_cookie_pairs_for(it) },
+      ]
+    end
+
+    def session_cookie_pair_for(session, environment: session.environment)
+      name = session_cookie_name_for(environment)
+      enc  = encrypted_cookie_value(name, session.id)
+
+      %(#{name}=#{enc})
+    end
 
     def session_cookie_name_for(environment)
       environment.present? ? :"session_id.#{environment.id}" : :session_id

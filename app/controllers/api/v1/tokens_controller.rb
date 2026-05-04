@@ -74,7 +74,7 @@ module Api::V1
         with: TokenPolicy
 
       # NOTE(ezekg) we only support session/cookie authn from portal origin
-      session = if request.origin == Keygen::Portal::ORIGIN
+      session = if request.origin == Keygen::Portal::ORIGIN && token.bearer == current_bearer
                   # TODO(ezekg) make default session expiry configurable
                   token.sessions.build(
                     environment: token.environment,
@@ -86,7 +86,7 @@ module Api::V1
                 end
 
       if token.save
-        set_session_id_cookie(session) if session in Session # lol nice
+        set_session_cookie(session) if session in Session # lol nice
 
         BroadcastEventService.call(
           event: 'token.generated',
@@ -109,7 +109,7 @@ module Api::V1
         to: :regenerate?
 
       if session = current_token.regenerate!(session: current_session)
-        set_session_id_cookie(session)
+        set_session_cookie(session)
       end
 
       BroadcastEventService.call(
@@ -126,7 +126,7 @@ module Api::V1
 
       # expire current session and generate a new one if we're revoking its token
       if session = token.regenerate!(session: current_session)
-        set_session_id_cookie(session)
+        set_session_cookie(session) if session.bearer == current_bearer
       end
 
       BroadcastEventService.call(
@@ -147,11 +147,9 @@ module Api::V1
         resource: token,
       )
 
-      # expire current session if we're revoking its token
+      # expire current session cookies if we're revoking its token
       if current_session.present? && current_session.token == token
-        unset_session_cookie(
-          session_id_cookie_for(current_session.environment),
-        )
+        unset_session_cookies(current_session)
       end
 
       token.destroy

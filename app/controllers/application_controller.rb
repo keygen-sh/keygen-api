@@ -101,9 +101,9 @@ class ApplicationController < ActionController::API
   def render_forbidden(*errors, **error)
     skip_verify_authorized!
 
-    # expire session cookie on certain terminal authz error codes
+    # expire session cookies on certain terminal authz error codes
     if error in code: 'SESSION_NOT_ALLOWED' | 'USER_BANNED'
-      unset_session_id_cookies
+      unset_session_cookies(current_session)
     end
 
     respond_to do |format|
@@ -140,8 +140,11 @@ class ApplicationController < ActionController::API
 
     response.headers['WWW-Authenticate'] = challenge
 
-    # expire session cookie on invalid authn
-    unset_session_id_cookies
+    # expire session cookies on invalid authn
+    unset_session_cookies(current_session)
+    unset_session_cookie(
+      session_cookie_name_for(current_environment),
+    )
 
     respond_to do |format|
       format.any {

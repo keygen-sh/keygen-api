@@ -162,7 +162,7 @@ module Auth
         raise Keygen::Error::InvalidSingleSignOnError.new('session is not valid', code: 'SSO_SESSION_INVALID')
       end
 
-      set_session_id_cookie(session,
+      set_session_cookie(session,
         skip_verify_origin: true, # i.e. allow cookie to be set from outside Portal origin
       )
 
