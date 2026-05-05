@@ -282,7 +282,8 @@ class Token < ApplicationRecord
     self.expiry = Time.current + TOKEN_DURATION if expiry.present?
 
     transaction do
-      sessions.destroy_all # expire all of the token's sessions
+      # FIXME(ezekg) quirk: https://stackoverflow.com/a/78727914/3247081
+      sessions.delete_all(:delete_all) # expire all of the token's sessions
 
       # rebuild the session if its token matches the regenerated token
       new_session = if session.present? && session.token == self
