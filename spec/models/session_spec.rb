@@ -116,14 +116,6 @@ describe Session, type: :model do
       expect(child).to_not be_valid
       expect(child.errors[:bearer]).to include 'bearer must match parent bearer'
     end
-
-    it 'should not allow a child session to outlive its parent' do
-      parent = create(:session, account:, environment: nil, token: nil, expiry: 1.hour.from_now)
-      child  = build(:session, account:, bearer: parent.bearer, parent:, token: nil, expiry: 2.hours.from_now)
-
-      expect(child).to_not be_valid
-      expect(child.errors[:expiry]).to include 'cannot outlive parent session'
-    end
   end
 
   describe '#expires_in?' do

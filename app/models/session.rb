@@ -69,16 +69,6 @@ class Session < ApplicationRecord
     end
   end
 
-  # assert that a child session cannot outlive its parent
-  validate on: %i[create update] do
-    next unless
-      parent.present? && parent.expiry? # anything goes if parent doesn't expire
-
-    if expiry.nil? || parent.expiry < expiry
-      errors.add :expiry, :invalid, message: 'cannot outlive parent session'
-    end
-  end
-
   def expires_in?(dt) = expiry - dt < Time.current
   def expired?        = expiry < Time.current || created_at < MAX_AGE.ago
   def expires?        = expiry?
