@@ -104,6 +104,9 @@ class ApplicationController < ActionController::API
     # expire session cookies on certain terminal authz error codes
     if error in code: 'SESSION_NOT_ALLOWED' | 'USER_BANNED'
       unset_session_cookies(current_session)
+      unset_session_cookie(
+        session_cookie_name_for(current_environment),
+      )
     end
 
     respond_to do |format|

@@ -375,6 +375,32 @@ Feature: Token sessions
       """
     And the current account should have 1 "session"
 
+  @ee
+  Scenario: License with environment-scoped session receives SESSION_NOT_ALLOWED error
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "policy" with the following:
+      """
+      { "authenticationStrategy": "TOKEN" }
+      """
+    And the current account has 1 isolated "license" for the last "policy"
+    And I am a license of account "test1"
+    And I authenticate with a session for "isolated"
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate?environment=isolated"
+    Then the response status should be "403"
+    And the response headers should contain "Set-Cookie" with a cookie:
+      """
+      session_id.$environments[0]=; domain=keygen.sh; expires=Thu, 01 Jan 1970 00:00:00 GMT; secure; samesite=None; partitioned;
+      """
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "Session authentication is not allowed by policy",
+        "code": "SESSION_NOT_ALLOWED"
+      }
+      """
+
   # regen
   Scenario: Admin regenerates the current token with session authentication
     Given the current account is "test1"
@@ -919,7 +945,7 @@ Feature: Token sessions
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "license" for the last "user" as "owner"
-    And I am an user of account "test1"
+    And I am a user of account "test1"
     And I authenticate with a session
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
