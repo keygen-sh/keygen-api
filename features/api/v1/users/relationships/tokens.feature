@@ -184,11 +184,13 @@ Feature: User tokens relationship
     And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Product generates a user token
+  Scenario: Product generates a user token (with license)
     Given the current account is "test1"
-    And the current account has 1 "product"
+    And the current account has 2 "products"
     And the current account has 1 "user"
-    And I am a product of account "test1"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And I am the first product of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$1/tokens"
     Then the response status should be "200"
@@ -197,6 +199,18 @@ Feature: User tokens relationship
     And the response body should be a "token" with a token
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 1 "event-log" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Product generates a user token (without license)
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 1 "user"
+    And I am the last product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users/$1/tokens"
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ce
@@ -933,9 +947,11 @@ Feature: User tokens relationship
   @ce
   Scenario: Product generates a user token with custom permissions (standard tier, CE)
     Given the current account is "test1"
-    And the current account has 1 "product"
+    And the current account has 2 "products"
     And the current account has 1 "user"
-    And I am a product of account "test1"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And I am the first product of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$1/tokens" with the following:
       """
@@ -965,9 +981,11 @@ Feature: User tokens relationship
   @ce
   Scenario: Product generates a user token with custom permissions (ent tier, CE)
     Given the current account is "ent1"
-    And the current account has 1 "product"
+    And the current account has 2 "products"
     And the current account has 1 "user"
-    And I am a product of account "ent1"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And I am the first product of account "ent1"
     And I use an authentication token
     When I send a POST request to "/accounts/ent1/users/$1/tokens" with the following:
       """
@@ -997,9 +1015,11 @@ Feature: User tokens relationship
   @ee
   Scenario: Product generates a user token with custom permissions (standard tier, EE)
     Given the current account is "test1"
-    And the current account has 1 "product"
+    And the current account has 2 "products"
     And the current account has 1 "user"
-    And I am a product of account "test1"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And I am the first product of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$1/tokens" with the following:
       """
@@ -1025,9 +1045,11 @@ Feature: User tokens relationship
   @ee
   Scenario: Product generates a user token with custom permissions (ent tier, EE)
     Given the current account is "ent1"
-    And the current account has 1 "product"
+    And the current account has 2 "products"
     And the current account has 1 "user"
-    And I am a product of account "ent1"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And I am the first product of account "ent1"
     And I use an authentication token
     When I send a POST request to "/accounts/ent1/users/$1/tokens" with the following:
       """
@@ -1053,12 +1075,14 @@ Feature: User tokens relationship
   @ee
   Scenario: Product generates a user token with permissions that exceed the user's permissions (standard tier)
     Given the current account is "test1"
-    And the current account has 1 "product"
+    And the current account has 2 "products"
     And the current account has 1 "user" with the following:
       """
       { "permissions": ["license.validate"] }
       """
-    And I am a product of account "test1"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And I am the first product of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$1/tokens" with the following:
       """
@@ -1101,12 +1125,14 @@ Feature: User tokens relationship
   @ee
   Scenario: Product generates a user token with permissions that exceed the user's permissions (ent tier)
     Given the current account is "ent1"
-    And the current account has 1 "product"
+    And the current account has 2 "products"
     And the current account has 1 "user" with the following:
       """
       { "permissions": ["license.validate"] }
       """
-    And I am a product of account "ent1"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And I am the first product of account "ent1"
     And I use an authentication token
     When I send a POST request to "/accounts/ent1/users/$1/tokens" with the following:
       """
@@ -1149,9 +1175,11 @@ Feature: User tokens relationship
   @ee
   Scenario: Product generates a user token with unsupported permissions (standard tier)
     Given the current account is "test1"
-    And the current account has 1 "product"
+    And the current account has 2 "products"
     And the current account has 1 "user"
-    And I am a product of account "test1"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And I am the first product of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$1/tokens" with the following:
       """
@@ -1188,9 +1216,11 @@ Feature: User tokens relationship
   @ee
   Scenario: Product generates a user token with unsupported permissions (ent tier)
     Given the current account is "ent1"
-    And the current account has 1 "product"
+    And the current account has 2 "products"
     And the current account has 1 "user"
-    And I am a product of account "ent1"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And I am the first product of account "ent1"
     And I use an authentication token
     When I send a POST request to "/accounts/ent1/users/$1/tokens" with the following:
       """
@@ -1227,9 +1257,11 @@ Feature: User tokens relationship
   @ee
   Scenario: Product generates a user token with invalid permissions (standard tier)
     Given the current account is "test1"
-    And the current account has 1 "product"
+    And the current account has 2 "products"
     And the current account has 1 "user"
-    And I am a product of account "test1"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And I am the first product of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$1/tokens" with the following:
       """
@@ -1266,9 +1298,11 @@ Feature: User tokens relationship
   @ee
   Scenario: Product generates a user token with invalid permissions (ent tier)
     Given the current account is "ent1"
-    And the current account has 1 "product"
+    And the current account has 2 "products"
     And the current account has 1 "user"
-    And I am a product of account "ent1"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And I am the first product of account "ent1"
     And I use an authentication token
     When I send a POST request to "/accounts/ent1/users/$1/tokens" with the following:
       """
@@ -1305,12 +1339,14 @@ Feature: User tokens relationship
   @ee
   Scenario: Product generates a user token with permissions for a user with wildcard permission (standard tier)
     Given the current account is "test1"
-    And the current account has 1 "product"
+    And the current account has 2 "products"
     And the current account has 1 "user" with the following:
       """
       { "permissions": ["*"] }
       """
-    And I am a product of account "test1"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And I am the first product of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$1/tokens" with the following:
       """
@@ -1349,12 +1385,14 @@ Feature: User tokens relationship
   @ee
   Scenario: Product generates a user token with permissions for a user with wildcard permission (ent tier)
     Given the current account is "ent1"
-    And the current account has 1 "product"
+    And the current account has 2 "products"
     And the current account has 1 "user" with the following:
       """
       { "permissions": ["*"] }
       """
-    And I am a product of account "ent1"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And I am the first product of account "ent1"
     And I use an authentication token
     When I send a POST request to "/accounts/ent1/users/$1/tokens" with the following:
       """
@@ -1453,16 +1491,13 @@ Feature: User tokens relationship
     And the current account has 1 "token" for each "product"
     And the current account has 5 "users"
     And the current account has 1 "token" for each "user"
-    And the current account has 1 "policy" for the first "product"
-    And the current account has 1 "license" for the first "policy"
-    And the first "license" has the following attributes:
-      """
-      { "userId": "$users[1]" }
-      """
-    And I am a product of account "test1"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And I am the last product of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/users/$1/tokens"
+    When I send a GET request to "/accounts/test1/users/$5/tokens"
     Then the response status should be "200"
+    And the response body should be an array of 1 "token"
 
   Scenario: Product requests tokens for another product's user
     Given the current account is "test1"
@@ -1471,17 +1506,46 @@ Feature: User tokens relationship
     And the current account has 5 "users"
     And the current account has 1 "token" for each "user"
     And the current account has 1 "policy" for the last "product"
-    And the current account has 1 "license" for the last "policy"
-    And the last "license" has the following attributes:
-      """
-      { "userId": "$users[5]" }
-      """
-    And I am a product of account "test1"
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And I am the first product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$5/tokens"
     Then the response status should be "200"
+    And the response body should be an array of 0 "tokens"
 
-  Scenario: License requests tokens for their user
+  Scenario: License requests tokens for their user (with user.read permission)
+    Given the current account is "test1"
+    And the current account has 4 "products"
+    And the current account has 1 "token" for each "product"
+    And the current account has 6 "users"
+    And the current account has 1 "token" for each "user"
+    And the current account has 1 "license" for each "user" through "owner"
+    And the last "license" has the following permissions:
+      """
+      ["license.read", "user.read"]
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$0/tokens"
+    Then the response status should be "403"
+
+  Scenario: License requests tokens for their user (without user.read permission)
+    Given the current account is "test1"
+    And the current account has 4 "products"
+    And the current account has 1 "token" for each "product"
+    And the current account has 6 "users"
+    And the current account has 1 "token" for each "user"
+    And the current account has 1 "license" for each "user" through "owner"
+    And the last "license" has the following permissions:
+      """
+      ["license.read"]
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$0/tokens"
+    Then the response status should be "403"
+
+  Scenario: License requests tokens for their user (with default permission)
     Given the current account is "test1"
     And the current account has 4 "products"
     And the current account has 1 "token" for each "product"

@@ -31,7 +31,9 @@ module Users
       case bearer
       in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only)
         allow!
-      in role: Role(:product | :environment) if user.user?
+      in role: Role(:environment) if user.user?
+        allow!
+      in role: Role(:product) if user.user? && user.products.exists?(bearer.id)
         allow!
       in role: Role(:user) if user == bearer
         allow!
@@ -51,7 +53,9 @@ module Users
       case bearer
       in role: Role(:admin | :developer) if user == bearer || user.user?
         allow!
-      in role: Role(:product | :environment) if user.user?
+      in role: Role(:environment) if user.user?
+        allow!
+      in role: Role(:product) if user.user? && user.products.exists?(bearer.id)
         allow!
       else
         deny!
