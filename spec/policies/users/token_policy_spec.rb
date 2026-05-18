@@ -378,21 +378,21 @@ describe Users::TokenPolicy, type: :policy do
         with_permissions %w[token.read] do
           without_token_permissions { denies :show }
 
-          allows :show
+          denies :show
         end
 
         with_permissions %w[user.tokens.generate] do
           without_token_permissions { denies :create }
 
-          allows :create
+          denies :create
         end
 
         with_wildcard_permissions do
-          allows :show, :create
+          denies :show, :create
         end
 
         with_default_permissions do
-          allows :show, :create
+          denies :show, :create
         end
 
         without_permissions do
