@@ -79,6 +79,62 @@ Feature: Display who the current API token bearer is
     Then the response status should be "200"
     And the response body should be a "license"
 
+  Scenario: License requests their profile using the latest API version
+    Given the current account is "test1"
+    And the current account has the following attributes:
+      """
+      { "apiVersion": "1.5" }
+      """
+    And the current account has 1 "user"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      { "authenticationStrategy": "TOKEN" }
+      """
+    And the current account has 1 "license" for the first "policy" and the last "user" as "owner"
+    And I am a license of account "test1"
+    And I use an authentication token
+    And I use API version "1.6"
+    When I send a GET request to "/accounts/test1/me"
+    Then the response status should be "200"
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
+
+  Scenario: License requests their profile using a legacy API version
+    Given the current account is "test1"
+    And the current account has the following attributes:
+      """
+      { "apiVersion": "1.5" }
+      """
+    And the current account has 1 "user"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      { "authenticationStrategy": "TOKEN" }
+      """
+    And the current account has 1 "license" for the first "policy" and the last "user" as "owner"
+    And I am a license of account "test1"
+    And I use an authentication token
+    And I use API version "1.4"
+    When I send a GET request to "/accounts/test1/me"
+    Then the response status should be "200"
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "user": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/user" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
+
   Scenario: License requests their profile (key)
     Given the current account is "test1"
     And the current account has 1 "policy"
