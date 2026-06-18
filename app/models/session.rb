@@ -72,4 +72,8 @@ class Session < ApplicationRecord
   def expires_in?(dt) = expiry - dt < Time.current
   def expired?        = expiry < Time.current || created_at < MAX_AGE.ago
   def expires?        = expiry?
+
+  def orphaned?
+    parent_id? && parent.nil? || token_id? && token.nil?
+  end
 end

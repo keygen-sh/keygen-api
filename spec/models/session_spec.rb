@@ -142,4 +142,56 @@ describe Session, type: :model do
       expect(session.expired?).to be true
     end
   end
+
+  describe '#orphaned?' do
+    context 'with parent' do
+      it 'should return false when the session has no parent' do
+        session = create(:session, account:)
+
+        expect(session.orphaned?).to be false
+      end
+
+      it 'should return false when the session parent exists' do
+        parent = create(:session, account:, token: nil)
+        child  = create(:session, account:, parent:, token: nil, bearer: parent.bearer)
+
+        expect(child.orphaned?).to be false
+      end
+
+      it 'should return true when the session parent no longer exists' do
+        parent = create(:session, account:, token: nil)
+        child  = create(:session, account:, parent:, token: nil, bearer: parent.bearer)
+
+        parent.delete
+        child.reload
+
+        expect(child.reload.orphaned?).to be true
+      end
+    end
+
+    context 'for token' do
+      it 'should return false when the session has no token' do
+        session = create(:session, account:)
+
+        expect(session.orphaned?).to be false
+      end
+
+      it 'should return false when the session token exists' do
+        token   = create(:token, account:)
+        session = create(:session, account:, token:, bearer: token.bearer)
+
+        expect(session.orphaned?).to be false
+      end
+
+      it 'should return true when the session token no longer exists' do
+        token   = create(:token, account:)
+        session = create(:session, account:, token:, bearer: token.bearer)
+
+        token.delete
+        session.reload
+
+        expect(session.orphaned?).to be true
+      end
+    end
+  end
 end

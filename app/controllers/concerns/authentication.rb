@@ -115,7 +115,7 @@ module Authentication
       current_account.nil? || session_id.blank?
 
     session = current_account.sessions.for_environment(current_environment)
-                                      .preload(:token, :bearer)
+                                      .preload(:token, :bearer, :parent)
                                       .find_by(
                                         id: session_id,
                                       )
@@ -124,7 +124,7 @@ module Authentication
     @current_http_token  = nil
 
     raise Keygen::Error::UnauthorizedError.new(code: 'SESSION_INVALID') if
-      session.nil? || session.bearer.nil?
+      session.nil? || session.bearer.nil? || session.orphaned?
 
     raise Keygen::Error::UnauthorizedError.new(code: 'SESSION_EXPIRED', detail: 'Session is expired') if
       session.expired?
