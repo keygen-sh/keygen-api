@@ -88,7 +88,7 @@ module ReadYourOwnWrites
     private
 
     def database_selector_delay=(delay)
-      database_selector_delay = delay
+      @database_selector_delay = delay
     end
   end
 
