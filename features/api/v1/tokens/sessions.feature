@@ -325,7 +325,7 @@ Feature: Token sessions
   Scenario: Admin revokes a session token with session authentication
     Given the current account is "test1"
     And the current account has 3 "tokens"
-    And the current account has 1 "session" for the third "token"
+    And the current account has 2 "sessions" for the third "token"
     And I am an admin of account "test1"
     And I authenticate with a session
     When I send a DELETE request to "/accounts/test1/tokens/$2"
