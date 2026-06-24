@@ -22,7 +22,7 @@ module Cookies
     }
   end
 
-  def unset_session_cookies(session, skip_verify_origin: false)
+  def unset_session_cookies(session = nil, skip_verify_origin: false)
     return unless
       skip_verify_origin || request.origin == Keygen::Portal::ORIGIN
 

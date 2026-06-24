@@ -6,6 +6,10 @@ Feature: Create account
     And there exists 1 "plan"
 
   Scenario: Anonymous creates an account
+    Given I send the following headers:
+      """
+      { "Origin": "https://portal.keygen.sh" }
+      """
     When I send a POST request to "/accounts" with the following:
       """
       {
@@ -40,6 +44,7 @@ Feature: Create account
       }
       """
     Then the response status should be "201"
+    And the response headers should not contain "Set-Cookie"
     And the response body should be an "account" with the name "Google"
     And the response body should be an "account" with the slug "google"
     And the response body should be an "account" with the following meta:
@@ -58,6 +63,51 @@ Feature: Create account
     And sidekiq should have 0 "request-log" jobs
     And the account "google" should not have a referral
     And the account "google" should have 1 "admin"
+
+  Scenario: Anonymous creates an account with an existing session
+    Given there exists an account "test1"
+    And the current account is "test1"
+    And I am an admin of account "test1"
+    And I authenticate with a session
+    And I send the following headers:
+      """
+      { "Origin": "https://portal.keygen.sh" }
+      """
+    When I send a POST request to "/accounts" with the following:
+      """
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "name": "Keygen",
+            "slug": "keygen"
+          },
+          "relationships": {
+            "plan": {
+              "data": { "type": "plans", "id": "$plan[0]" }
+            },
+            "admins": {
+              "data": [
+                {
+                  "type": "user",
+                  "attributes": {
+                    "firstName": "Zeke",
+                    "email": "zeke@keygen.sh",
+                    "password": "secret123"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response headers should contain "Set-Cookie" with a cookie:
+      """
+      session_id=; domain=keygen.sh; expires=Thu, 01 Jan 1970 00:00:00 GMT; secure; samesite=None; partitioned;
+      """
+    And the response body should be an "account"
 
   Scenario: Anonymous creates an account with multiple admins
     When I send a POST request to "/accounts" with the following:
