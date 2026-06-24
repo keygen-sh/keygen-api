@@ -55,6 +55,8 @@ module Api::V1
       authorize! account
 
       if account.save
+        unset_session_cookies # clear any existing session
+
         render jsonapi: account, status: :created, location: v1_account_url(account)
       else
         render_unprocessable_resource account

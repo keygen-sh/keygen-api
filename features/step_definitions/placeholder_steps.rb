@@ -130,7 +130,7 @@ def parse_placeholders(str, account:, bearer:, crypt:)
         ROTP::TOTP.new(@second_factor.secret).now
       else
         model =
-          if account && resource.singularize != 'account'
+          if account && !(resource.singularize in 'account' | 'plan') # FIXME(ezekg) it all sucks
             args = case index
                    in UUID_RE => id
                      [:find_by, id:]
