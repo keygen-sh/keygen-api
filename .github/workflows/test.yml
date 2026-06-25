@@ -9,8 +9,71 @@ on:
 concurrency:
   group: ${{github.workflow}}-${{github.event.pull_request.number || github.ref}}
   cancel-in-progress: true
+env:
+  KEYGEN_LICENSE_FILE: ${{secrets.KEYGEN_LICENSE_FILE}}
+  KEYGEN_LICENSE_KEY: ${{secrets.KEYGEN_LICENSE_KEY}}
+  KEYGEN_HOST: api.keygen.sh
+  KEYGEN_HOSTS: rubygems.pkg.keygen.sh,raw.pkg.keygen.sh,tauri.pkg.keygen.sh,pypi.pkg.keygen.sh,npm.pkg.keygen.sh,oci.pkg.keygen.sh,auth.keygen.sh
+  SECRET_KEY_BASE: 1b39b6912d39c7dd412d9f5795dd9cdaed7f97d7d02cf0bdac7c9878830b16462af858027e2a51e9c63ff95edd505d461536829bbbce6bfb2db69963c014597a
+  ENCRYPTION_DETERMINISTIC_KEY: GZ5FU0dXHcFxJVqPVpZSihVVqiScvQNq
+  ENCRYPTION_PRIMARY_KEY: r9ay7kGB1p7pEtuRQ6r1gSEZhShPonMz
+  ENCRYPTION_KEY_DERIVATION_SALT: tCf2PKf9LZ6vgfYgf7sAXRg7sDNYj0DP
+  CF_ACCESS_KEY_ID: test
+  CF_SECRET_ACCESS_KEY: test
+  CF_ACCOUNT_ID: test
+  CF_BUCKET: test
+  CF_REGION: auto
+  AWS_ACCESS_KEY_ID: test
+  AWS_SECRET_ACCESS_KEY: test
+  AWS_BUCKET: test
+  AWS_REGION: us-east-2
+  DATABASE_URL: postgres://postgres:postgres@localhost:5432
+  REPLICA_DATABASE_URL: postgres://postgres:postgres@localhost:5432
+  REDIS_URL: redis://localhost:6379
+  RAILS_LOG_LEVEL: ${{vars.RAILS_LOG_LEVEL}}
+  RAILS_ENV: test
+  DEBUG: ${{vars.DEBUG}}
 jobs:
-  test:
+  ce:
+    runs-on: depot-ubuntu-latest-16
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+    strategy:
+      matrix:
+        TEST_RUNNER:
+          - rspec
+          - cucumber
+        REPLICA_DATABASE_ENABLED:
+          - '0'
+          - '1'
+    env:
+      KEYGEN_EDITION: CE
+      KEYGEN_MODE: singleplayer
+      REPLICA_DATABASE_ENABLED: ${{matrix.REPLICA_DATABASE_ENABLED}}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Test
+        uses: ./.github/actions/test
+        with:
+          test-runner: ${{matrix.TEST_RUNNER}}
+  ee:
     runs-on: depot-ubuntu-latest-16
     services:
       postgres:
@@ -43,9 +106,6 @@ jobs:
         TEST_RUNNER:
           - rspec
           - cucumber
-        KEYGEN_EDITION:
-          - CE
-          - EE
         KEYGEN_MODE:
           - singleplayer
           - multiplayer
@@ -55,57 +115,17 @@ jobs:
         CLICKHOUSE_DATABASE_ENABLED:
           - '0'
           - '1'
-        exclude:
-          # NB(ezekg) we do not offer a multiplayer variant of CE
-          - KEYGEN_EDITION: CE
-            KEYGEN_MODE: multiplayer
     env:
-      KEYGEN_LICENSE_FILE: ${{secrets.KEYGEN_LICENSE_FILE}}
-      KEYGEN_LICENSE_KEY: ${{secrets.KEYGEN_LICENSE_KEY}}
-      KEYGEN_EDITION: ${{matrix.KEYGEN_EDITION}}
+      KEYGEN_EDITION: EE
       KEYGEN_MODE: ${{matrix.KEYGEN_MODE}}
-      KEYGEN_HOST: api.keygen.sh
-      KEYGEN_HOSTS: rubygems.pkg.keygen.sh,raw.pkg.keygen.sh,tauri.pkg.keygen.sh,pypi.pkg.keygen.sh,npm.pkg.keygen.sh,oci.pkg.keygen.sh,auth.keygen.sh
-      SECRET_KEY_BASE: 1b39b6912d39c7dd412d9f5795dd9cdaed7f97d7d02cf0bdac7c9878830b16462af858027e2a51e9c63ff95edd505d461536829bbbce6bfb2db69963c014597a
-      ENCRYPTION_DETERMINISTIC_KEY: GZ5FU0dXHcFxJVqPVpZSihVVqiScvQNq
-      ENCRYPTION_PRIMARY_KEY: r9ay7kGB1p7pEtuRQ6r1gSEZhShPonMz
-      ENCRYPTION_KEY_DERIVATION_SALT: tCf2PKf9LZ6vgfYgf7sAXRg7sDNYj0DP
-      CF_ACCESS_KEY_ID: test
-      CF_SECRET_ACCESS_KEY: test
-      CF_ACCOUNT_ID: test
-      CF_BUCKET: test
-      CF_REGION: auto
-      AWS_ACCESS_KEY_ID: test
-      AWS_SECRET_ACCESS_KEY: test
-      AWS_BUCKET: test
-      AWS_REGION: us-east-2
-      DATABASE_URL: postgres://postgres:postgres@localhost:5432
-      REPLICA_DATABASE_URL: postgres://postgres:postgres@localhost:5432
       REPLICA_DATABASE_ENABLED: ${{matrix.REPLICA_DATABASE_ENABLED}}
       CLICKHOUSE_DATABASE_URL: clickhouse://clickhouse:clickhouse@localhost:8123
       CLICKHOUSE_DATABASE_ENABLED: ${{matrix.CLICKHOUSE_DATABASE_ENABLED}}
       CLICKHOUSE_TLS_DISABLED: '1'
-      REDIS_URL: redis://localhost:6379
-      RAILS_LOG_LEVEL: ${{vars.RAILS_LOG_LEVEL}}
-      RAILS_ENV: test
-      DEBUG: ${{vars.DEBUG}}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Install
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.4.9'
-          bundler-cache: true
-      - name: Setup
-        run: bundle exec rake test:setup
       - name: Test
-        run: bundle exec rake test:${{matrix.TEST_RUNNER}}
-      - name: Debug
-        uses: actions/upload-artifact@v4
-        if: ${{failure()}}
+        uses: ./.github/actions/test
         with:
-          path: ${{github.workspace}}/log/test.log
-          name: test-${{matrix.TEST_RUNNER}}-${{github.run_id}}-log
-          if-no-files-found: ignore
-          retention-days: 1
+          test-runner: ${{matrix.TEST_RUNNER}}

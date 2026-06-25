@@ -37,8 +37,11 @@ Dir[Rails.root.join('spec/shared/**/*.rb')].each { |f| require(f) }
 Rails.application.eager_load!
 
 # clear database tables after each test
-DatabaseCleaner[:active_record].strategy                  = :transaction # covers e.g. :primary
-DatabaseCleaner[:active_record, db: :clickhouse].strategy = :truncation
+DatabaseCleaner[:active_record].strategy = :transaction # covers e.g. :primary
+
+if Keygen.database.clickhouse_available? && Keygen.database.clickhouse_enabled?
+  DatabaseCleaner[:active_record, db: :clickhouse].strategy = :truncation
+end
 
 RSpec.configure do |config|
   expectations_config = RSpec::Expectations.configuration

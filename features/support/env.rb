@@ -39,8 +39,11 @@ Rails.application.eager_load!
 # NB(ezekg) for integration tests, our database resolver will select the replica on GETs
 #           so we need to use :truncation instead of :transaction, otherwise we can't read
 #           the other connection's uncommitted transaction before rollback.
-DatabaseCleaner[:active_record].strategy                  = [:truncation, except: %w[event_types permissions]]
-DatabaseCleaner[:active_record, db: :clickhouse].strategy = :truncation
+DatabaseCleaner[:active_record].strategy = [:truncation, except: %w[event_types permissions]]
+
+if Keygen.database.clickhouse_available? && Keygen.database.clickhouse_enabled?
+  DatabaseCleaner[:active_record, db: :clickhouse].strategy = :truncation
+end
 
 # You may also want to configure DatabaseCleaner to use different strategies for certain features and scenarios.
 # See the DatabaseCleaner documentation for details. Example:

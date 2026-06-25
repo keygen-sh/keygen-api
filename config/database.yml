@@ -41,10 +41,12 @@ test: &test
     <<: *primary_test
     url: <%= ENV['REPLICA_DATABASE_URL'] %>
     replica: true
+  <% if ENV.key?('CLICKHOUSE_DATABASE_URL') %>
   clickhouse:
     <<: *clickhouse
     url: <%= ENV['CLICKHOUSE_DATABASE_URL'] %>
     database: keygen_clickhouse_test<%= ENV['TEST_ENV_NUMBER'] %>
+  <% end %>
 
 production:
   primary:
@@ -61,4 +63,3 @@ production:
     <<: *clickhouse
     url: <%= ENV['CLICKHOUSE_DATABASE_URL'] %>
   <% end %>
-
