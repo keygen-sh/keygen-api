@@ -1,13 +1,17 @@
 # frozen_string_literal: true
 
 Rails.autoloaders.each do |autoloader|
-  # NB(ezekg) avoid eager loading analytics models in environments that don't have clickhouse
+  autoloader.collapse(
+    # NB(ezekg) the clickhouse/ directory is only for organizational purposes to facilitate below
+    Rails.root.join('app/models/clickhouse'),
+  )
+
+  # avoid eager loading analytics models in environments that don't have clickhouse
   unless Keygen.database.clickhouse_available? && Keygen.database.clickhouse_enabled?
     autoloader.do_not_eager_load(
       Rails.root.join('app/models/clickhouse_record.rb'),
-      Rails.root.join('app/models/analytics/'),
-      *Rails.root.glob('app/models/*_spark.rb'),
-      *Rails.root.glob('app/models/*_log.rb'),
+      Rails.root.join('app/models/clickhouse'),
+      Rails.root.join('app/models/analytics'),
     )
   end
 
