@@ -2505,6 +2505,31 @@ Feature: Search
     And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  @ce
+  Scenario: Admin attempts to perform an SQL injection
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "licenses",
+          "query": {
+            "name": "'; select pg_terminate_backend(pg_backend_pid()); --"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 0 "licenses"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "event-log" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  @ee
   Scenario: Admin attempts to perform an SQL injection
     Given I am an admin of account "test1"
     And the current account is "test1"

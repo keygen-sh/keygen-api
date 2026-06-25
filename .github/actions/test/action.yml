@@ -1,0 +1,28 @@
+name: Test
+description: Install dependencies, set up the test environment, and run a test suite.
+inputs:
+  test-runner:
+    description: Test runner to execute.
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Install
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.4.9'
+        bundler-cache: true
+    - name: Setup
+      shell: bash
+      run: bundle exec rake test:setup
+    - name: Test
+      shell: bash
+      run: bundle exec rake test:${{inputs.test-runner}}
+    - name: Debug
+      uses: actions/upload-artifact@v4
+      if: ${{failure()}}
+      with:
+        path: ${{github.workspace}}/log/test.log
+        name: test-${{github.job}}-${{inputs.test-runner}}-${{github.run_id}}-log
+        if-no-files-found: ignore
+        retention-days: 1
