@@ -3,7 +3,7 @@
 require 'rails_helper'
 require 'spec_helper'
 
-describe EventLogPolicy, type: :policy do
+describe EventLogPolicy, :only_clickhouse, type: :policy do
   subject { described_class.new(record, account:, environment:, bearer:, token:) }
 
   with_role_authorization :admin do

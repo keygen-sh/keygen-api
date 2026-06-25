@@ -3,7 +3,7 @@
 require 'rails_helper'
 require 'spec_helper'
 
-describe Analytics::Leaderboard do
+describe Analytics::Leaderboard, :only_clickhouse do
   let(:account) { create(:account) }
 
   before { Sidekiq::Testing.inline! }

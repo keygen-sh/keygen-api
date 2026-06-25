@@ -3,7 +3,7 @@
 require 'rails_helper'
 require 'spec_helper'
 
-describe Accounts::AnalyticsPolicy, type: :policy do
+describe Accounts::AnalyticsPolicy, :only_clickhouse, type: :policy do
   subject { described_class.new(account:, environment:, bearer:, token:) }
 
   with_role_authorization :admin do

@@ -3,7 +3,7 @@
 require 'rails_helper'
 require 'spec_helper'
 
-describe Analytics::Gauge do
+describe Analytics::Gauge, :only_clickhouse do
   let(:account) { create(:account) }
 
   describe '.new' do
