@@ -3,7 +3,7 @@
 require 'rails_helper'
 require 'spec_helper'
 
-describe Analytics::Heatmap, :only_clickhouse do
+describe Analytics::Heatmap do
   let(:account) { create(:account) }
 
   describe '.new' do
