@@ -3,7 +3,7 @@
 require 'rails_helper'
 require 'spec_helper'
 
-describe EventLog, type: :model do
+describe EventLog, :only_clickhouse, type: :model do
   let(:account) { create(:account, plan: build(:plan, :ent, event_log_retention_duration: rand(1.day..365.days))) }
 
   before { Current.account = account }
