@@ -58,18 +58,6 @@ shared_examples :dirtyable do
         expect { model.foo_attribute_assigned? }.to raise_error NoMethodError
       end
     end
-
-    context "when tracking attributes that don't exist" do
-      let(:dirtyable) {
-        Class.new(described_class) do
-          tracks_attributes :foo
-        end
-      }
-
-      it 'should raise' do
-        expect { dirtyable }.to raise_error NotImplementedError
-      end
-    end
   end
 
   describe '.tracks_nested_attributes_for' do

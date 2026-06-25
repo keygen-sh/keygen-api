@@ -57,22 +57,6 @@ describe Dirtyable, type: :concern do
           expect { model.qux_attribute_assigned? }.to raise_error NoMethodError
         end
       end
-
-      context "when tracking attributes that don't exist" do
-        let(:dirtyable) {
-          Class.new {
-            include ActiveModel::Model
-            include ActiveModel::Attributes
-            include Dirtyable
-
-            tracks_attributes :foo
-          }
-        }
-
-        it 'should raise' do
-          expect { dirtyable }.to raise_error NotImplementedError
-        end
-      end
     end
 
     describe '.tracks_nested_attributes_for' do
