@@ -36,15 +36,6 @@ module Dirtyable
     # based on whether or not an environment was explicitly passed.
     #
     def tracks_attributes(*attribute_names)
-      raise NotImplementedError, "attributes not accepted for #{self}: #{attribute_names.inspect}" unless
-        attribute_names.empty? || attribute_names.all? {
-          it.to_s.in?(self.attribute_names) || (
-            self < ::ActiveRecord::Base && (
-              it.to_s.in?(self.column_names) || it.to_s.in?(reflections.keys)
-            )
-          )
-        }
-
       module_exec do
         if self <= ActiveRecord::Base
           after_save -> { remove_instance_variable(:@assigned_attributes) },
