@@ -10,13 +10,13 @@ module Analytics
     include ActiveModel::Attributes
 
     COUNTERS = {
-      alus: ActiveLicensedUsers,
-      events: Events,
-      licenses: Licenses,
-      machines: Machines,
-      requests: Requests,
-      users: Users,
-      validations: Validations,
+      alus: 'ActiveLicensedUsers',
+      events: 'Events',
+      licenses: 'Licenses',
+      machines: 'Machines',
+      requests: 'Requests',
+      users: 'Users',
+      validations: 'Validations',
     }
 
     attribute :account, default: -> { Current.account }
@@ -66,7 +66,7 @@ module Analytics
     attr_reader :counter_name,
                 :counter_options
 
-    def counter_class = COUNTERS[counter_name]
+    def counter_class = self.class.const_get(COUNTERS[counter_name], false)
     def counter       = @counter ||= counter_class.new(account:, environment:, **counter_options)
   end
 end

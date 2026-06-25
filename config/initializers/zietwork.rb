@@ -11,7 +11,6 @@ Rails.autoloaders.each do |autoloader|
     autoloader.do_not_eager_load(
       Rails.root.join('app/models/clickhouse_record.rb'),
       Rails.root.join('app/models/clickhouse'),
-      Rails.root.join('app/models/analytics'),
     )
   end
 
