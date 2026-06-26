@@ -110,7 +110,7 @@ Prefer:
 
 ## 5. Clickhouse
 
-Clickhouse is an optional secondary database. Its config is always present in the `test` environment, but it must still be explicitly **enabled** at runtime via:
+Clickhouse is an optional secondary database. In the `test` environment, its config is present when `CLICKHOUSE_DATABASE_URL` is set, and it must still be explicitly **enabled** at runtime via:
 
 ```bash
 CLICKHOUSE_DATABASE_ENABLED=1
