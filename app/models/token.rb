@@ -145,9 +145,9 @@ class Token < ApplicationRecord
       type.blank? && id.blank? && role.blank?
 
     scope = all
-    scope = scope.for_bearer_type(type) if type.present?
-    scope = scope.for_bearer_id(id)     if id.present?
-    scope = scope.for_bearer_role(role) if role.present?
+    scope = scope.for_bearer_type(type)  if type.present?
+    scope = scope.for_bearer_id(id)      if id.present?
+    scope = scope.for_bearer_role(*role) if role.present?
 
     scope
   } do
@@ -173,12 +173,15 @@ class Token < ApplicationRecord
     where(bearer_id: bearer_id)
   }
 
-  scope :for_bearer_role, -> role {
-    name = role.to_s.underscore
-    return none if
-      name.empty?
+  scope :for_bearer_role, -> *roles {
+    names = roles.map { it.to_s.underscore } # support multiple roles
+                 .compact_blank
+                 .uniq
 
-    joins(<<~SQL.squish).where(roles: { name: })
+    return none if
+      names.empty?
+
+    joins(<<~SQL.squish).where(roles: { name: names })
       INNER JOIN roles
         ON roles.resource_type = tokens.bearer_type
        AND roles.resource_id   = tokens.bearer_id

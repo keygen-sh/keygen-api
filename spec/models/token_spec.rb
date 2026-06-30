@@ -230,6 +230,20 @@ describe Token, type: :model do
       expect(tokens).to_not include license_token
     end
 
+    it 'should filter by bearer roles' do
+      admin_token   = create(:token, account:, bearer: create(:admin, account:))
+      user_token    = create(:token, account:, bearer: create(:user, account:))
+      product_token = create(:token, account:, bearer: create(:product, account:))
+      license_token = create(:token, account:, bearer: create(:license, account:))
+
+      tokens = described_class.for_bearer(role: %i[user license])
+
+      expect(tokens).to_not include admin_token
+      expect(tokens).to include user_token
+      expect(tokens).to_not include product_token
+      expect(tokens).to include license_token
+    end
+
     it 'should filter by bearer role' do
       admin_token   = create(:token, account:, bearer: create(:admin, account:))
       user_token    = create(:token, account:, bearer: create(:user, account:))
