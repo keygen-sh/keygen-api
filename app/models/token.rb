@@ -135,29 +135,21 @@ class Token < ApplicationRecord
     end
   }
 
-  scope :for_product, -> id { for_bearer(Product.name, id) }
-  scope :for_license, -> id { for_bearer(License.name, id) }
-  scope :for_user,    -> id { for_bearer(User.name, id) }
+  scope :for_product, -> id { for_bearer(type: Product.name, id:) }
+  scope :for_license, -> id { for_bearer(type: License.name, id:) }
+  scope :for_user,    -> id { for_bearer(type: User.name, id:) }
 
-  scope :for_bearer, -> *terms {
-    case terms
-    in [ActiveRecord::Base => bearer]
-      where(bearer:)
-    in [Hash => params]
-      for_bearer(params.symbolize_keys.values_at(:type, :id))
-    in [[String | Symbol => type, nil]]
-      for_bearer_type(type)
-    in [[String | Symbol => type, String => id]]
-      for_bearer_type(type).for_bearer_id(id)
-    in [String | Symbol => type, nil]
-      for_bearer_type(type)
-    in [String | Symbol => type, String => id]
-      for_bearer_type(type).for_bearer_id(id)
-    in [String => id]
-      for_bearer_id(id)
-    else
-      none
-    end
+  scope :for_bearer, -> (bearer = nil, type: nil, id: nil, role: nil) {
+    return where(bearer:) if bearer in ActiveRecord::Base
+    return none if
+      type.blank? && id.blank? && role.blank?
+
+    scope = all
+    scope = scope.for_bearer_type(type) if type.present?
+    scope = scope.for_bearer_id(id)     if id.present?
+    scope = scope.for_bearer_role(role) if role.present?
+
+    scope
   } do
     def environments = for_bearer_type(:environment)
     def products     = for_bearer_type(:product)
@@ -179,6 +171,18 @@ class Token < ApplicationRecord
       bearer_id.empty?
 
     where(bearer_id: bearer_id)
+  }
+
+  scope :for_bearer_role, -> role {
+    name = role.to_s.underscore
+    return none if
+      name.empty?
+
+    joins(<<~SQL.squish).where(roles: { name: })
+      INNER JOIN roles
+        ON roles.resource_type = tokens.bearer_type
+       AND roles.resource_id   = tokens.bearer_id
+    SQL
   }
 
   delegate :role, :role_permissions,
