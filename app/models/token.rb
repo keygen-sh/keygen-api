@@ -145,8 +145,12 @@ class Token < ApplicationRecord
       where(bearer:)
     in [Hash => params]
       for_bearer(params.symbolize_keys.values_at(:type, :id))
+    in [[String | Symbol => type, nil]]
+      for_bearer_type(type)
     in [[String | Symbol => type, String => id]]
       for_bearer_type(type).for_bearer_id(id)
+    in [String | Symbol => type, nil]
+      for_bearer_type(type)
     in [String | Symbol => type, String => id]
       for_bearer_type(type).for_bearer_id(id)
     in [String => id]
