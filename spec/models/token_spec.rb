@@ -201,6 +201,92 @@ describe Token, type: :model do
     end
   end
 
+  describe '.for_bearer' do
+    it 'should filter by bearer' do
+      admin_token   = create(:token, account:, bearer: create(:admin, account:))
+      user_token    = create(:token, account:, bearer: create(:user, account:))
+      product_token = create(:token, account:, bearer: create(:product, account:))
+      license_token = create(:token, account:, bearer: create(:license, account:))
+
+      tokens = described_class.for_bearer(license_token.bearer)
+
+      expect(tokens).to_not include admin_token
+      expect(tokens).to_not include user_token
+      expect(tokens).to_not include product_token
+      expect(tokens).to include license_token
+    end
+
+    it 'should filter by bearer type' do
+      admin_token   = create(:token, account:, bearer: create(:admin, account:))
+      user_token    = create(:token, account:, bearer: create(:user, account:))
+      product_token = create(:token, account:, bearer: create(:product, account:))
+      license_token = create(:token, account:, bearer: create(:license, account:))
+
+      tokens = described_class.for_bearer(type: :user)
+
+      expect(tokens).to include admin_token
+      expect(tokens).to include user_token
+      expect(tokens).to_not include product_token
+      expect(tokens).to_not include license_token
+    end
+
+    it 'should filter by bearer role' do
+      admin_token   = create(:token, account:, bearer: create(:admin, account:))
+      user_token    = create(:token, account:, bearer: create(:user, account:))
+      product_token = create(:token, account:, bearer: create(:product, account:))
+      license_token = create(:token, account:, bearer: create(:license, account:))
+
+      tokens = described_class.for_bearer(role: :product)
+
+      expect(tokens).to include product_token
+      expect(tokens).to_not include admin_token
+      expect(tokens).to_not include user_token
+      expect(tokens).to_not include license_token
+    end
+
+    it 'should filter by bearer type and role' do
+      admin_token   = create(:token, account:, bearer: create(:admin, account:))
+      user_token    = create(:token, account:, bearer: create(:user, account:))
+      product_token = create(:token, account:, bearer: create(:product, account:))
+      license_token = create(:token, account:, bearer: create(:license, account:))
+
+      tokens = described_class.for_bearer(type: :user, role: :admin)
+
+      expect(tokens).to include admin_token
+      expect(tokens).to_not include user_token
+      expect(tokens).to_not include product_token
+      expect(tokens).to_not include license_token
+    end
+
+    it 'should filter by bearer id' do
+      admin_token   = create(:token, account:, bearer: create(:admin, account:))
+      user_token    = create(:token, account:, bearer: create(:user, account:))
+      product_token = create(:token, account:, bearer: create(:product, id: admin_token.bearer_id, account:))
+      license_token = create(:token, account:, bearer: create(:license, account:))
+
+      tokens = described_class.for_bearer(id: admin_token.bearer_id)
+
+      expect(tokens).to include admin_token
+      expect(tokens).to_not include user_token
+      expect(tokens).to include product_token
+      expect(tokens).to_not include license_token
+    end
+
+    it 'should filter by bearer type and id' do
+      admin_token   = create(:token, account:, bearer: create(:admin, account:))
+      user_token    = create(:token, account:, bearer: create(:user, account:))
+      product_token = create(:token, account:, bearer: create(:product, id: admin_token.bearer_id, account:))
+      license_token = create(:token, account:, bearer: create(:license, account:))
+
+      tokens = described_class.for_bearer(type: :user, id: admin_token.bearer_id)
+
+      expect(tokens).to include admin_token
+      expect(tokens).to_not include user_token
+      expect(tokens).to_not include product_token
+      expect(tokens).to_not include license_token
+    end
+  end
+
   describe '#permissions' do
     it 'should return default permissions' do
       bearer  = create(:user, account:, permissions: %w[license.validate license.read machine.read machine.create machine.delete])

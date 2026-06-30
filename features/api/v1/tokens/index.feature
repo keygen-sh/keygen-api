@@ -72,7 +72,7 @@ Feature: List authentication tokens
     Then the response status should be "200"
     And the response body should be an array of 1 "token"
 
-  Scenario: Admin requests all tokens for product bearers
+  Scenario: Admin requests all tokens with product bearers
     Given the current account is "test1"
     And I am an admin of account "test1"
     And the current account has 3 "products"
@@ -85,6 +85,20 @@ Feature: List authentication tokens
     When I send a GET request to "/accounts/test1/tokens?bearer[type]=product"
     Then the response status should be "200"
     And the response body should be an array of 3 "tokens"
+
+  Scenario: Admin requests all tokens for admin bearers
+    Given the current account is "test1"
+    And the current account has 3 "products"
+    And the current account has 1 "token" for each "product"
+    And the current account has 5 "users"
+    And the current account has 1 "token" for each "user"
+    And the current account has 2 "licenses"
+    And the current account has 1 "token" for each "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/tokens?bearer[role]=admin"
+    Then the response status should be "200"
+    And the response body should be an array of 1 "token"
 
   @ee
   Scenario: Isolated environment requests their tokens while authenticated
