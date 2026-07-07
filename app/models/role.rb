@@ -3,6 +3,7 @@
 class Role < ApplicationRecord
   include Keygen::EE::ProtectedMethods[:permissions=, entitlements: %i[permissions]]
   include Keygen::PortableClass
+  include Denormalizable
   include Accountable
   include Dirtyable
 
@@ -36,8 +37,15 @@ class Role < ApplicationRecord
     def actions = loaded? ? collect(&:action) : super
   end
 
+  has_many :tokens,
+    primary_key: %i[resource_type resource_id],
+    foreign_key: %i[bearer_type bearer_id]
+
   # NB(ezekg) we're using account over account_id here because it may not be persisted
   has_account default: -> { resource&.account }
+
+  denormalizes :name,
+    to: :tokens, as: :bearer_role
 
   # FIXME(ezekg) replace with accountable concern i.e. an association
   delegate :default_permissions, :default_permission_ids,

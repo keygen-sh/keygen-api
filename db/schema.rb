@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_01_131644) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_07_121900) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_catalog.plpgsql"
@@ -878,6 +878,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_01_131644) do
     t.uuid "account_id"
     t.integer "activations", default: 0
     t.uuid "bearer_id"
+    t.string "bearer_role"
     t.string "bearer_type"
     t.datetime "created_at", precision: nil, null: false
     t.integer "deactivations", default: 0
@@ -888,6 +889,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_01_131644) do
     t.integer "max_deactivations"
     t.string "name"
     t.datetime "updated_at", precision: nil, null: false
+    t.index ["account_id", "bearer_role", "created_at"], name: "index_tokens_on_account_id_and_bearer_role_and_created_at"
     t.index ["account_id", "created_at"], name: "index_tokens_on_account_id_and_created_at"
     t.index ["bearer_id", "bearer_type", "created_at"], name: "index_tokens_on_bearer_id_and_bearer_type_and_created_at"
     t.index ["created_at"], name: "index_tokens_on_created_at", order: :desc

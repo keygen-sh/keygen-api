@@ -9,6 +9,7 @@ class Token < ApplicationRecord
   include Environmental
   include Accountable
   include Tokenable
+  include Denormalizable
   include Limitable
   include Orderable
   include Pageable
@@ -17,6 +18,11 @@ class Token < ApplicationRecord
 
   belongs_to :bearer,
     polymorphic: true
+
+  # NB(ezekg) rails doesn't support :through associations for polymorphic associations
+  belongs_to :role,
+    primary_key: %i[resource_type resource_id],
+    foreign_key: %i[bearer_type bearer_id]
 
   # FIXME(ezekg) sessions must come before permissions otherwise autosave breaks
   has_many :sessions,
@@ -45,6 +51,9 @@ class Token < ApplicationRecord
   has_permissions Permission::ALL_PERMISSIONS,
     # Default to wildcard permission but allow all
     default: %w[*]
+
+  denormalizes :name,
+    from: :role, as: :bearer_role
 
   accepts_nested_attributes_for :token_permissions
   tracks_nested_attributes_for :token_permissions
@@ -181,17 +190,17 @@ class Token < ApplicationRecord
     return none if
       names.empty?
 
-    joins(<<~SQL.squish).where(roles: { name: names })
-      INNER JOIN roles
-        ON roles.account_id    = tokens.account_id
-       AND roles.resource_type = tokens.bearer_type
-       AND roles.resource_id   = tokens.bearer_id
-    SQL
+    where(bearer_role: names)
   }
 
-  delegate :role, :role_permissions,
+  delegate :role_permissions,
     allow_nil: true,
     to: :bearer
+
+  # NB(ezekg) role overrides the association reader to fall back to the bearer's
+  #           in-memory role, since the association cannot be resolved until the
+  #           bearer is persisted, i.e. when bearer_id is nil during creation.
+  def role = super || bearer&.role
 
   # Instead of doing a has_many(through:), we're doing this so that we can
   # allow permissions to be attached by action, rather than just ID. This

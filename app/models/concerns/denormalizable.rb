@@ -6,15 +6,21 @@ module Denormalizable
   DENORMALIZE_ASSOCIATION_ASYNC_BATCH_SIZE = 1_000
 
   class_methods do
-    def denormalizes(*attribute_names, with: nil, from: nil, to: nil, prefix: nil)
+    def denormalizes(*attribute_names, with: nil, from: nil, to: nil, prefix: nil, as: nil)
       raise ArgumentError, 'must provide :from, :to, or :with (but not multiple)' unless
         from.present? ^ to.present? ^ with.present?
 
+      raise ArgumentError, 'must provide either :prefix or :as (but not both)' if
+        prefix.present? && as.present?
+
+      raise ArgumentError, 'must provide a single attribute when using :as' if
+        as.present? && attribute_names.many?
+
       case
       when from.present?
-        attribute_names.each { instrument_denormalized_attribute_from(it, from:, prefix:) }
+        attribute_names.each { instrument_denormalized_attribute_from(it, from:, prefix:, as:) }
       when to.present?
-        attribute_names.each { instrument_denormalized_attribute_to(it, to:, prefix:) }
+        attribute_names.each { instrument_denormalized_attribute_to(it, to:, prefix:, as:) }
       when with.present?
         raise NotImplementedError, 'denormalizes :with is not supported yet'
       else
@@ -24,14 +30,15 @@ module Denormalizable
 
     private
 
-    def instrument_denormalized_attribute_from(attribute_name, from:, prefix:)
+    def instrument_denormalized_attribute_from(attribute_name, from:, prefix:, as: nil)
       case from
       in Symbol => association_name if reflection = reflect_on_association(association_name)
-        prefixed_attribute_name = case prefix
-                                  when true
+        prefixed_attribute_name = case
+                                  when as.present?
+                                    as.to_s
+                                  when prefix == true
                                     "#{association_name}_#{attribute_name}"
-                                  when Symbol,
-                                       String
+                                  when (prefix in Symbol | String)
                                     "#{prefix}_#{attribute_name}"
                                   else
                                     attribute_name.to_s
@@ -41,28 +48,32 @@ module Denormalizable
           raise ArgumentError, "must be a singular association: #{association_name.inspect}"
         end
 
+        # NB(ezekg) supports composite foreign keys, e.g. %i[bearer_type bearer_id]
+        association_changed = -> { Array(reflection.foreign_key).any? { send(:"#{it}_changed?") } || send(:"#{reflection.name}_changed?") }
+
         # FIXME(ezekg) after_initialize ignores prepend: false
-        set_callback :initialize, :after, -> { write_denormalized_attribute_from_schrodingers_record(association_name, attribute_name, prefixed_attribute_name) }, if: -> { send(:"#{reflection.foreign_key}_changed?") || send(:"#{reflection.name}_changed?") }, unless: :persisted?, prepend: false
-        before_validation -> { write_denormalized_attribute_from_schrodingers_record(association_name, attribute_name, prefixed_attribute_name) }, if: -> { send(:"#{reflection.foreign_key}_changed?") || send(:"#{reflection.name}_changed?") }, on: :create
-        before_update -> { write_denormalized_attribute_from_persisted_record(association_name, attribute_name, prefixed_attribute_name) }, if: -> { send(:"#{reflection.foreign_key}_changed?") || send(:"#{reflection.name}_changed?") }
+        set_callback :initialize, :after, -> { write_denormalized_attribute_from_schrodingers_record(association_name, attribute_name, prefixed_attribute_name) }, if: association_changed, unless: :persisted?, prepend: false
+        before_validation -> { write_denormalized_attribute_from_schrodingers_record(association_name, attribute_name, prefixed_attribute_name) }, if: association_changed, on: :create
+        before_update -> { write_denormalized_attribute_from_persisted_record(association_name, attribute_name, prefixed_attribute_name) }, if: association_changed
 
         # make sure validation fails if our denormalized column is modified directly
         validate -> { validate_denormalized_attribute_from_persisted_record(association_name, attribute_name, prefixed_attribute_name) }, if: :"#{prefixed_attribute_name}_changed?", on: :update
 
-        denormalized_attributes << attribute_name
+        denormalized_attributes << prefixed_attribute_name.to_sym
       else
         raise ArgumentError, "invalid :from association: #{from.inspect}"
       end
     end
 
-    def instrument_denormalized_attribute_to(attribute_name, to:, prefix:)
+    def instrument_denormalized_attribute_to(attribute_name, to:, prefix:, as: nil)
       case to
       in Symbol => association_name if reflection = reflect_on_association(association_name)
-        prefixed_attribute_name = case prefix
-                                  when true
+        prefixed_attribute_name = case
+                                  when as.present?
+                                    as.to_s
+                                  when prefix == true
                                     "#{association_name}_#{attribute_name}"
-                                  when Symbol,
-                                       String
+                                  when (prefix in Symbol | String)
                                     "#{prefix}_#{attribute_name}"
                                   else
                                     attribute_name.to_s
