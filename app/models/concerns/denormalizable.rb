@@ -55,11 +55,10 @@ module Denormalizable
       end
     end
 
-    ##
     # instrument_denormalized_attribute_from_through instruments a denormalized attribute
-    # where the source record is resolved via a method on the :through association's
-    # record, e.g. denormalizing a role's name through a polymorphic bearer. Since the
-    # source record is resolved in-memory, an unpersisted :through record is supported.
+    # where the source record is resolved in-memory via a method on the :through
+    # association's record, e.g. a role through a polymorphic bearer, so an
+    # unpersisted :through record is supported.
     def instrument_denormalized_attribute_from_through(attribute_name, from:, through:, prefix:, as: nil)
       case through
       in Symbol => through_association_name if reflection = reflect_on_association(through_association_name)
@@ -71,12 +70,10 @@ module Denormalizable
 
         association_changed = denormalized_association_changed(reflection)
 
-        # FIXME(ezekg) after_initialize ignores prepend: false
         set_callback :initialize, :after, -> { write_denormalized_attribute_from_record_through(through_association_name, from, attribute_name, prefixed_attribute_name) }, if: association_changed, unless: :persisted?, prepend: false
         before_validation -> { write_denormalized_attribute_from_record_through(through_association_name, from, attribute_name, prefixed_attribute_name) }, if: association_changed, on: :create
         before_update -> { write_denormalized_attribute_from_record_through(through_association_name, from, attribute_name, prefixed_attribute_name) }, if: association_changed
 
-        # make sure validation fails if our denormalized column is modified directly
         validate -> { validate_denormalized_attribute_from_record_through(through_association_name, from, attribute_name, prefixed_attribute_name) }, if: :"#{prefixed_attribute_name}_changed?", on: :update
 
         denormalized_attributes << prefixed_attribute_name.to_sym
@@ -107,17 +104,10 @@ module Denormalizable
       end
     end
 
-    ##
     # instrument_denormalized_attribute_to_through instruments a denormalized attribute
     # where the target relation is resolved via a method on the :through association's
-    # record, e.g. denormalizing a role's name to tokens through the role's resource.
-    # The target is assumed to be a collection.
-    #
-    # The target relation is explicitly scoped to records owned by the :through record,
-    # via the target's owner association (see denormalized_owner_reflection_through),
-    # since the relation may be scoped wider than the :through record, e.g.
-    # Environment#tokens contains all tokens in the environment, not just
-    # the environment's own tokens.
+    # record, scoped to records owned by it (see denormalized_owner_reflection_through),
+    # e.g. denormalizing a role's name to tokens through the role's resource.
     def instrument_denormalized_attribute_to_through(attribute_name, to:, through:, prefix:, as: nil)
       case through
       in Symbol => through_association_name if reflection = reflect_on_association(through_association_name)
@@ -129,7 +119,6 @@ module Denormalizable
 
         after_initialize -> { write_denormalized_attribute_to_unpersisted_relation_through(through_association_name, to, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_changed?", unless: :persisted?
         before_validation -> { write_denormalized_attribute_to_unpersisted_relation_through(through_association_name, to, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_changed?", on: :create
-
         after_update -> { write_denormalized_attribute_to_persisted_relation_through(through_association_name, to, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_previously_changed?"
 
         denormalized_attributes << attribute_name
@@ -138,10 +127,6 @@ module Denormalizable
       end
     end
 
-    ##
-    # denormalized_attribute_name returns the name of the denormalized attribute,
-    # i.e. an aliased name via :as, a prefixed name via :prefix, or the attribute
-    # name itself.
     def denormalized_attribute_name(association_name, attribute_name, prefix: nil, as: nil)
       case
       when as.present?
@@ -155,10 +140,8 @@ module Denormalizable
       end
     end
 
-    ##
-    # denormalized_association_changed returns a callable condition that returns
-    # true when the given association has changed, i.e. via its foreign keys,
-    # e.g. bearer_type and bearer_id, or via its target record.
+    # denormalized_association_changed returns a callable condition that returns true
+    # when the given association has changed, via its foreign keys or target record.
     def denormalized_association_changed(reflection)
       foreign_keys  = Array(reflection.foreign_key)
       foreign_keys += [reflection.foreign_type] if reflection.polymorphic?
@@ -167,7 +150,7 @@ module Denormalizable
     end
   end
 
-  # FIXME(ezekg) Move this out into a separate module so that we don't pollute the model.
+  # FIXME(ezekg) move this out into a separate module so that we don't pollute the model
   included do
     cattr_reader :denormalized_attributes, default: Set.new
 
@@ -239,12 +222,9 @@ module Denormalizable
       end
     end
 
-    ##
     # denormalized_owner_reflection_through reflects on the target's owner association,
-    # i.e. the target's belongs_to association that points back at the :through record.
-    # When the :through association is polymorphic, the owner association must be
-    # polymorphic too, e.g. tokens are owned by their polymorphic bearer. Raises
-    # when no owner association is found, or when it is ambiguous.
+    # i.e. the target's belongs_to association that points back at the :through record,
+    # e.g. tokens are owned by their polymorphic bearer.
     def denormalized_owner_reflection_through(through_association_name, target_class)
       through_reflection = self.class.reflect_on_association(through_association_name)
 
@@ -266,15 +246,16 @@ module Denormalizable
       end
     end
 
-    ##
-    # denormalized_record_owned_by? returns true when the record is owned by the
-    # owner, i.e. its owner association's foreign keys match the owner.
+    # denormalized_record_owned_by? returns true when the record's owner association
+    # foreign keys match the owner.
     def denormalized_record_owned_by?(record, owner, owner_reflection)
       return false if
         owner.nil?
 
-      owned   = record.read_attribute(owner_reflection.foreign_key) == owner.read_attribute(owner.class.primary_key)
-      owned &&= record.read_attribute(owner_reflection.foreign_type) == owner.class.polymorphic_name if owner_reflection.polymorphic?
+      owned   = record.read_attribute(owner_reflection.foreign_key)  == owner.read_attribute(owner.class.primary_key)
+      owned &&= record.read_attribute(owner_reflection.foreign_type) == owner.class.polymorphic_name if
+        owner_reflection.polymorphic?
+
       owned
     end
 
@@ -297,8 +278,9 @@ module Denormalizable
     def write_denormalized_attribute_from_unpersisted_record(source_association_name, source_attribute_name, target_attribute_name)
       record = send(source_association_name)
 
-      # If we're denormalizing a foreign key, we need to look up the association and denormalize
-      # the actual record, since it likely doesn't have an ID assigned yet.
+      # NB(ezekg) if we're denormalizing a foreign key, we need to look up the association
+      #           and denormalize the actual record, since it likely doesn't have a
+      #           primary key assigned yet.
       if record.present? && (source_reflection = record.class.reflect_on_all_associations.find { it.foreign_key == source_attribute_name.to_s })
         target_reflection = self.class.reflect_on_all_associations.find { it.foreign_key == target_attribute_name.to_s }
 
