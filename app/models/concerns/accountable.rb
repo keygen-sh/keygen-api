@@ -130,9 +130,8 @@ module Accountable
 
           # Perform asserts on create and update.
           validate on: %i[create update] do
-            # NB(ezekg) supports composite foreign keys, e.g. %i[bearer_type bearer_id]
             next unless
-              account_id_changed? || Array(reflection.foreign_key).any? { public_send("#{it}_changed?") }
+              account_id_changed? || public_send("#{reflection.foreign_key}_changed?")
 
             association = public_send(reflection.name)
             next if

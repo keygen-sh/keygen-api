@@ -14,9 +14,7 @@ namespace :keygen do
       record_ids =
         args.extras.flatten.partition { Permission::ALL_PERMISSIONS.include?(it) }
 
-      # NB(ezekg) :role_permissions is a real association for roleable models, but
-      #           only a delegate for e.g. tokens, so this raises for non-roleables
-      records = model.includes(:account, role_permissions: :permission)
+      records = model.includes(:account, role: { role_permissions: :permission })
                      .where(id: record_ids)
 
       records.find_each(batch_size:) do |record|
