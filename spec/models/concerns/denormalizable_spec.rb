@@ -128,14 +128,6 @@ describe Denormalizable, type: :concern do
       end
     end
 
-    it 'should raise for :with' do
-      expect { denormalizable.denormalizes :product_id, with: :foo }.to raise_error NotImplementedError
-    end
-
-    it 'should raise for :with and :through' do
-      expect { denormalizable.denormalizes :product_id, with: :foo, through: :policy }.to raise_error ArgumentError
-    end
-
     it 'should raise for missing args' do
       expect { denormalizable.denormalizes :product_id }.to raise_error ArgumentError
     end

@@ -6,18 +6,15 @@ module Denormalizable
   DENORMALIZE_ASSOCIATION_ASYNC_BATCH_SIZE = 1_000
 
   class_methods do
-    def denormalizes(*attribute_names, with: nil, from: nil, to: nil, through: nil, prefix: nil, as: nil)
-      raise ArgumentError, 'must provide :from, :to, or :with (but not multiple)' unless
-        from.present? ^ to.present? ^ with.present?
+    def denormalizes(*attribute_names, from: nil, to: nil, through: nil, prefix: nil, as: nil)
+      raise ArgumentError, 'must provide either :from or :to (but not both)' unless
+        from.present? ^ to.present?
 
       raise ArgumentError, 'must provide either :prefix or :as (but not both)' if
         prefix.present? && as.present?
 
       raise ArgumentError, 'must provide a single attribute when using :as' if
         as.present? && attribute_names.many?
-
-      raise ArgumentError, 'must provide :from or :to when using :through' if
-        through.present? && with.present?
 
       case
       when from.present? && through.present?
@@ -28,10 +25,6 @@ module Denormalizable
         attribute_names.each { instrument_denormalized_attribute_to_through(it, to:, through:, prefix:, as:) }
       when to.present?
         attribute_names.each { instrument_denormalized_attribute_to(it, to:, prefix:, as:) }
-      when with.present?
-        raise NotImplementedError, 'denormalizes :with is not supported yet'
-      else
-        raise ArgumentError, 'must provide either :from, :to, or :with'
       end
     end
 
