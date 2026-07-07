@@ -119,6 +119,12 @@ module Denormalizable
     # where the target relation is resolved via a method on the :through association's
     # record, e.g. denormalizing a role's name to tokens through the role's resource.
     # The target is assumed to be a collection.
+    #
+    # The target relation is explicitly scoped to records owned by the :through record,
+    # via the target's owner association (see denormalized_owner_reflection_through),
+    # since the relation may be scoped wider than the :through record, e.g.
+    # Environment#tokens contains all tokens in the environment, not just
+    # the environment's own tokens.
     def instrument_denormalized_attribute_to_through(attribute_name, to:, through:, prefix:, as: nil)
       case through
       in Symbol => through_association_name if reflection = reflect_on_association(through_association_name)
@@ -130,6 +136,7 @@ module Denormalizable
 
         after_initialize -> { write_denormalized_attribute_to_unpersisted_relation_through(through_association_name, to, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_changed?", unless: :persisted?
         before_validation -> { write_denormalized_attribute_to_unpersisted_relation_through(through_association_name, to, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_changed?", on: :create
+
         after_update -> { write_denormalized_attribute_to_persisted_relation_through(through_association_name, to, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_previously_changed?"
 
         denormalized_attributes << attribute_name
@@ -199,18 +206,34 @@ module Denormalizable
     end
 
     def write_denormalized_attribute_to_unpersisted_relation_through(through_association_name, target_name, target_attribute_name, source_attribute_name)
-      relation = send(through_association_name)&.send(target_name)
+      owner    = send(through_association_name)
+      relation = owner&.send(target_name)
+      return if
+        relation.nil?
 
-      relation&.each do |record|
+      reflection = denormalized_owner_reflection_through(through_association_name, relation.klass)
+
+      relation.each do |record|
+        next unless
+          denormalized_record_owned_by?(record, owner, reflection)
+
         record.write_attribute(target_attribute_name, read_attribute(source_attribute_name))
       end
     end
 
     def write_denormalized_attribute_to_persisted_relation_through(through_association_name, target_name, target_attribute_name, source_attribute_name)
-      source_attribute_value_was = send("#{source_attribute_name}_previously_was")
-      target_relation            = send(through_association_name)&.send(target_name)
+      owner    = send(through_association_name)
+      relation = owner&.send(target_name)
+      return if
+        relation.nil?
 
-      target_relation&.ids&.each_slice(DENORMALIZE_ASSOCIATION_ASYNC_BATCH_SIZE) do |ids|
+      # explicitly scope the relation to records owned by the :through record
+      reflection      = denormalized_owner_reflection_through(through_association_name, relation.klass)
+      target_relation = relation.where(reflection.name => owner)
+
+      source_attribute_value_was = send("#{source_attribute_name}_previously_was")
+
+      target_relation.ids.each_slice(DENORMALIZE_ASSOCIATION_ASYNC_BATCH_SIZE) do |ids|
         DenormalizeAssociationAsyncJob.perform_later(
           source_class_name: self.class.name,
           source_id: id,
@@ -221,6 +244,45 @@ module Denormalizable
           target_attribute_name:,
         )
       end
+    end
+
+    ##
+    # denormalized_owner_reflection_through reflects on the target's owner association,
+    # i.e. the target's belongs_to association that points back at the :through record.
+    # When the :through association is polymorphic, the owner association must be
+    # polymorphic too, e.g. tokens are owned by their polymorphic bearer. Raises
+    # when no owner association is found, or when it is ambiguous.
+    def denormalized_owner_reflection_through(through_association_name, target_class)
+      through_reflection = self.class.reflect_on_association(through_association_name)
+
+      owner_reflections = target_class.reflect_on_all_associations(:belongs_to).select do |reflection|
+        if through_reflection.polymorphic?
+          reflection.polymorphic?
+        else
+          !reflection.polymorphic? && reflection.klass == through_reflection.klass
+        end
+      end
+
+      case owner_reflections
+      in [owner_reflection]
+        owner_reflection
+      in []
+        raise ArgumentError, "no owner association found on #{target_class} for #{through_association_name.inspect}"
+      else
+        raise ArgumentError, "ambiguous owner association on #{target_class} for #{through_association_name.inspect}"
+      end
+    end
+
+    ##
+    # denormalized_record_owned_by? returns true when the record is owned by the
+    # owner, i.e. its owner association's foreign keys match the owner.
+    def denormalized_record_owned_by?(record, owner, owner_reflection)
+      return false if
+        owner.nil?
+
+      owned   = record.read_attribute(owner_reflection.foreign_key) == owner.read_attribute(owner.class.primary_key)
+      owned &&= record.read_attribute(owner_reflection.foreign_type) == owner.class.polymorphic_name if owner_reflection.polymorphic?
+      owned
     end
 
     def write_denormalized_attribute_to_unpersisted_record(target_association_name, target_attribute_name, source_attribute_name)

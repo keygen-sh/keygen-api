@@ -201,6 +201,48 @@ describe Token, type: :model do
     end
   end
 
+  describe '#bearer_role' do
+    context 'on create' do
+      it 'should denormalize role from unpersisted bearer' do
+        bearer = build(:user, account:)
+        token  = create(:token, account:, bearer:)
+
+        expect(token.bearer_role).to eq 'user'
+      end
+
+      it 'should denormalize role from persisted bearer' do
+        bearer = create(:admin, account:)
+        token  = create(:token, account:, bearer:)
+
+        expect(token.bearer_role).to eq 'admin'
+      end
+    end
+
+    context 'on update' do
+      before { Sidekiq::Testing.inline! }
+      after  { Sidekiq::Testing.fake! }
+
+      it 'should denormalize role on role change' do
+        bearer = create(:user, account:)
+        token  = create(:token, account:, bearer:)
+
+        # NB(ezekg) tokens are revoked on role change, except for the current
+        #           token, which is kept in sync via denormalization
+        Current.set(token:) do
+          bearer.change_role! :admin
+        end
+
+        expect(token.reload.bearer_role).to eq 'admin'
+      end
+
+      it 'should raise when modified directly' do
+        token = create(:token, account:, bearer: create(:user, account:))
+
+        expect { token.update!(bearer_role: 'admin') }.to raise_error ActiveRecord::RecordInvalid
+      end
+    end
+  end
+
   describe '.for_bearer' do
     it 'should filter by bearer' do
       admin_token   = create(:token, account:, bearer: create(:admin, account:))

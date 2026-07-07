@@ -467,14 +467,18 @@ class Token < ApplicationRecord
 
       # FIXME(ezekg) Can't use token_permissions.upsert_all at this point, because for
       #              some reason token_id ends up being nil. Instead, we'll use the
-      #              class method and then call reload.
+      #              class method and then reset the stale associations.
       TokenPermission.upsert_all(
         token_permissions_attributes.map { it.merge(token_id: id) },
         record_timestamps: true,
         on_duplicate: :skip,
       )
 
-      reload
+      # NB(ezekg) reset stale associations after the bulk upsert, so that the next
+      #           access queries fresh records (vs a reload, which would also clear
+      #           our dirty state mid-save, e.g. previous_changes)
+      token_permissions.reset
+      permissions.reset
     end
   end
 end

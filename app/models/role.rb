@@ -137,10 +137,16 @@ class Role < ApplicationRecord
   # permission_ids returns an array of the role's permission IDs,
   # including pending changes.
   def permission_ids
-    if role_permissions_attributes_assigned?
+    case
+    when role_permissions_attributes_assigned?
       role_permissions_attributes.collect { it[:permission_id] }
-    else
+    when role_permissions.loaded?
       role_permissions.collect(&:permission_id)
+    else
+      # NB(ezekg) avoid loading the association just to read ids, since a
+      #           loaded through-association will result in n+1 queries on
+      #           subsequent permission reads
+      role_permissions.pluck(:permission_id)
     end
   end
 
@@ -247,7 +253,7 @@ class Role < ApplicationRecord
       if role_permissions_attributes.any?
         # FIXME(ezekg) Can't use role_permissions.upsert_all at this point, because for
         #              some reason role_id ends up being nil. Instead, we'll use the
-        #              class method and then call reload.
+        #              class method and then reset the stale associations.
         RolePermission.upsert_all(
           role_permissions_attributes.map { it.merge(role_id: id) },
           record_timestamps: true,
@@ -255,7 +261,11 @@ class Role < ApplicationRecord
         )
       end
 
-      reload
+      # NB(ezekg) reset stale associations after the bulk upsert, so that the next
+      #           access queries fresh records (vs a reload, which would also clear
+      #           our dirty state mid-save, e.g. previous_changes)
+      role_permissions.reset
+      permissions.reset
     end
   end
 end
