@@ -183,7 +183,8 @@ class Token < ApplicationRecord
 
     joins(<<~SQL.squish).where(roles: { name: names })
       INNER JOIN roles
-        ON roles.resource_type = tokens.bearer_type
+        ON roles.account_id    = tokens.account_id
+       AND roles.resource_type = tokens.bearer_type
        AND roles.resource_id   = tokens.bearer_id
     SQL
   }
