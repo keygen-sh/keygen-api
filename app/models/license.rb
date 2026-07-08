@@ -4,7 +4,7 @@ class License < ApplicationRecord
   include Envented::Callbacks
   include Keygen::PortableClass
   include AsyncTouchable
-  include Denormalizable
+  include Denormalizable::Model
   include Environmental
   include Accountable
   include Limitable

@@ -4,7 +4,7 @@ class Session < ApplicationRecord
   MAX_AGE = 2.weeks
 
   include AsyncUpdatable, AsyncDestroyable
-  include Denormalizable
+  include Denormalizable::Model
   include Environmental
   include Accountable
 

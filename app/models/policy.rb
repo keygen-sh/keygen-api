@@ -7,7 +7,7 @@ class Policy < ApplicationRecord
   class EmptyPoolError < StandardError; end
 
   include Keygen::PortableClass
-  include Denormalizable
+  include Denormalizable::Model
   include Environmental
   include Accountable
   include Limitable

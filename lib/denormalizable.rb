@@ -1,46 +1,50 @@
 # frozen_string_literal: true
 
 module Denormalizable
-  extend ActiveSupport::Concern
-
   class Error < StandardError; end
   class AssociationNotFoundError < Error; end
   class InverseAssociationNotFoundError < Error; end
 
   DENORMALIZE_ASSOCIATION_ASYNC_BATCH_SIZE = 1_000
 
-  included do
-    class_attribute :denormalizations, default: {}, instance_accessor: false
-  end
+  ##
+  # Model is the concern included into models that denormalize attributes.
+  module Model
+    extend ActiveSupport::Concern
 
-  class_methods do
-    def denormalizes(*attribute_names, from: nil, to: nil, through: nil, inverse_of: nil, prefix: nil, as: nil)
-      raise ArgumentError, 'must provide either :from or :to (but not both)' unless
-        from.present? ^ to.present?
-
-      raise ArgumentError, 'must provide :to and :through when using :inverse_of' if
-        inverse_of.present? && (to.blank? || through.blank?)
-
-      raise ArgumentError, 'must provide either :prefix or :as (but not both)' if
-        prefix.present? && as.present?
-
-      raise ArgumentError, 'must provide a single attribute when using :as' if
-        as.present? && attribute_names.many?
-
-      attribute_names.each do |attribute_name|
-        denormalization = if from.present?
-                            Denormalization::From.new(self, attribute: attribute_name, association: Association.build(self, from, kind: :from, through:), prefix:, as:)
-                          else
-                            Denormalization::To.new(self, attribute: attribute_name, association: Association.build(self, to, kind: :to, through:, inverse_of:), prefix:, as:)
-                          end
-
-        denormalization.instrument!
-
-        self.denormalizations = denormalizations.merge(denormalization.key => denormalization.freeze)
-      end
+    included do
+      class_attribute :denormalizations, default: {}, instance_accessor: false
     end
 
-    def denormalized_attributes = denormalizations.keys.to_set
+    class_methods do
+      def denormalizes(*attribute_names, from: nil, to: nil, through: nil, inverse_of: nil, prefix: nil, as: nil)
+        raise ArgumentError, 'must provide either :from or :to (but not both)' unless
+          from.present? ^ to.present?
+
+        raise ArgumentError, 'must provide :to and :through when using :inverse_of' if
+          inverse_of.present? && (to.blank? || through.blank?)
+
+        raise ArgumentError, 'must provide either :prefix or :as (but not both)' if
+          prefix.present? && as.present?
+
+        raise ArgumentError, 'must provide a single attribute when using :as' if
+          as.present? && attribute_names.many?
+
+        attribute_names.each do |attribute_name|
+          denormalization = if from.present?
+                              Denormalization::From.new(self, attribute: attribute_name, association: Association.build(self, from, kind: :from, through:), prefix:, as:)
+                            else
+                              Denormalization::To.new(self, attribute: attribute_name, association: Association.build(self, to, kind: :to, through:, inverse_of:), prefix:, as:)
+                            end
+
+          denormalization.instrument!
+
+          self.denormalizations = denormalizations.merge(denormalization.key => denormalization.freeze)
+        end
+      end
+
+      def denormalized_attributes = denormalizations.keys.to_set
+    end
   end
 
   ##

@@ -39,7 +39,7 @@ describe Denormalizable do
     end
 
     temporary_model :book do
-      include Denormalizable
+      include Denormalizable::Model
 
       belongs_to :publisher
       has_many :reviews
@@ -232,7 +232,7 @@ describe Denormalizable do
     end
 
     temporary_model :book do
-      include Denormalizable
+      include Denormalizable::Model
 
       belongs_to :imprint
       belongs_to :publisher, optional: true
@@ -345,7 +345,7 @@ describe Denormalizable do
     end
 
     temporary_model :contract do
-      include Denormalizable
+      include Denormalizable::Model
 
       belongs_to :party, polymorphic: true
 
@@ -410,7 +410,7 @@ describe Denormalizable do
     end
 
     temporary_model :author do
-      include Denormalizable
+      include Denormalizable::Model
 
       has_one :contract
 
@@ -469,7 +469,7 @@ describe Denormalizable do
     end
 
     temporary_model :publisher do
-      include Denormalizable
+      include Denormalizable::Model
 
       has_many :books
 
@@ -569,7 +569,7 @@ describe Denormalizable do
     end
 
     temporary_model :agent do
-      include Denormalizable
+      include Denormalizable::Model
 
       belongs_to :client, polymorphic: true
 
@@ -680,7 +680,7 @@ describe Denormalizable do
       end
 
       temporary_model :agent do
-        include Denormalizable
+        include Denormalizable::Model
 
         belongs_to :client, polymorphic: true
 

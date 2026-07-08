@@ -9,7 +9,7 @@ class Token < ApplicationRecord
   include Environmental
   include Accountable
   include Tokenable
-  include Denormalizable
+  include Denormalizable::Model
   include Limitable
   include Orderable
   include Pageable

@@ -3,7 +3,7 @@
 class Role < ApplicationRecord
   include Keygen::EE::ProtectedMethods[:permissions=, entitlements: %i[permissions]]
   include Keygen::PortableClass
-  include Denormalizable
+  include Denormalizable::Model
   include Accountable
   include Dirtyable
 
