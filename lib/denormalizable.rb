@@ -151,8 +151,8 @@ module Denormalizable
 
     # each_loaded only yields records already in memory -- any writes are
     # never saved, so loading the entire collection just to write attributes
-    # on discarded copies would be wasted work (persisted records are kept in
-    # sync via persisted_relation and the records' own denormalization
+    # on discarded copies would be wasted work (persisted records are
+    # denormalized via persisted_relation and the records' own denormalization
     # callbacks)
     def each_loaded(record, &block)
       owner    = owner(record)
@@ -271,24 +271,25 @@ module Denormalizable
       source_changed  = association.changed_condition
 
       # FIXME(ezekg) after_initialize ignores prepend: false
-      model.set_callback :initialize, :after, -> { denormalization.write(self) }, if: source_changed, unless: :persisted?, prepend: false
-      model.before_validation -> { denormalization.write(self) }, if: source_changed, on: :create
-      model.before_update -> { denormalization.write(self, persisted: true) }, if: source_changed
+      model.set_callback :initialize, :after, -> { denormalization.denormalize(self) }, if: source_changed, unless: :persisted?, prepend: false
+      model.before_validation -> { denormalization.denormalize(self) }, if: source_changed, on: :create
+      model.before_update -> { denormalization.denormalize(self, persisted: true) }, if: source_changed
 
       # make sure validation fails if our denormalized column is modified directly
       model.validate -> { denormalization.validate(self) }, if: :"#{column}_changed?", on: :update
     end
 
-    # write copies the source record's attribute onto the record. when the
-    # source is unpersisted, i.e. persisted is false and the resolved record
-    # is not saved, foreign keys are copied by assigning the association.
-    def write(record, persisted: false)
+    # denormalize copies the source record's attribute onto the record. when
+    # the source is unpersisted, i.e. persisted is false and the resolved
+    # record is not saved, foreign keys are copied by assigning the
+    # association.
+    def denormalize(record, persisted: false)
       source = association.resolve(record)
 
       if persisted || source&.persisted?
         record.write_attribute(column, source&.read_attribute(attribute))
       else
-        write_unpersisted(record, source)
+        denormalize_unpersisted(record, source)
       end
     end
 
@@ -306,7 +307,7 @@ module Denormalizable
 
     private
 
-    def write_unpersisted(record, source)
+    def denormalize_unpersisted(record, source)
       # NB(ezekg) if we're denormalizing a foreign key, we need to look up the association
       #           and denormalize the actual record, since it likely doesn't have a
       #           primary key assigned yet.
@@ -323,8 +324,9 @@ module Denormalizable
   ##
   # Denormalization::To denormalizes an attribute from the declaring model
   # onto target records, e.g. a role copies its name onto its resource's
-  # tokens. targets already in memory are synced directly, and persisted
-  # targets are synced after save -- asynchronously in batches for relations,
+  # tokens. targets already in memory are denormalized directly, and
+  # persisted targets are denormalized after save -- asynchronously in
+  # batches for relations,
   # directly for singular targets.
   class Denormalization::To < Denormalization
     def key = attribute
@@ -333,12 +335,12 @@ module Denormalizable
       denormalization = self
 
       # FIXME(ezekg) set to nil on destroy unless the association is dependent?
-      model.after_initialize -> { denormalization.sync(self) }, if: :"#{attribute}_changed?", unless: :persisted?
-      model.before_validation -> { denormalization.sync(self) }, if: :"#{attribute}_changed?", on: :create
-      model.after_save -> { denormalization.sync_persisted(self) }, if: :"#{attribute}_previously_changed?"
+      model.after_initialize -> { denormalization.denormalize(self) }, if: :"#{attribute}_changed?", unless: :persisted?
+      model.before_validation -> { denormalization.denormalize(self) }, if: :"#{attribute}_changed?", on: :create
+      model.after_save -> { denormalization.denormalize_persisted(self) }, if: :"#{attribute}_previously_changed?"
     end
 
-    def sync(record)
+    def denormalize(record)
       value = record.read_attribute(attribute)
 
       association.each_loaded(record) do |target|
@@ -346,7 +348,7 @@ module Denormalizable
       end
     end
 
-    def sync_persisted(record)
+    def denormalize_persisted(record)
       if target_relation = association.persisted_relation(record)
         enqueue(record, target_relation)
       else
