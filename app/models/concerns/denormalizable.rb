@@ -6,9 +6,12 @@ module Denormalizable
   DENORMALIZE_ASSOCIATION_ASYNC_BATCH_SIZE = 1_000
 
   class_methods do
-    def denormalizes(*attribute_names, from: nil, to: nil, through: nil, prefix: nil, as: nil)
+    def denormalizes(*attribute_names, from: nil, to: nil, through: nil, inverse_of: nil, prefix: nil, as: nil)
       raise ArgumentError, 'must provide either :from or :to (but not both)' unless
         from.present? ^ to.present?
+
+      raise ArgumentError, 'must provide :to and :through when using :inverse_of' if
+        inverse_of.present? && (to.blank? || through.blank?)
 
       raise ArgumentError, 'must provide either :prefix or :as (but not both)' if
         prefix.present? && as.present?
@@ -22,7 +25,7 @@ module Denormalizable
       when from.present?
         attribute_names.each { instrument_denormalized_attribute_from(it, from:, prefix:, as:) }
       when to.present? && through.present?
-        attribute_names.each { instrument_denormalized_attribute_to_through(it, to:, through:, prefix:, as:) }
+        attribute_names.each { instrument_denormalized_attribute_to_through(it, to:, through:, inverse_of:, prefix:, as:) }
       when to.present?
         attribute_names.each { instrument_denormalized_attribute_to(it, to:, prefix:, as:) }
       else
@@ -112,8 +115,10 @@ module Denormalizable
     # instrument_denormalized_attribute_to_through instruments a denormalized attribute
     # where the target relation is resolved via a method on the :through association's
     # record, scoped to records owned by it (see denormalized_owner_reflection_through),
-    # e.g. denormalizing a role's name to tokens through the role's resource.
-    def instrument_denormalized_attribute_to_through(attribute_name, to:, through:, prefix:, as: nil)
+    # e.g. denormalizing a role's name to tokens through the role's resource. use
+    # :inverse_of to explicitly name the target's owner association when the
+    # target relation's inverse is not the ownership edge.
+    def instrument_denormalized_attribute_to_through(attribute_name, to:, through:, inverse_of: nil, prefix:, as: nil)
       case through
       in Symbol => through_association_name if reflection = reflect_on_association(through_association_name)
         prefixed_attribute_name = denormalized_attribute_name(to, attribute_name, prefix:, as:)
@@ -122,9 +127,9 @@ module Denormalizable
           raise ArgumentError, "must be a singular association: #{through_association_name.inspect}"
         end
 
-        after_initialize -> { write_denormalized_attribute_to_unpersisted_relation_through(through_association_name, to, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_changed?", unless: :persisted?
-        before_validation -> { write_denormalized_attribute_to_unpersisted_relation_through(through_association_name, to, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_changed?", on: :create
-        after_update -> { write_denormalized_attribute_to_persisted_relation_through(through_association_name, to, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_previously_changed?"
+        after_initialize -> { write_denormalized_attribute_to_unpersisted_relation_through(through_association_name, to, inverse_of, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_changed?", unless: :persisted?
+        before_validation -> { write_denormalized_attribute_to_unpersisted_relation_through(through_association_name, to, inverse_of, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_changed?", on: :create
+        after_update -> { write_denormalized_attribute_to_persisted_relation_through(through_association_name, to, inverse_of, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_previously_changed?"
 
         denormalized_attributes << attribute_name
       else
@@ -186,13 +191,13 @@ module Denormalizable
       end
     end
 
-    def write_denormalized_attribute_to_unpersisted_relation_through(through_association_name, target_name, target_attribute_name, source_attribute_name)
+    def write_denormalized_attribute_to_unpersisted_relation_through(through_association_name, target_name, inverse_name, target_attribute_name, source_attribute_name)
       owner    = send(through_association_name)
       relation = owner&.send(target_name)
       return if
         relation.nil?
 
-      reflection = denormalized_owner_reflection_through(owner, target_name)
+      reflection = denormalized_owner_reflection_through(owner, target_name, inverse_name)
 
       relation.each do |record|
         next unless
@@ -202,14 +207,14 @@ module Denormalizable
       end
     end
 
-    def write_denormalized_attribute_to_persisted_relation_through(through_association_name, target_name, target_attribute_name, source_attribute_name)
+    def write_denormalized_attribute_to_persisted_relation_through(through_association_name, target_name, inverse_name, target_attribute_name, source_attribute_name)
       owner    = send(through_association_name)
       relation = owner&.send(target_name)
       return if
         relation.nil?
 
       # explicitly scope the relation to records owned by the :through record
-      reflection      = denormalized_owner_reflection_through(owner, target_name)
+      reflection      = denormalized_owner_reflection_through(owner, target_name, inverse_name)
       target_relation = relation.where(reflection.name => owner)
 
       source_attribute_value_was = send("#{source_attribute_name}_previously_was")
@@ -229,15 +234,23 @@ module Denormalizable
 
     # denormalized_owner_reflection_through reflects on the target's owner association,
     # i.e. the target's belongs_to association that points back at the :through record,
-    # resolved via the inverse of the :through record's association to the target,
-    # e.g. tokens are owned by their polymorphic bearer.
-    def denormalized_owner_reflection_through(owner, target_name)
+    # e.g. tokens are owned by their polymorphic bearer. resolved via an explicit
+    # :inverse_of when given, otherwise via the inverse of the :through record's
+    # association to the target. an explicit :inverse_of is required when the
+    # target relation's inverse is not the ownership edge, e.g. an environment's
+    # tokens are scoped to the environment, not to the environment as a bearer.
+    def denormalized_owner_reflection_through(owner, target_name, inverse_name = nil)
       reflection = owner.class.reflect_on_association(target_name)
       raise ArgumentError, "no association found on #{owner.class} for #{target_name.inspect}" if
         reflection.nil?
 
-      reflection.inverse_of or
-        raise ArgumentError, "no inverse association found on #{owner.class} for #{target_name.inspect}"
+      if inverse_name.present?
+        reflection.klass.reflect_on_association(inverse_name) or
+          raise ArgumentError, "no inverse association found on #{reflection.klass} for #{inverse_name.inspect}"
+      else
+        reflection.inverse_of or
+          raise ArgumentError, "no inverse association found on #{owner.class} for #{target_name.inspect}"
+      end
     end
 
     # denormalized_record_owned_by? returns true when the record's owner association

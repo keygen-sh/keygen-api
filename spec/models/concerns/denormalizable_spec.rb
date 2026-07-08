@@ -112,6 +112,20 @@ describe Denormalizable, type: :concern do
       it 'should not raise with :as' do
         expect { denormalizable.denormalizes :name, to: :machines, through: :policy, as: :license_name }.to_not raise_error
       end
+
+      it 'should not raise with :inverse_of' do
+        expect { denormalizable.denormalizes :name, to: :machines, through: :policy, inverse_of: :license }.to_not raise_error
+      end
+    end
+
+    context 'when denormalizing with :inverse_of' do
+      it 'should raise without :through' do
+        expect { denormalizable.denormalizes :name, to: :machines, inverse_of: :license }.to raise_error ArgumentError
+      end
+
+      it 'should raise without :to' do
+        expect { denormalizable.denormalizes :name, from: :policy, through: :policy, inverse_of: :license }.to raise_error ArgumentError
+      end
     end
 
     context 'when denormalizing with :as' do
