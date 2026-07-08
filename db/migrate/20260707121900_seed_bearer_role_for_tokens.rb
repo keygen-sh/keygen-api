@@ -28,6 +28,7 @@ class SeedBearerRoleForTokens < ActiveRecord::Migration[8.1]
             roles ON roles.resource_type = tokens.bearer_type AND
                      roles.resource_id   = tokens.bearer_id
           WHERE
+            roles.name IS NOT NULL AND
             tokens.bearer_role IS NULL AND
             tokens.id > :cursor
           ORDER BY
