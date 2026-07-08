@@ -187,7 +187,7 @@ module Denormalizable
       return if
         relation.nil?
 
-      reflection = denormalized_owner_reflection_through(through_association_name, relation.klass)
+      reflection = denormalized_owner_reflection_through(owner, target_name)
 
       relation.each do |record|
         next unless
@@ -204,7 +204,7 @@ module Denormalizable
         relation.nil?
 
       # explicitly scope the relation to records owned by the :through record
-      reflection      = denormalized_owner_reflection_through(through_association_name, relation.klass)
+      reflection      = denormalized_owner_reflection_through(owner, target_name)
       target_relation = relation.where(reflection.name => owner)
 
       source_attribute_value_was = send("#{source_attribute_name}_previously_was")
@@ -224,26 +224,15 @@ module Denormalizable
 
     # denormalized_owner_reflection_through reflects on the target's owner association,
     # i.e. the target's belongs_to association that points back at the :through record,
+    # resolved via the inverse of the :through record's association to the target,
     # e.g. tokens are owned by their polymorphic bearer.
-    def denormalized_owner_reflection_through(through_association_name, target_class)
-      through_reflection = self.class.reflect_on_association(through_association_name)
+    def denormalized_owner_reflection_through(owner, target_name)
+      reflection = owner.class.reflect_on_association(target_name)
+      raise ArgumentError, "no association found on #{owner.class} for #{target_name.inspect}" if
+        reflection.nil?
 
-      owner_reflections = target_class.reflect_on_all_associations(:belongs_to).select do |reflection|
-        if through_reflection.polymorphic?
-          reflection.polymorphic?
-        else
-          !reflection.polymorphic? && reflection.klass == through_reflection.klass
-        end
-      end
-
-      case owner_reflections
-      in [owner_reflection]
-        owner_reflection
-      in []
-        raise ArgumentError, "no owner association found on #{target_class} for #{through_association_name.inspect}"
-      else
-        raise ArgumentError, "ambiguous owner association on #{target_class} for #{through_association_name.inspect}"
-      end
+      reflection.inverse_of or
+        raise ArgumentError, "no inverse association found on #{owner.class} for #{target_name.inspect}"
     end
 
     # denormalized_record_owned_by? returns true when the record's owner association
