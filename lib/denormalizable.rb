@@ -25,9 +25,9 @@ module Denormalizable
 
       attribute_names.each do |attribute_name|
         denormalization = if from.present?
-                            Denormalization::Pull.new(self, attribute: attribute_name, source: from, through:, prefix:, as:)
+                            Denormalization::From.new(self, attribute: attribute_name, association: Association.build(self, from, kind: :from, through:), prefix:, as:)
                           else
-                            Denormalization::Push.new(self, attribute: attribute_name, target: to, through:, inverse_of:, prefix:, as:)
+                            Denormalization::To.new(self, attribute: attribute_name, association: Association.build(self, to, kind: :to, through:, inverse_of:), prefix:, as:)
                           end
 
         denormalization.instrument!
@@ -40,36 +40,210 @@ module Denormalizable
   end
 
   ##
-  # Denormalization is a single denormalized attribute declaration, i.e. one
-  # attribute of one denormalizes call. Subclasses implement the direction:
-  # Pull writes a source record's attribute onto the declaring model, and
-  # Push writes the declaring model's attribute onto target records.
-  #
-  # Callbacks registered by instrument! close over the denormalization and
-  # receive the record, so no methods are defined on the including model.
-  class Denormalization
-    attr_reader :model, :attribute, :through, :column
+  # Association resolves the records a denormalized attribute is read from or
+  # written to, encapsulating reflection, resolution, change tracking and
+  # ownership so that denormalizations don't need to care how records are
+  # reached.
+  class Association
+    attr_reader :model, :name
 
-    def initialize(model, attribute:, through: nil, prefix: nil, as: nil)
-      @model     = model
-      @attribute = attribute
-      @through   = through
-      @prefix    = prefix
-      @as        = as
+    # build returns the association for the given name: a Singular or
+    # Collection for an association declared on the model itself, or a
+    # Through when the records are resolved via a method on the :through
+    # association's record.
+    def self.build(model, name, kind:, through: nil, inverse_of: nil)
+      if through.present?
+        Through.new(model, name, through:, inverse_of:)
+      else
+        reflection = model.reflect_on_association(name)
+        raise ArgumentError, "invalid :#{kind} association: #{name.inspect}" if
+          reflection.nil?
+
+        if reflection.collection?
+          Collection.new(model, name)
+        else
+          Singular.new(model, name)
+        end
+      end
     end
 
-    def through? = through.present?
+    def initialize(model, name)
+      @model = model
+      @name  = name
+    end
+
+    def collection? = false
 
     private
 
-    def column_name_for(association_name)
+    # changed_condition_for returns a callable condition that returns true
+    # when the given association has changed, via its foreign keys or target
+    # record.
+    def changed_condition_for(reflection)
+      foreign_keys  = Array(reflection.foreign_key)
+      foreign_keys += [reflection.foreign_type] if reflection.polymorphic?
+
+      -> { foreign_keys.any? { send(:"#{it}_changed?") } || send(:"#{reflection.name}_changed?") }
+    end
+  end
+
+  ##
+  # Association::Direct is an association declared on the model itself.
+  class Association::Direct < Association
+    def resolve(record) = record.public_send(name)
+
+    def changed_condition = changed_condition_for(model.reflect_on_association(name))
+  end
+
+  ##
+  # Association::Singular is a direct singular association, e.g. a belongs_to
+  # or has_one.
+  class Association::Singular < Association::Direct
+    def each_loaded(record, &block)
+      target = resolve(record)
+
+      block.call(target) unless target.nil?
+    end
+
+    # singular targets are written directly, not via a batched relation
+    def persisted_relation(record) = nil
+  end
+
+  ##
+  # Association::Collection is a direct collection association, e.g. a
+  # has_many.
+  class Association::Collection < Association::Direct
+    def collection? = true
+
+    def each_loaded(record, &block) = resolve(record).each(&block)
+
+    def persisted_relation(record) = resolve(record)
+  end
+
+  ##
+  # Association::Through is an association resolved via a method on the
+  # :through association's record, e.g. a role through a polymorphic bearer,
+  # so an unpersisted :through record is supported. records are scoped to
+  # those owned by the :through record (see owner_reflection). use
+  # :inverse_of to explicitly name the owner association when the resolved
+  # relation's inverse is not the ownership edge.
+  class Association::Through < Association
+    attr_reader :through
+
+    def initialize(model, name, through:, inverse_of: nil)
+      super(model, name)
+
+      reflection = model.reflect_on_association(through)
+      raise ArgumentError, "invalid :through association: #{through.inspect}" if
+        reflection.nil?
+
+      raise ArgumentError, "must be a singular association: #{through.inspect}" if
+        reflection.collection?
+
+      @through    = through
+      @inverse_of = inverse_of
+    end
+
+    def owner(record)   = record.public_send(through)
+    def resolve(record) = owner(record)&.public_send(name)
+
+    def changed_condition = changed_condition_for(model.reflect_on_association(through))
+
+    # each_loaded only yields records already in memory -- any writes are
+    # never saved, so loading the entire collection just to write attributes
+    # on discarded copies would be wasted work (persisted records are kept in
+    # sync via persisted_relation and the records' own denormalization
+    # callbacks)
+    def each_loaded(record, &block)
+      owner    = owner(record)
+      relation = resolve(record)
+      return unless
+        relation&.loaded?
+
+      reflection = owner_reflection(owner)
+
+      relation.each do |target|
+        block.call(target) if owned_by?(target, owner, reflection)
+      end
+    end
+
+    def persisted_relation(record)
+      owner    = owner(record)
+      relation = resolve(record)
+      return if
+        relation.nil?
+
+      # explicitly scope the relation to records owned by the :through record
+      relation.where(owner_reflection(owner).name => owner)
+    end
+
+    private
+
+    # owner_reflection reflects on the resolved records' owner association,
+    # i.e. their belongs_to association that points back at the :through
+    # record, e.g. tokens are owned by their polymorphic bearer. resolved via
+    # an explicit :inverse_of when given, otherwise via the inverse of the
+    # :through record's association. an explicit :inverse_of is required when
+    # the relation's inverse is not the ownership edge, e.g. an environment's
+    # tokens are scoped to the environment, not to the environment as a
+    # bearer.
+    def owner_reflection(owner)
+      reflection = owner.class.reflect_on_association(name)
+      raise ArgumentError, "no association found on #{owner.class} for #{name.inspect}" if
+        reflection.nil?
+
+      if @inverse_of.present?
+        reflection.klass.reflect_on_association(@inverse_of) or
+          raise ArgumentError, "no inverse association found on #{reflection.klass} for #{@inverse_of.inspect}"
+      else
+        reflection.inverse_of or
+          raise ArgumentError, "no inverse association found on #{owner.class} for #{name.inspect}"
+      end
+    end
+
+    # owned_by? returns true when the record's owner association foreign keys
+    # match the owner.
+    def owned_by?(record, owner, owner_reflection)
+      return false if
+        owner.nil?
+
+      owned   = record.read_attribute(owner_reflection.foreign_key)  == owner.read_attribute(owner.class.primary_key)
+      owned &&= record.read_attribute(owner_reflection.foreign_type) == owner.class.polymorphic_name if
+        owner_reflection.polymorphic?
+
+      owned
+    end
+  end
+
+  ##
+  # Denormalization is a single denormalized attribute declaration, i.e. one
+  # attribute of one denormalizes call. subclasses implement the direction:
+  # From copies a source record's attribute onto the declaring model, and To
+  # copies the declaring model's attribute onto target records. the records
+  # themselves are resolved by the denormalization's association.
+  #
+  # callbacks registered by instrument! close over the denormalization and
+  # receive the record, so no methods are defined on the including model.
+  class Denormalization
+    attr_reader :model, :attribute, :association, :column
+
+    def initialize(model, attribute:, association:, prefix: nil, as: nil)
+      @model       = model
+      @attribute   = attribute
+      @association = association
+      @column      = column_name(prefix:, as:)
+    end
+
+    private
+
+    def column_name(prefix:, as:)
       case
-      when @as.present?
-        @as.to_s
-      when @prefix == true
-        "#{association_name}_#{attribute}"
-      when (@prefix in Symbol | String)
-        "#{@prefix}_#{attribute}"
+      when as.present?
+        as.to_s
+      when prefix == true
+        "#{association.name}_#{attribute}"
+      when (prefix in Symbol | String)
+        "#{prefix}_#{attribute}"
       else
         attribute.to_s
       end
@@ -83,31 +257,18 @@ module Denormalizable
   end
 
   ##
-  # Pull denormalizes an attribute from a source record onto the declaring
-  # model, e.g. a token pulls its bearer's role name into bearer_role. The
-  # source is resolved via a path of methods, so a :through source, e.g. a
-  # role through a polymorphic bearer, supports unpersisted records.
-  class Denormalization::Pull < Denormalization
-    def initialize(model, attribute:, source:, through: nil, prefix: nil, as: nil)
-      super(model, attribute:, through:, prefix:, as:)
-
-      @source = source
-      @path   = [through, source].compact
-      @column = column_name_for(source)
-    end
-
+  # Denormalization::From denormalizes an attribute from a source record onto
+  # the declaring model, e.g. a token copies its bearer's role name into
+  # bearer_role.
+  class Denormalization::From < Denormalization
     def key = column.to_sym
 
     def instrument!
-      reflection = model.reflect_on_association(@path.first)
-      raise ArgumentError, "invalid #{through? ? ':through' : ':from'} association: #{@path.first.inspect}" if
-        reflection.nil?
-
-      raise ArgumentError, "must be a singular association: #{@path.first.inspect}" if
-        reflection.collection?
+      raise ArgumentError, "must be a singular association: #{association.name.inspect}" if
+        association.collection?
 
       denormalization = self
-      source_changed  = source_changed_condition(reflection)
+      source_changed  = association.changed_condition
 
       # FIXME(ezekg) after_initialize ignores prepend: false
       model.set_callback :initialize, :after, -> { denormalization.write(self) }, if: source_changed, unless: :persisted?, prepend: false
@@ -122,7 +283,7 @@ module Denormalizable
     # source is unpersisted, i.e. persisted is false and the resolved record
     # is not saved, foreign keys are copied by assigning the association.
     def write(record, persisted: false)
-      source = resolve(record)
+      source = association.resolve(record)
 
       if persisted || source&.persisted?
         record.write_attribute(column, source&.read_attribute(attribute))
@@ -132,7 +293,7 @@ module Denormalizable
     end
 
     def validate(record)
-      source = resolve(record)
+      source = association.resolve(record)
 
       unless record.read_attribute(column) == source&.read_attribute(attribute)
         if reflection = find_reflection_by_foreign_key(record.class, column)
@@ -144,8 +305,6 @@ module Denormalizable
     end
 
     private
-
-    def resolve(record) = @path.reduce(record) { |r, step| r&.public_send(step) }
 
     def write_unpersisted(record, source)
       # NB(ezekg) if we're denormalizing a foreign key, we need to look up the association
@@ -159,54 +318,18 @@ module Denormalizable
         record.write_attribute(column, source&.read_attribute(attribute))
       end
     end
-
-    # source_changed_condition returns a callable condition that returns true
-    # when the source association has changed, via its foreign keys or target
-    # record. for a :through source, the :through association is watched.
-    def source_changed_condition(reflection)
-      foreign_keys  = Array(reflection.foreign_key)
-      foreign_keys += [reflection.foreign_type] if reflection.polymorphic?
-
-      -> { foreign_keys.any? { send(:"#{it}_changed?") } || send(:"#{reflection.name}_changed?") }
-    end
   end
 
   ##
-  # Push denormalizes an attribute from the declaring model onto target
-  # records, e.g. a role pushes its name onto its resource's tokens. targets
-  # already in memory are synced directly, and persisted targets are synced
-  # asynchronously in batches after save.
-  #
-  # for a :through target, the relation is resolved via a method on the
-  # :through association's record and explicitly scoped to records owned by
-  # it (see owner_reflection). use :inverse_of to explicitly name the
-  # target's owner association when the target relation's inverse is not the
-  # ownership edge.
-  class Denormalization::Push < Denormalization
-    def initialize(model, attribute:, target:, through: nil, inverse_of: nil, prefix: nil, as: nil)
-      super(model, attribute:, through:, prefix:, as:)
-
-      @target     = target
-      @inverse_of = inverse_of
-      @column     = column_name_for(target)
-    end
-
+  # Denormalization::To denormalizes an attribute from the declaring model
+  # onto target records, e.g. a role copies its name onto its resource's
+  # tokens. targets already in memory are synced directly, and persisted
+  # targets are synced after save -- asynchronously in batches for relations,
+  # directly for singular targets.
+  class Denormalization::To < Denormalization
     def key = attribute
 
     def instrument!
-      if through?
-        reflection = model.reflect_on_association(through)
-        raise ArgumentError, "invalid :through association: #{through.inspect}" if
-          reflection.nil?
-
-        raise ArgumentError, "must be a singular association: #{through.inspect}" if
-          reflection.collection?
-      else
-        @reflection = model.reflect_on_association(@target)
-        raise ArgumentError, "invalid :to association: #{@target.inspect}" if
-          @reflection.nil?
-      end
-
       denormalization = self
 
       # FIXME(ezekg) set to nil on destroy unless the association is dependent?
@@ -215,63 +338,25 @@ module Denormalizable
       model.after_save -> { denormalization.sync_persisted(self) }, if: :"#{attribute}_previously_changed?"
     end
 
-    # sync writes the record's attribute onto in-memory target records. any
-    # writes are never saved, so for a :through target only records already
-    # in memory are synced -- loading the entire collection just to write
-    # attributes on discarded copies would be wasted work (persisted records
-    # are kept in sync via sync_persisted and the target's own denormalization
-    # callbacks).
     def sync(record)
       value = record.read_attribute(attribute)
 
-      case
-      when through?
-        owner    = record.public_send(through)
-        relation = owner&.public_send(@target)
-        return unless
-          relation&.loaded?
-
-        reflection = owner_reflection(owner)
-
-        relation.each do |target|
-          next unless
-            owned_by?(target, owner, reflection)
-
-          target.write_attribute(column, value)
-        end
-      when collection?
-        record.public_send(@target).each { it.write_attribute(column, value) }
-      else
-        record.public_send(@target)&.write_attribute(column, value)
+      association.each_loaded(record) do |target|
+        target.write_attribute(column, value)
       end
     end
 
-    # sync_persisted writes the record's attribute onto persisted target
-    # records, asynchronously in batches for relations.
     def sync_persisted(record)
-      case
-      when through?
-        owner    = record.public_send(through)
-        relation = owner&.public_send(@target)
-        return if
-          relation.nil?
-
-        # explicitly scope the relation to records owned by the :through record
-        reflection = owner_reflection(owner)
-
-        enqueue(record, relation.where(reflection.name => owner))
-      when collection?
-        enqueue(record, record.public_send(@target))
+      if target_relation = association.persisted_relation(record)
+        enqueue(record, target_relation)
       else
-        target = record.public_send(@target)
+        target = association.resolve(record)
 
         target&.update(column => record.read_attribute(attribute))
       end
     end
 
     private
-
-    def collection? = @reflection.collection?
 
     def enqueue(record, target_relation)
       options = {}
@@ -293,41 +378,6 @@ module Denormalizable
           **options,
         )
       end
-    end
-
-    # owner_reflection reflects on the target's owner association, i.e. the
-    # target's belongs_to association that points back at the :through record,
-    # e.g. tokens are owned by their polymorphic bearer. resolved via an
-    # explicit :inverse_of when given, otherwise via the inverse of the
-    # :through record's association to the target. an explicit :inverse_of is
-    # required when the target relation's inverse is not the ownership edge,
-    # e.g. an environment's tokens are scoped to the environment, not to the
-    # environment as a bearer.
-    def owner_reflection(owner)
-      reflection = owner.class.reflect_on_association(@target)
-      raise ArgumentError, "no association found on #{owner.class} for #{@target.inspect}" if
-        reflection.nil?
-
-      if @inverse_of.present?
-        reflection.klass.reflect_on_association(@inverse_of) or
-          raise ArgumentError, "no inverse association found on #{reflection.klass} for #{@inverse_of.inspect}"
-      else
-        reflection.inverse_of or
-          raise ArgumentError, "no inverse association found on #{owner.class} for #{@target.inspect}"
-      end
-    end
-
-    # owned_by? returns true when the record's owner association foreign keys
-    # match the owner.
-    def owned_by?(record, owner, owner_reflection)
-      return false if
-        owner.nil?
-
-      owned   = record.read_attribute(owner_reflection.foreign_key)  == owner.read_attribute(owner.class.primary_key)
-      owned &&= record.read_attribute(owner_reflection.foreign_type) == owner.class.polymorphic_name if
-        owner_reflection.polymorphic?
-
-      owned
     end
   end
 
