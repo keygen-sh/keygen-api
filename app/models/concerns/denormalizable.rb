@@ -194,8 +194,13 @@ module Denormalizable
     def write_denormalized_attribute_to_unpersisted_relation_through(through_association_name, target_name, inverse_name, target_attribute_name, source_attribute_name)
       owner    = send(through_association_name)
       relation = owner&.send(target_name)
-      return if
-        relation.nil?
+
+      # only sync records already in memory — the writes are never saved, so
+      # loading the entire collection just to write attributes on discarded
+      # copies would be wasted work (persisted records are kept in sync via
+      # the target's own denormalization callbacks and the update path)
+      return unless
+        relation&.loaded?
 
       reflection = denormalized_owner_reflection_through(owner, target_name, inverse_name)
 
