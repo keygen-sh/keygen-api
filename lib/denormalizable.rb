@@ -324,10 +324,9 @@ module Denormalizable
   ##
   # Denormalization::To denormalizes an attribute from the declaring model
   # onto target records, e.g. a role copies its name onto its resource's
-  # tokens. targets already in memory are denormalized directly, and
+  # tokens. targets already in memory are denormalized synchronously, and
   # persisted targets are denormalized after save -- asynchronously in
-  # batches for relations,
-  # directly for singular targets.
+  # batches for relations, inline for singular targets.
   class Denormalization::To < Denormalization
     def key = attribute
 
@@ -337,9 +336,10 @@ module Denormalizable
       # FIXME(ezekg) set to nil on destroy unless the association is dependent?
       model.after_initialize -> { denormalization.denormalize(self) }, if: :"#{attribute}_changed?", unless: :persisted?
       model.before_validation -> { denormalization.denormalize(self) }, if: :"#{attribute}_changed?", on: :create
-      model.after_save -> { denormalization.denormalize_persisted(self) }, if: :"#{attribute}_previously_changed?"
+      model.after_save -> { denormalization.denormalize_async(self) }, if: :"#{attribute}_previously_changed?"
     end
 
+    # denormalize writes the attribute onto in-memory target records.
     def denormalize(record)
       value = record.read_attribute(attribute)
 
@@ -348,7 +348,10 @@ module Denormalizable
       end
     end
 
-    def denormalize_persisted(record)
+    # denormalize_async writes the attribute onto persisted target records,
+    # asynchronously in batches for relations (singular targets are updated
+    # inline).
+    def denormalize_async(record)
       if target_relation = association.persisted_relation(record)
         enqueue(record, target_relation)
       else
