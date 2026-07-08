@@ -113,8 +113,8 @@ module Denormalizable
       block.call(target) unless target.nil?
     end
 
-    # singular targets are written directly, not via a batched relation
-    def persisted_relation(record) = nil
+    # singular targets are denormalized inline, not in batches
+    def async_relation(record) = nil
   end
 
   ##
@@ -125,7 +125,7 @@ module Denormalizable
 
     def each_loaded(record, &block) = resolve(record).each(&block)
 
-    def persisted_relation(record) = resolve(record)
+    def async_relation(record) = resolve(record)
   end
 
   ##
@@ -160,7 +160,7 @@ module Denormalizable
     # each_loaded only yields records already in memory -- any writes are
     # never saved, so loading the entire collection just to write attributes
     # on discarded copies would be wasted work (persisted records are
-    # denormalized via persisted_relation and the records' own denormalization
+    # denormalized via async_relation and the records' own denormalization
     # callbacks)
     def each_loaded(record, &block)
       owner    = owner(record)
@@ -175,7 +175,7 @@ module Denormalizable
       end
     end
 
-    def persisted_relation(record)
+    def async_relation(record)
       owner    = owner(record)
       relation = resolve(record)
       return if
@@ -360,7 +360,7 @@ module Denormalizable
     # asynchronously in batches for relations (singular targets are updated
     # inline).
     def denormalize_async(record)
-      if target_relation = association.persisted_relation(record)
+      if target_relation = association.async_relation(record)
         enqueue(record, target_relation)
       else
         target = association.resolve(record)
