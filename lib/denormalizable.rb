@@ -411,7 +411,7 @@ module Denormalizable
       source_class_name:,
       source_id:,
       source_attribute_name:,
-      source_attribute_value_was: NOT_PROVIDED, # FIXME(ezekg) remove once old jobs are processed
+      source_attribute_value_was: NOT_PROVIDED,
       target_class_name:,
       target_ids:,
       target_attribute_name:
