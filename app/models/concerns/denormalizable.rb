@@ -357,6 +357,12 @@ module Denormalizable
   class DenormalizeAssociationAsyncJob < ActiveJob::Base
     NOT_PROVIDED = Class.new
 
+    # NB(ezekg) we're enqueued from after_update, i.e. inside the transaction, so
+    #           we need to defer the enqueue until after commit, otherwise the
+    #           job may run before the source's new value is committed and
+    #           no-op, leaving the denormalized attribute stale
+    self.enqueue_after_transaction_commit = true
+
     queue_as { ActiveRecord.queues[:denormalize] }
 
     discard_on ActiveJob::DeserializationError
