@@ -6,6 +6,7 @@ FactoryBot.define do
 
     account  { NIL_ACCOUNT }
     resource { nil }
+    name     { nil }
 
     trait :user do
       name { :user }

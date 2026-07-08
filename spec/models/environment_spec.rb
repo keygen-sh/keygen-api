@@ -95,4 +95,68 @@ describe Environment, type: :model do
       expect { environment.touch }.to_not change { account.admins.count }
     end
   end
+
+  # Environment#tokens is scoped to the environment under :environment_id,
+  # not to the environment under :bearer_id, i.e. it contains tokens borne
+  # by other bearers within the environment. without an explicit :inverse_of,
+  # which we have, the ownership check would resolve the relation's inverse,
+  # i.e. Token#environment, matching every token in the environment.
+  describe 'when denormalizing role to tokens', :only_ee do
+    let(:environment) { create(:environment, account:) }
+    let(:user)        { create(:user, account:, environment:) }
+
+    context 'on initialization' do
+      it 'should only write to loaded records owned by the :through record' do
+        environment_token = create(:token, account:, bearer: environment)
+        user_token        = create(:token, account:, bearer: user, environment:)
+
+        tokens = environment.tokens.load # preload
+
+        build(:role, account:, resource: environment, name: 'renamed')
+
+        expect(tokens.find { it.id == environment_token.id }.bearer_role).to eq 'renamed'
+        expect(tokens.find { it.id == user_token.id }.bearer_role).to eq 'user'
+      end
+    end
+
+    context 'on create' do
+      before { Sidekiq::Testing.inline! }
+      after  { Sidekiq::Testing.fake! }
+
+      it 'should update records owned by the :through record' do
+        environment_token = create(:token, account:, bearer: environment)
+        user_token        = create(:token, account:, bearer: user, environment:)
+
+        environment.role.delete # clear prior role since role asserts uniqueness
+
+        role = build(:role, account:, resource: environment, name: 'renamed')
+
+        # NB(ezekg) role names are validated by resource type, so we need to
+        #           bypass validations to exercise a rename
+        role.save!(validate: false)
+
+        tokens = environment.tokens.load
+
+        expect(tokens.find { it.id == environment_token.id }.bearer_role).to eq 'renamed'
+        expect(tokens.find { it.id == user_token.id }.bearer_role).to eq 'user'
+      end
+    end
+
+    context 'on update' do
+      before { Sidekiq::Testing.inline! }
+      after  { Sidekiq::Testing.fake! }
+
+      it 'should only update records owned by the :through record' do
+        environment_token = create(:token, account:, bearer: environment)
+        user_token        = create(:token, account:, bearer: user, environment:)
+
+        # NB(ezekg) role names are validated by resource type, so we need to
+        #           bypass validations to exercise a rename
+        environment.role.update_attribute(:name, 'renamed')
+
+        expect(environment_token.reload.bearer_role).to eq 'renamed'
+        expect(user_token.reload.bearer_role).to eq 'user'
+      end
+    end
+  end
 end

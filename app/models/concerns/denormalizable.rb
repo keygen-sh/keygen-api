@@ -98,11 +98,11 @@ module Denormalizable
         if reflection.collection?
           after_initialize -> { write_denormalized_attribute_to_unpersisted_relation(association_name, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_changed?", unless: :persisted?
           before_validation -> { write_denormalized_attribute_to_unpersisted_relation(association_name, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_changed?", on: :create
-          after_update -> { write_denormalized_attribute_to_persisted_relation(association_name, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_previously_changed?"
+          after_save -> { write_denormalized_attribute_to_persisted_relation(association_name, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_previously_changed?"
         else
           after_initialize -> { write_denormalized_attribute_to_unpersisted_record(association_name, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_changed?", unless: :persisted?
           before_validation -> { write_denormalized_attribute_to_unpersisted_record(association_name, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_changed?", on: :create
-          after_update -> { write_denormalized_attribute_to_persisted_record(association_name, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_previously_changed?"
+          after_save -> { write_denormalized_attribute_to_persisted_record(association_name, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_previously_changed?"
         end
 
         denormalized_attributes << attribute_name
@@ -128,7 +128,7 @@ module Denormalizable
 
         after_initialize -> { write_denormalized_attribute_to_unpersisted_relation_through(through_association_name, to, inverse_of, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_changed?", unless: :persisted?
         before_validation -> { write_denormalized_attribute_to_unpersisted_relation_through(through_association_name, to, inverse_of, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_changed?", on: :create
-        after_update -> { write_denormalized_attribute_to_persisted_relation_through(through_association_name, to, inverse_of, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_previously_changed?"
+        after_save -> { write_denormalized_attribute_to_persisted_relation_through(through_association_name, to, inverse_of, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_previously_changed?"
 
         denormalized_attributes << attribute_name
       else
@@ -174,18 +174,24 @@ module Denormalizable
     end
 
     def write_denormalized_attribute_to_persisted_relation(target_association_name, target_attribute_name, source_attribute_name)
-      source_attribute_value_was = send("#{source_attribute_name}_previously_was")
-      target_association         = send(target_association_name)
+      target_association = send(target_association_name)
+      options            = {}
+
+      # NB(ezekg) on create there's no previous value to guard against lost
+      #           updates, and targets may carry stale values, e.g. from a
+      #           previously destroyed source, so we skip the filter
+      options[:source_attribute_value_was] = send("#{source_attribute_name}_previously_was") unless
+        previously_new_record?
 
       target_association.ids.each_slice(DENORMALIZE_ASSOCIATION_ASYNC_BATCH_SIZE) do |ids|
         DenormalizeAssociationAsyncJob.perform_later(
           source_class_name: self.class.name,
           source_id: id,
           source_attribute_name:,
-          source_attribute_value_was:,
           target_class_name: target_association.klass.name,
           target_ids: ids,
           target_attribute_name:,
+          **options,
         )
       end
     end
@@ -194,7 +200,7 @@ module Denormalizable
       owner    = send(through_association_name)
       relation = owner&.send(target_name)
 
-      # only sync records already in memory — the writes are never saved, so
+      # only sync records already in memory -- any writes are never saved, so
       # loading the entire collection just to write attributes on discarded
       # copies would be wasted work (persisted records are kept in sync via
       # the target's own denormalization callbacks and the update path)
@@ -221,17 +227,23 @@ module Denormalizable
       reflection      = denormalized_owner_reflection_through(owner, target_name, inverse_name)
       target_relation = relation.where(reflection.name => owner)
 
-      source_attribute_value_was = send("#{source_attribute_name}_previously_was")
+      options = {}
+
+      # NB(ezekg) on create there's no previous value to guard against lost
+      #           updates, and targets may carry stale values, e.g. from a
+      #           previously destroyed source, so we skip the filter
+      options[:source_attribute_value_was] = send("#{source_attribute_name}_previously_was") unless
+        previously_new_record?
 
       target_relation.ids.each_slice(DENORMALIZE_ASSOCIATION_ASYNC_BATCH_SIZE) do |ids|
         DenormalizeAssociationAsyncJob.perform_later(
           source_class_name: self.class.name,
           source_id: id,
           source_attribute_name:,
-          source_attribute_value_was:,
           target_class_name: target_relation.klass.name,
           target_ids: ids,
           target_attribute_name:,
+          **options,
         )
       end
     end
