@@ -3,6 +3,10 @@
 module Denormalizable
   extend ActiveSupport::Concern
 
+  class Error < StandardError; end
+  class AssociationNotFoundError < Error; end
+  class InverseAssociationNotFoundError < Error; end
+
   DENORMALIZE_ASSOCIATION_ASYNC_BATCH_SIZE = 1_000
 
   included do
@@ -189,15 +193,15 @@ module Denormalizable
     # bearer.
     def owner_reflection(owner)
       reflection = owner.class.reflect_on_association(name)
-      raise ArgumentError, "no association found on #{owner.class} for #{name.inspect}" if
+      raise AssociationNotFoundError, "no association found on #{owner.class} for #{name.inspect}" if
         reflection.nil?
 
       if @inverse_of.present?
         reflection.klass.reflect_on_association(@inverse_of) or
-          raise ArgumentError, "no inverse association found on #{reflection.klass} for #{@inverse_of.inspect}"
+          raise InverseAssociationNotFoundError, "no inverse association found on #{reflection.klass} for #{@inverse_of.inspect}"
       else
         reflection.inverse_of or
-          raise ArgumentError, "no inverse association found on #{owner.class} for #{name.inspect}"
+          raise InverseAssociationNotFoundError, "no inverse association found on #{owner.class} for #{name.inspect}"
       end
     end
 
