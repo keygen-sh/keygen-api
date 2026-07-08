@@ -5,14 +5,19 @@ class SeedBearerRoleForTokens < ActiveRecord::Migration[8.1]
   verbose!
 
   BATCH_SIZE = 10_000
+  MIN_UUID   = '00000000-0000-0000-0000-000000000000'
 
   def up
-    update_count = nil
-    batch_count  = 0
+    cursor      = MIN_UUID
+    batch_count = 0
 
-    until update_count == 0
-      batch_count  += 1
-      update_count  = exec_update(<<~SQL.squish, batch_count:, batch_size: BATCH_SIZE)
+    # NB(ezekg) we paginate via a keyset cursor on the primary key because the
+    #           bearer_role predicate has no supporting index, and without a
+    #           cursor each batch would rescan the table from the start, e.g.
+    #           past tokens left NULL because their bearer has no role
+    loop do
+      batch_count += 1
+      token_ids    = exec_query(<<~SQL.squish, cursor:, batch_count:, batch_size: BATCH_SIZE).rows.flatten
         WITH batch AS (
           SELECT
             tokens.id  AS token_id,
@@ -23,7 +28,10 @@ class SeedBearerRoleForTokens < ActiveRecord::Migration[8.1]
             roles ON roles.resource_type = tokens.bearer_type AND
                      roles.resource_id   = tokens.bearer_id
           WHERE
-            tokens.bearer_role IS NULL
+            tokens.bearer_role IS NULL AND
+            tokens.id > :cursor
+          ORDER BY
+            tokens.id
           LIMIT
             :batch_size
         )
@@ -35,42 +43,62 @@ class SeedBearerRoleForTokens < ActiveRecord::Migration[8.1]
           batch
         WHERE
           tokens.id = batch.token_id
+        RETURNING
+          tokens.id
         /* batch=:batch_count */
       SQL
+
+      break if
+        token_ids.empty?
+
+      cursor = token_ids.max
     end
   end
 
   def down
-    update_count = nil
-    batch_count  = 0
+    cursor      = MIN_UUID
+    batch_count = 0
 
-    until update_count == 0
-      batch_count  += 1
-      update_count  = exec_update(<<~SQL.squish, batch_count:, batch_size: BATCH_SIZE)
+    loop do
+      batch_count += 1
+      token_ids    = exec_query(<<~SQL.squish, cursor:, batch_count:, batch_size: BATCH_SIZE).rows.flatten
+        WITH batch AS (
+          SELECT
+            tokens.id AS token_id
+          FROM
+            tokens
+          WHERE
+            tokens.bearer_role IS NOT NULL AND
+            tokens.id > :cursor
+          ORDER BY
+            tokens.id
+          LIMIT
+            :batch_size
+        )
         UPDATE
           tokens
         SET
           bearer_role = NULL
+        FROM
+          batch
         WHERE
-          tokens.id IN (
-            SELECT
-              tokens.id
-            FROM
-              tokens
-            WHERE
-              tokens.bearer_role IS NOT NULL
-            LIMIT
-              :batch_size
-          )
+          tokens.id = batch.token_id
+        RETURNING
+          tokens.id
         /* batch=:batch_count */
       SQL
+
+      break if
+        token_ids.empty?
+
+      cursor = token_ids.max
     end
   end
 
   private
 
-  def exec_update(sql, **binds)
-    ActiveRecord::Base.connection.exec_update(
+  def exec_query(sql, **binds)
+    ActiveRecord::Base.connection.exec_query(
       ActiveRecord::Base.sanitize_sql([sql, **binds]),
     )
   end
