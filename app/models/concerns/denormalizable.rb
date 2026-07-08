@@ -25,6 +25,8 @@ module Denormalizable
         attribute_names.each { instrument_denormalized_attribute_to_through(it, to:, through:, prefix:, as:) }
       when to.present?
         attribute_names.each { instrument_denormalized_attribute_to(it, to:, prefix:, as:) }
+      else
+        raise ArgumentError, 'must provide either :from or :to'
       end
     end
 
@@ -70,9 +72,12 @@ module Denormalizable
 
         association_changed = denormalized_association_changed(reflection)
 
-        set_callback :initialize, :after, -> { write_denormalized_attribute_from_record_through(through_association_name, from, attribute_name, prefixed_attribute_name) }, if: association_changed, unless: :persisted?, prepend: false
-        before_validation -> { write_denormalized_attribute_from_record_through(through_association_name, from, attribute_name, prefixed_attribute_name) }, if: association_changed, on: :create
-        before_update -> { write_denormalized_attribute_from_record_through(through_association_name, from, attribute_name, prefixed_attribute_name) }, if: association_changed
+        # FIXME(ezekg) after_initialize ignores prepend: false
+        set_callback :initialize, :after, -> { write_denormalized_attribute_from_schrodingers_record_through(through_association_name, from, attribute_name, prefixed_attribute_name) }, if: association_changed, unless: :persisted?, prepend: false
+        before_validation -> { write_denormalized_attribute_from_schrodingers_record_through(through_association_name, from, attribute_name, prefixed_attribute_name) }, if: association_changed, on: :create
+        before_update -> { write_denormalized_attribute_from_persisted_record_through(through_association_name, from, attribute_name, prefixed_attribute_name) }, if: association_changed
+
+        # make sure validation fails if our denormalized column is modified directly
 
         validate -> { validate_denormalized_attribute_from_record_through(through_association_name, from, attribute_name, prefixed_attribute_name) }, if: :"#{prefixed_attribute_name}_changed?", on: :update
 
@@ -295,10 +300,35 @@ module Denormalizable
       end
     end
 
-    def write_denormalized_attribute_from_record_through(through_association_name, source_name, source_attribute_name, target_attribute_name)
+    def write_denormalized_attribute_from_unpersisted_record_through(through_association_name, source_name, source_attribute_name, target_attribute_name)
+      record = send(through_association_name)&.send(source_name)
+
+      # NB(ezekg) if we're denormalizing a foreign key, we need to look up the association
+      #           and denormalize the actual record, since it likely doesn't have a
+      #           primary key assigned yet.
+      if record.present? && (source_reflection = record.class.reflect_on_all_associations.find { it.foreign_key == source_attribute_name.to_s })
+        target_reflection = self.class.reflect_on_all_associations.find { it.foreign_key == target_attribute_name.to_s }
+
+        send(:"#{target_reflection.name}=", record.send(source_reflection.name))
+      else
+        write_attribute(target_attribute_name, record&.read_attribute(source_attribute_name))
+      end
+    end
+
+    def write_denormalized_attribute_from_persisted_record_through(through_association_name, source_name, source_attribute_name, target_attribute_name)
       record = send(through_association_name)&.send(source_name)
 
       write_attribute(target_attribute_name, record&.read_attribute(source_attribute_name))
+    end
+
+    def write_denormalized_attribute_from_schrodingers_record_through(through_association_name, source_name, ...)
+      record = send(through_association_name)&.send(source_name)
+
+      if record&.persisted?
+        write_denormalized_attribute_from_persisted_record_through(through_association_name, source_name, ...)
+      else
+        write_denormalized_attribute_from_unpersisted_record_through(through_association_name, source_name, ...)
+      end
     end
 
     def validate_denormalized_attribute_from_persisted_record(source_association_name, source_attribute_name, target_attribute_name)
