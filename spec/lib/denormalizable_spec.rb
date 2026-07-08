@@ -3,7 +3,9 @@
 require 'rails_helper'
 require 'spec_helper'
 
-describe Denormalizable, type: :concern do
+require_dependency Rails.root / 'lib' / 'denormalizable'
+
+describe Denormalizable do
   let(:account)        { create(:account) }
   let(:denormalizable) {
     Class.new ActiveRecord::Base do
