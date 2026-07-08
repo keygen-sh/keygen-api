@@ -83,7 +83,7 @@ module Denormalizable
       foreign_keys  = Array(reflection.foreign_key)
       foreign_keys += [reflection.foreign_type] if reflection.polymorphic?
 
-      -> { foreign_keys.any? { send(:"#{it}_changed?") } || send(:"#{reflection.name}_changed?") }
+      -> record { foreign_keys.any? { record.public_send(:"#{it}_changed?") } || record.public_send(:"#{reflection.name}_changed?") }
     end
   end
 
@@ -271,12 +271,12 @@ module Denormalizable
       source_changed  = association.changed_condition
 
       # FIXME(ezekg) after_initialize ignores prepend: false
-      model.set_callback :initialize, :after, -> { denormalization.denormalize(self) }, if: source_changed, unless: :persisted?, prepend: false
-      model.before_validation -> { denormalization.denormalize(self) }, if: source_changed, on: :create
-      model.before_update -> { denormalization.denormalize(self, persisted: true) }, if: source_changed
+      model.set_callback :initialize, :after, -> record { denormalization.denormalize(record) }, if: source_changed, unless: :persisted?, prepend: false
+      model.before_validation -> record { denormalization.denormalize(record) }, if: source_changed, on: :create
+      model.before_update -> record { denormalization.denormalize(record, persisted: true) }, if: source_changed
 
       # make sure validation fails if our denormalized column is modified directly
-      model.validate -> { denormalization.validate(self) }, if: :"#{column}_changed?", on: :update
+      model.validate -> record { denormalization.validate(record) }, if: :"#{column}_changed?", on: :update
     end
 
     # denormalize copies the source record's attribute onto the record. when
@@ -334,9 +334,9 @@ module Denormalizable
       denormalization = self
 
       # FIXME(ezekg) set to nil on destroy unless the association is dependent?
-      model.after_initialize -> { denormalization.denormalize(self) }, if: :"#{attribute}_changed?", unless: :persisted?
-      model.before_validation -> { denormalization.denormalize(self) }, if: :"#{attribute}_changed?", on: :create
-      model.after_save -> { denormalization.denormalize_async(self) }, if: :"#{attribute}_previously_changed?"
+      model.after_initialize -> record { denormalization.denormalize(record) }, if: :"#{attribute}_changed?", unless: :persisted?
+      model.before_validation -> record { denormalization.denormalize(record) }, if: :"#{attribute}_changed?", on: :create
+      model.after_save -> record { denormalization.denormalize_async(record) }, if: :"#{attribute}_previously_changed?"
     end
 
     # denormalize writes the attribute onto in-memory target records.
