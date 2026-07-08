@@ -202,6 +202,15 @@ describe Denormalizable do
     end
   end
 
+  describe Denormalizable::Denormalization do
+    it 'should raise for abstract methods' do
+      denormalization = Denormalizable::Denormalization.new(nil, attribute: :name, association: nil)
+
+      expect { denormalization.key }.to raise_error NotImplementedError
+      expect { denormalization.instrument! }.to raise_error NotImplementedError
+    end
+  end
+
   describe 'denormalizing :from a singular association' do
     temporary_table :publishers do |t|
       t.string :name

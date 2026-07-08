@@ -242,6 +242,12 @@ module Denormalizable
       @column      = column_name(prefix:, as:)
     end
 
+    # key is the name the denormalization is registered under.
+    def key = raise NotImplementedError
+
+    # instrument! registers the denormalization's callbacks on the model.
+    def instrument! = raise NotImplementedError
+
     private
 
     def column_name(prefix:, as:)
@@ -295,7 +301,7 @@ module Denormalizable
       source = association.resolve(record)
 
       if persisted || source&.persisted?
-        record.write_attribute(column, source&.read_attribute(attribute))
+        denormalize_persisted(record, source)
       else
         denormalize_unpersisted(record, source)
       end
@@ -315,6 +321,7 @@ module Denormalizable
 
     private
 
+    def denormalize_persisted(record, source) = record.write_attribute(column, source&.read_attribute(attribute))
     def denormalize_unpersisted(record, source)
       # NB(ezekg) if we're denormalizing a foreign key, we need to look up the association
       #           and denormalize the actual record, since it likely doesn't have a
@@ -344,11 +351,24 @@ module Denormalizable
       # FIXME(ezekg) set to nil on destroy unless the association is dependent?
       model.after_initialize -> record { denormalization.denormalize(record) }, if: :"#{attribute}_changed?", unless: :persisted?
       model.before_validation -> record { denormalization.denormalize(record) }, if: :"#{attribute}_changed?", on: :create
-      model.after_save -> record { denormalization.denormalize_async(record) }, if: :"#{attribute}_previously_changed?"
+      model.after_save -> record { denormalization.denormalize(record, persisted: true) }, if: :"#{attribute}_previously_changed?"
     end
 
-    # denormalize writes the attribute onto in-memory target records.
-    def denormalize(record)
+    # denormalize writes the attribute onto target records: loaded, in-memory
+    # targets before save, persisted targets after save.
+    def denormalize(record, persisted: false)
+      if persisted
+        denormalize_persisted(record)
+      else
+        denormalize_loaded(record)
+      end
+    end
+
+    private
+
+    # denormalize_loaded writes the attribute onto loaded, in-memory target
+    # records.
+    def denormalize_loaded(record)
       value = record.read_attribute(attribute)
 
       association.each_loaded(record) do |target|
@@ -356,10 +376,10 @@ module Denormalizable
       end
     end
 
-    # denormalize_async writes the attribute onto persisted target records,
-    # asynchronously in batches for relations (singular targets are updated
-    # inline).
-    def denormalize_async(record)
+    # denormalize_persisted writes the attribute onto persisted target
+    # records -- asynchronously in batches for collection targets, inline
+    # for singular targets.
+    def denormalize_persisted(record)
       if target_relation = association.async_relation(record)
         enqueue(record, target_relation)
       else
@@ -368,8 +388,6 @@ module Denormalizable
         target&.update(column => record.read_attribute(attribute))
       end
     end
-
-    private
 
     def enqueue(record, target_relation)
       options = {}
