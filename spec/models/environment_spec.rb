@@ -3,7 +3,7 @@
 require 'rails_helper'
 require 'spec_helper'
 
-describe Environment, type: :model do
+describe Environment, :only_ee, type: :model do
   let(:account) { create(:account) }
 
   it_behaves_like :accountable
@@ -101,7 +101,7 @@ describe Environment, type: :model do
   # by other bearers within the environment. without an explicit :inverse_of,
   # which we have, the ownership check would resolve the relation's inverse,
   # i.e. Token#environment, matching every token in the environment.
-  describe 'when denormalizing role to tokens', :only_ee do
+  describe 'when denormalizing role to tokens' do
     let(:environment) { create(:environment, account:) }
     let(:user)        { create(:user, account:, environment:) }
 
