@@ -481,7 +481,11 @@ module Denormalizable
     def denormalize_association(record)
       target = association.resolve(record)
 
-      target&.update(column => record.read_attribute(attribute))
+      # NB(ezekg) update_column so the write is unconditional, symmetric with
+      #           the async job's update_all -- update would silently leave
+      #           the column stale when the target is invalid for unrelated
+      #           reasons
+      target&.update_column(column, record.read_attribute(attribute))
     end
   end
 

@@ -505,6 +505,17 @@ describe Denormalizable do
 
         expect { author.update!(name: 'Jane Doe') }.to_not raise_error
       end
+
+      it 'should denormalize to an invalid target' do
+        author   = Author.create!(name: 'Jane')
+        contract = author.create_contract!(author_name: 'Jane')
+
+        Contract.validate { errors.add(:base, 'invalid') }
+
+        author.update!(name: 'Jane Doe')
+
+        expect(contract.reload.author_name).to eq 'Jane Doe'
+      end
     end
   end
 
