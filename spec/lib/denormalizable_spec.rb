@@ -254,6 +254,7 @@ describe Denormalizable do
       t.references :imprint
       t.references :publisher
       t.string :imprint_name
+      t.string :publisher_key
       t.string :name
       t.timestamps
     end
@@ -275,6 +276,7 @@ describe Denormalizable do
 
       denormalizes :name, from: :imprint, prefix: true
       denormalizes :publisher_id, from: :imprint
+      denormalizes :publisher_id, from: :imprint, as: :publisher_key
     end
 
     context 'on initialization' do
@@ -306,6 +308,14 @@ describe Denormalizable do
         book      = Book.create!(imprint:)
 
         expect(book.publisher_id).to eq publisher.id
+      end
+
+      it 'should denormalize a foreign key from an unpersisted source into a plain column' do
+        publisher = Publisher.create!(name: 'Penguin')
+        imprint   = Imprint.new(name: 'Del Rey', publisher:)
+        book      = Book.create!(imprint:)
+
+        expect(book.publisher_key).to eq publisher.id.to_s
       end
     end
 

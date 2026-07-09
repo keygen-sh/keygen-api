@@ -388,12 +388,12 @@ module Denormalizable
 
     def denormalize_persisted(record, source) = record.write_attribute(column, source&.read_attribute(attribute))
     def denormalize_unpersisted(record, source)
-      # NB(ezekg) if we're denormalizing a foreign key, we need to look up the association
-      #           and denormalize the actual record, since it likely doesn't have a
-      #           primary key assigned yet.
-      if source.present? && (source_reflection = find_reflection_by_foreign_key(source.class, attribute))
-        target_reflection = find_reflection_by_foreign_key(record.class, column)
-
+      # NB(ezekg) if we're denormalizing a foreign key into an association-backed
+      #           column, we need to look up the association and denormalize the
+      #           actual record, since it likely doesn't have a primary key
+      #           assigned yet -- otherwise fall back to a plain write, matching
+      #           the persisted path
+      if source.present? && (source_reflection = find_reflection_by_foreign_key(source.class, attribute)) && (target_reflection = find_reflection_by_foreign_key(record.class, column))
         record.public_send(:"#{target_reflection.name}=", source.public_send(source_reflection.name))
       else
         record.write_attribute(column, source&.read_attribute(attribute))
