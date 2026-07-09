@@ -36,6 +36,7 @@ describe Denormalizable do
 
     temporary_model :publisher do
       has_many :books
+      has_one :contract
     end
 
     temporary_model :book do
@@ -110,6 +111,10 @@ describe Denormalizable do
         expect { Book.denormalizes :name, from: :imprint, through: :reviews }.to raise_error ArgumentError
       end
 
+      it 'should raise for collection :from association' do
+        expect { Book.denormalizes :name, from: :books, through: :publisher }.to raise_error ArgumentError
+      end
+
       it 'should not raise with true :prefix' do
         expect { Book.denormalizes :name, from: :imprint, through: :publisher, prefix: true }.to_not raise_error
       end
@@ -151,6 +156,14 @@ describe Denormalizable do
       it 'should not raise with :inverse_of' do
         expect { Book.denormalizes :name, to: :books, through: :publisher, inverse_of: :publisher }.to_not raise_error
       end
+
+      it 'should not raise for singular :to association' do
+        expect { Book.denormalizes :name, to: :contract, through: :publisher }.to_not raise_error
+      end
+
+      it 'should raise with :inverse_of for singular :to association' do
+        expect { Book.denormalizes :name, to: :contract, through: :publisher, inverse_of: :book }.to raise_error ArgumentError
+      end
     end
 
     context 'when denormalizing with :inverse_of' do
@@ -188,17 +201,23 @@ describe Denormalizable do
     it 'should register denormalizations' do
       Book.denormalizes :name, from: :publisher, prefix: true
       Book.denormalizes :name, to: :reviews, as: :book_name
+      Book.denormalizes :name, from: :imprint, through: :publisher, as: :imprint_name
+      Book.denormalizes :id, to: :books, through: :publisher, as: :book_id
 
       expect(Book.denormalizations).to include(
         publisher_name: an_instance_of(Denormalizable::Denormalization::From),
         name: an_instance_of(Denormalizable::Denormalization::To),
+        imprint_name: an_instance_of(Denormalizable::Denormalization::From),
+        id: an_instance_of(Denormalizable::Denormalization::To),
       )
 
       expect(Book.denormalizations[:publisher_name].association).to be_an_instance_of Denormalizable::Association::Singular
       expect(Book.denormalizations[:name].association).to be_an_instance_of Denormalizable::Association::Collection
+      expect(Book.denormalizations[:imprint_name].association).to be_an_instance_of Denormalizable::Association::Through::Singular
+      expect(Book.denormalizations[:id].association).to be_an_instance_of Denormalizable::Association::Through::Collection
 
       expect(Book.denormalizations.values).to all be_frozen
-      expect(Book.denormalized_attributes).to eq Set[:publisher_name, :name]
+      expect(Book.denormalized_attributes).to eq Set[:publisher_name, :name, :imprint_name, :id]
     end
   end
 
@@ -535,6 +554,72 @@ describe Denormalizable do
         3.times { publisher.books.create!(publisher_name: 'Penguin') }
 
         expect { publisher.update!(name: 'Penguin Random House') }.to have_enqueued_job(Denormalizable::DenormalizeAssociationAsyncJob).exactly(2).times
+      end
+    end
+  end
+
+  describe 'denormalizing :to a singular :through association' do
+    temporary_table :publishers do |t|
+      t.string :name
+      t.timestamps
+    end
+
+    temporary_table :books do |t|
+      t.references :publisher
+      t.string :name
+      t.timestamps
+    end
+
+    temporary_table :contracts do |t|
+      t.references :publisher
+      t.string :book_name
+      t.timestamps
+    end
+
+    temporary_model :publisher do
+      has_many :books
+      has_one :contract
+    end
+
+    temporary_model :contract do
+      belongs_to :publisher
+    end
+
+    temporary_model :book do
+      include Denormalizable::Model
+
+      belongs_to :publisher
+
+      denormalizes :name, to: :contract, through: :publisher, as: :book_name
+    end
+
+    context 'on create' do
+      it 'should denormalize to a persisted target' do
+        publisher = Publisher.create!(name: 'Penguin')
+        contract  = publisher.create_contract!
+
+        Book.create!(publisher:, name: 'It')
+
+        expect(contract.reload.book_name).to eq 'It'
+      end
+    end
+
+    context 'on update' do
+      it 'should denormalize to a persisted target' do
+        publisher = Publisher.create!(name: 'Penguin')
+        contract  = publisher.create_contract!
+        book      = Book.create!(publisher:, name: 'It')
+
+        book.update!(name: 'The Stand')
+
+        expect(contract.reload.book_name).to eq 'The Stand'
+      end
+
+      it 'should not raise without a target' do
+        publisher = Publisher.create!(name: 'Penguin')
+        book      = Book.create!(publisher:, name: 'It')
+
+        expect { book.update!(name: 'The Stand') }.to_not raise_error
       end
     end
   end
