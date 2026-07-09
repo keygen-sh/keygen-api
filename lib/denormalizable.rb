@@ -465,8 +465,12 @@ module Denormalizable
         record.previously_new_record?
 
       # NB(ezekg) in_batches so we never materialize the full id set in
-      #           memory, e.g. for a source with millions of targets
-      relation.in_batches(of: DENORMALIZE_ASSOCIATION_ASYNC_BATCH_SIZE) do |batch|
+      #           memory, e.g. for a source with millions of targets -- and
+      #           since primary keys are not necessarily k-sortable, e.g.
+      #           UUIDv4, cursor on insertion order when possible so that
+      #           records inserted mid-enumeration land ahead of the cursor
+      #           instead of being skipped behind it
+      relation.in_batches(of: DENORMALIZE_ASSOCIATION_ASYNC_BATCH_SIZE, cursor: %i[created_at id]) do |batch|
         DenormalizeAssociationAsyncJob.perform_later(
           source_class_name: record.class.name,
           source_id: record.id,
