@@ -2,7 +2,6 @@
 
 module Denormalizable
   class Error < StandardError; end
-  class AssociationNotFoundError < Error; end
   class InverseAssociationNotFoundError < Error; end
 
   DENORMALIZE_ASSOCIATION_ASYNC_BATCH_SIZE = 1_000
@@ -163,7 +162,7 @@ module Denormalizable
   # Association::Through is an association resolved via a method on the
   # :through association's record, e.g. a role through a polymorphic bearer,
   # so an unpersisted :through record is supported. collection records are
-  # scoped to those owned by the :through record (see owner_reflection). use
+  # scoped to those owned by the :through record (see owner_reflection_for). use
   # :inverse_of to explicitly name the owner association when the resolved
   # relation's inverse is not the ownership edge.
   #
@@ -185,25 +184,26 @@ module Denormalizable
     def owner(record)   = record.public_send(through)
     def resolve(record) = owner(record)&.public_send(name)
 
-    # each_loaded only yields records already in memory -- for a collection,
-    # any writes are never saved, so loading the entire collection just to
-    # write attributes on discarded copies would be wasted work (persisted
-    # records are denormalized via async_relation and the records' own
-    # denormalization callbacks)
+    # each_loaded yields the resolved records for in-memory denormalization.
+    # collection writes are never saved, so only loaded records are yielded
+    # there -- loading the entire collection just to write attributes on
+    # discarded copies would be wasted work (persisted records are
+    # denormalized via async_relation and the records' own denormalization
+    # callbacks)
     def each_loaded(record, &block)
       owner  = owner(record)
       target = resolve(record)
       return if
         target.nil?
 
-      if collection_for?(owner)
+      if reflection = collection_reflection_for(owner)
         return unless
           target.loaded?
 
-        reflection = owner_reflection(owner)
+        owner_reflection = owner_reflection_for(owner, reflection)
 
-        target.each do |record|
-          block.call(record) if owned_by?(record, owner, reflection)
+        target.each do |owned|
+          block.call(owned) if owned_by?(owned, owner, owner_reflection)
         end
       else
         block.call(target)
@@ -217,23 +217,26 @@ module Denormalizable
         target.nil?
 
       # singular targets are denormalized inline, not in batches
-      return unless
-        collection_for?(owner)
+      reflection = collection_reflection_for(owner)
+      return if
+        reflection.nil?
 
       # explicitly scope the relation to records owned by the :through record
-      target.where(owner_reflection(owner).name => owner)
+      target.where(owner_reflection_for(owner, reflection).name => owner)
     end
 
     private
 
-    # collection_for? returns true when the resolved association is a
-    # collection on the owner's class (an unreflectable name, e.g. a plain
-    # method, is treated as singular)
-    def collection_for?(owner)
-      owner.class.reflect_on_association(name)&.collection? || false
+    # collection_reflection_for returns the resolved association's reflection
+    # on the owner's class when it's a collection, otherwise nil, e.g. for
+    # singular associations and unreflectable names like plain methods
+    def collection_reflection_for(owner)
+      reflection = owner.class.reflect_on_association(name)
+
+      reflection if reflection&.collection?
     end
 
-    # owner_reflection reflects on the resolved records' owner association,
+    # owner_reflection_for reflects on the resolved records' owner association,
     # i.e. their belongs_to association that points back at the :through
     # record, e.g. tokens are owned by their polymorphic bearer. resolved via
     # an explicit :inverse_of when given, otherwise via the inverse of the
@@ -241,11 +244,7 @@ module Denormalizable
     # the relation's inverse is not the ownership edge, e.g. an environment's
     # tokens are scoped to the environment, not to the environment as a
     # bearer.
-    def owner_reflection(owner)
-      reflection = owner.class.reflect_on_association(name)
-      raise AssociationNotFoundError, "no association found on #{owner.class} for #{name.inspect}" if
-        reflection.nil?
-
+    def owner_reflection_for(owner, reflection)
       if @inverse_of.present?
         reflection.klass.reflect_on_association(@inverse_of) or
           raise InverseAssociationNotFoundError, "no inverse association found on #{reflection.klass} for #{@inverse_of.inspect}"
@@ -501,8 +500,6 @@ module Denormalizable
     self.enqueue_after_transaction_commit = true
 
     queue_as { ActiveRecord.queues[:denormalize] }
-
-    discard_on ActiveJob::DeserializationError
 
     def perform(
       source_class_name:,
