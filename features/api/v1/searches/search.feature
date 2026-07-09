@@ -2529,7 +2529,7 @@ Feature: Search
     And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
-  @ee
+  @ee @clickhouse
   Scenario: Admin attempts to perform an SQL injection
     Given I am an admin of account "test1"
     And the current account is "test1"
