@@ -53,7 +53,7 @@ module Denormalizable
   # ownership so that denormalizations don't need to care how records are
   # reached.
   class Association
-    attr_reader :model, :name
+    attr_reader :model, :name, :reflection
 
     # build returns the association for the given name: a Singular or
     # Collection for an association declared on the model itself, or a
@@ -61,46 +61,52 @@ module Denormalizable
     # association's record.
     def self.build(model, name, kind:, through: nil, inverse_of: nil)
       if through.present?
-        Through.new(model, name, through:, inverse_of:)
+        reflection = model.reflect_on_association(through)
+        raise ArgumentError, "invalid :through association: #{through.inspect}" if
+          reflection.nil?
+
+        raise ArgumentError, "must be a singular association: #{through.inspect}" if
+          reflection.collection?
+
+        Through.new(model, name, reflection:, inverse_of:)
       else
         reflection = model.reflect_on_association(name)
         raise ArgumentError, "invalid :#{kind} association: #{name.inspect}" if
           reflection.nil?
 
         if reflection.collection?
-          Collection.new(model, name)
+          Collection.new(model, name, reflection:)
         else
-          Singular.new(model, name)
+          Singular.new(model, name, reflection:)
         end
       end
     end
 
-    def initialize(model, name)
-      @model = model
-      @name  = name
+    def initialize(model, name, reflection:)
+      @model      = model
+      @name       = name
+      @reflection = reflection
     end
 
-    def collection? = false
+    def collection? = reflection.collection?
 
-    private
+    # changed_condition returns a callable condition that returns true when
+    # the association has changed, via its foreign keys or target record.
+    def changed_condition
+      association_name = reflection.name
 
-    # changed_condition_for returns a callable condition that returns true
-    # when the given association has changed, via its foreign keys or target
-    # record.
-    def changed_condition_for(reflection)
       foreign_keys  = Array(reflection.foreign_key)
       foreign_keys += [reflection.foreign_type] if reflection.polymorphic?
 
-      -> record { foreign_keys.any? { record.public_send(:"#{it}_changed?") } || record.public_send(:"#{reflection.name}_changed?") }
+      -> record { foreign_keys.any? { record.public_send(:"#{it}_changed?") } || record.public_send(:"#{association_name}_changed?") }
     end
   end
 
   ##
-  # Association::Direct is an association declared on the model itself.
+  # Association::Direct is an association declared on the model itself, i.e.
+  # its reflection is the association itself.
   class Association::Direct < Association
     def resolve(record) = record.public_send(name)
-
-    def changed_condition = changed_condition_for(model.reflect_on_association(name))
   end
 
   ##
@@ -121,8 +127,6 @@ module Denormalizable
   # Association::Collection is a direct collection association, e.g. a
   # has_many.
   class Association::Collection < Association::Direct
-    def collection? = true
-
     def each_loaded(record, &block) = resolve(record).each(&block)
 
     def async_relation(record) = resolve(record)
@@ -136,26 +140,18 @@ module Denormalizable
   # :inverse_of to explicitly name the owner association when the resolved
   # relation's inverse is not the ownership edge.
   class Association::Through < Association
-    attr_reader :through
+    def initialize(model, name, inverse_of: nil, **)
+      super(model, name, **)
 
-    def initialize(model, name, through:, inverse_of: nil)
-      super(model, name)
-
-      reflection = model.reflect_on_association(through)
-      raise ArgumentError, "invalid :through association: #{through.inspect}" if
-        reflection.nil?
-
-      raise ArgumentError, "must be a singular association: #{through.inspect}" if
-        reflection.collection?
-
-      @through    = through
       @inverse_of = inverse_of
     end
 
+    # the :through association's name, i.e. our reflection is the :through
+    # association, not the resolved association itself
+    def through = reflection.name
+
     def owner(record)   = record.public_send(through)
     def resolve(record) = owner(record)&.public_send(name)
-
-    def changed_condition = changed_condition_for(model.reflect_on_association(through))
 
     # each_loaded only yields records already in memory -- any writes are
     # never saved, so loading the entire collection just to write attributes
@@ -380,16 +376,14 @@ module Denormalizable
     # records -- asynchronously in batches for collection targets, inline
     # for singular targets.
     def denormalize_persisted(record)
-      if target_relation = association.async_relation(record)
-        enqueue(record, target_relation)
+      if relation = association.async_relation(record)
+        denormalize_association_async(record, relation)
       else
-        target = association.resolve(record)
-
-        target&.update(column => record.read_attribute(attribute))
+        denormalize_association(record)
       end
     end
 
-    def enqueue(record, target_relation)
+    def denormalize_association_async(record, relation)
       options = {}
 
       # NB(ezekg) on create there's no previous value to guard against lost
@@ -398,17 +392,23 @@ module Denormalizable
       options[:source_attribute_value_was] = record.public_send(:"#{attribute}_previously_was") unless
         record.previously_new_record?
 
-      target_relation.ids.each_slice(DENORMALIZE_ASSOCIATION_ASYNC_BATCH_SIZE) do |ids|
+      relation.ids.each_slice(DENORMALIZE_ASSOCIATION_ASYNC_BATCH_SIZE) do |ids|
         DenormalizeAssociationAsyncJob.perform_later(
           source_class_name: record.class.name,
           source_id: record.id,
           source_attribute_name: attribute,
-          target_class_name: target_relation.klass.name,
+          target_class_name: relation.klass.name,
           target_ids: ids,
           target_attribute_name: column,
           **options,
         )
       end
+    end
+
+    def denormalize_association(record)
+      target = association.resolve(record)
+
+      target&.update(column => record.read_attribute(attribute))
     end
   end
 
