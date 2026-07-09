@@ -221,6 +221,16 @@ describe Denormalizable do
       expect(Book.denormalized_attributes).to eq Set[:publisher_name, :"reviews.name", :imprint_name, :"books.id"]
     end
 
+    it 'should resolve denormalized column names' do
+      Book.denormalizes :name, from: :publisher, prefix: true
+      Book.denormalizes :name, from: :publisher, prefix: :official
+      Book.denormalizes :name, from: :publisher, as: :moniker
+      Book.denormalizes :name, from: :publisher
+
+      expect(Book.denormalizations.keys).to eq %i[publisher_name official_name moniker name]
+      expect(Book.denormalizations.values.map(&:column)).to eq %w[publisher_name official_name moniker name]
+    end
+
     it 'should register multiple denormalizations of the same attribute' do
       Book.denormalizes :name, to: :reviews, as: :book_name
       Book.denormalizes :name, to: :books, through: :publisher, as: :book_name
@@ -271,7 +281,7 @@ describe Denormalizable do
     temporary_model :book do
       include Denormalizable::Model
 
-      belongs_to :imprint
+      belongs_to :imprint, optional: true
       belongs_to :publisher, optional: true
 
       denormalizes :name, from: :imprint, prefix: true
@@ -344,6 +354,14 @@ describe Denormalizable do
         expect { book.update!(name: 'The Book') }.to_not change { book.imprint_name }
       end
 
+      it 'should denormalize a cleared source' do
+        book = Book.create!(imprint: Imprint.create!(name: 'Del Rey'))
+
+        book.update!(imprint: nil)
+
+        expect(book.imprint_name).to be_nil
+      end
+
       it 'should raise when the denormalized attribute is modified directly' do
         book = Book.create!(imprint: Imprint.create!(name: 'Del Rey'))
 
@@ -393,7 +411,7 @@ describe Denormalizable do
     temporary_model :contract do
       include Denormalizable::Model
 
-      belongs_to :party, polymorphic: true
+      belongs_to :party, polymorphic: true, optional: true
 
       denormalizes :name, from: :agent, through: :party, as: :agent_name
     end
@@ -415,6 +433,12 @@ describe Denormalizable do
         contract = Contract.create!(party: author)
 
         expect(contract.agent_name).to eq 'WME'
+      end
+
+      it 'should not raise without a :through owner' do
+        contract = Contract.create!(party: nil)
+
+        expect(contract.agent_name).to be_nil
       end
     end
 
@@ -591,6 +615,18 @@ describe Denormalizable do
         expect(modified.reload.publisher_name).to eq 'Macmillan'
       end
 
+      it 'should not denormalize when the source is destroyed before the job performs' do
+        publisher = Publisher.create!(name: 'Penguin')
+        book      = publisher.books.create!(publisher_name: 'Penguin')
+
+        publisher.update!(name: 'Penguin Random House')
+        publisher.delete
+
+        perform_enqueued_jobs only: Denormalizable::DenormalizeAssociationAsyncJob
+
+        expect(book.reload.publisher_name).to eq 'Penguin'
+      end
+
       it 'should denormalize in batches' do
         stub_const('Denormalizable::DENORMALIZE_ASSOCIATION_ASYNC_BATCH_SIZE', 2)
 
@@ -636,6 +672,17 @@ describe Denormalizable do
       belongs_to :publisher
 
       denormalizes :name, to: :contract, through: :publisher, as: :book_name
+    end
+
+    context 'on initialization' do
+      it 'should denormalize to a loaded target' do
+        publisher = Publisher.create!(name: 'Penguin')
+        publisher.create_contract!
+
+        Book.new(publisher:, name: 'It')
+
+        expect(publisher.contract.book_name).to eq 'It'
+      end
     end
 
     context 'on create' do
