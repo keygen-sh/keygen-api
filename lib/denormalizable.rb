@@ -351,7 +351,7 @@ module Denormalizable
     # record is not saved, foreign keys are copied by assigning the
     # association.
     def denormalize(record, persisted: false)
-      source = association.resolve(record)
+      source = resolve_source(record)
 
       if persisted || source&.persisted?
         denormalize_persisted(record, source)
@@ -361,7 +361,7 @@ module Denormalizable
     end
 
     def validate(record)
-      source = association.resolve(record)
+      source = resolve_source(record)
 
       unless record.read_attribute(column) == source&.read_attribute(attribute)
         if reflection = find_reflection_by_foreign_key(record.class, column)
@@ -373,6 +373,18 @@ module Denormalizable
     end
 
     private
+
+    # resolve_source resolves the source record, guarding against a source
+    # that resolves to a collection at runtime, e.g. via a polymorphic
+    # :through, whose arity can't be reflected on at declaration time (see
+    # Association.build)
+    def resolve_source(record)
+      source = association.resolve(record)
+      raise Error, "cannot denormalize from a collection: #{association.name.inspect}" if
+        source.is_a?(ActiveRecord::Relation)
+
+      source
+    end
 
     def denormalize_persisted(record, source) = record.write_attribute(column, source&.read_attribute(attribute))
     def denormalize_unpersisted(record, source)

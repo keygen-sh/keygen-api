@@ -424,6 +424,22 @@ describe Denormalizable do
         expect { contract.update!(agent_name: 'CAA') }.to raise_error ActiveRecord::RecordInvalid
       end
     end
+
+    context 'with a source resolving to a collection' do
+      temporary_model :endorsement, table_name: :contracts do
+        include Denormalizable::Model
+
+        belongs_to :party, polymorphic: true
+
+        denormalizes :name, from: :contracts, through: :party, as: :agent_name
+      end
+
+      it 'should raise when denormalizing' do
+        author = Author.create!(name: 'Jane')
+
+        expect { Endorsement.create!(party: author) }.to raise_error Denormalizable::Error
+      end
+    end
   end
 
   describe 'denormalizing :to a singular association' do
