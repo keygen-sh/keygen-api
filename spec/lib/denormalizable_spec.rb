@@ -207,18 +207,25 @@ describe Denormalizable do
 
       expect(Book.denormalizations).to include(
         publisher_name: an_instance_of(Denormalizable::Denormalization::From),
-        name: an_instance_of(Denormalizable::Denormalization::To),
+        "reviews.name": an_instance_of(Denormalizable::Denormalization::To),
         imprint_name: an_instance_of(Denormalizable::Denormalization::From),
-        id: an_instance_of(Denormalizable::Denormalization::To),
+        "books.id": an_instance_of(Denormalizable::Denormalization::To),
       )
 
       expect(Book.denormalizations[:publisher_name].association).to be_an_instance_of Denormalizable::Association::Singular
-      expect(Book.denormalizations[:name].association).to be_an_instance_of Denormalizable::Association::Collection
+      expect(Book.denormalizations[:"reviews.name"].association).to be_an_instance_of Denormalizable::Association::Collection
       expect(Book.denormalizations[:imprint_name].association).to be_an_instance_of Denormalizable::Association::Through
-      expect(Book.denormalizations[:id].association).to be_an_instance_of Denormalizable::Association::Through
+      expect(Book.denormalizations[:"books.id"].association).to be_an_instance_of Denormalizable::Association::Through
 
       expect(Book.denormalizations.values).to all be_frozen
-      expect(Book.denormalized_attributes).to eq Set[:publisher_name, :name, :imprint_name, :id]
+      expect(Book.denormalized_attributes).to eq Set[:publisher_name, :"reviews.name", :imprint_name, :"books.id"]
+    end
+
+    it 'should register multiple denormalizations of the same attribute' do
+      Book.denormalizes :name, to: :reviews, as: :book_name
+      Book.denormalizes :name, to: :books, through: :publisher, as: :book_name
+
+      expect(Book.denormalizations.keys).to eq %i[reviews.name books.name]
     end
   end
 

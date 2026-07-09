@@ -408,7 +408,11 @@ module Denormalizable
   # persisted targets are denormalized after save -- asynchronously in
   # batches for relations, inline for singular targets.
   class Denormalization::To < Denormalization
-    def key = attribute
+    # NB(ezekg) unlike From, which owns its column and can key by it, the
+    #           denormalized column lives on the targets here -- so we key by
+    #           target and attribute, since the same attribute may be
+    #           denormalized to multiple targets
+    def key = :"#{association.name}.#{attribute}"
 
     def instrument!
       denormalization = self
