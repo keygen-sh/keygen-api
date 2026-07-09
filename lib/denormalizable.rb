@@ -17,9 +17,12 @@ module Denormalizable
     end
 
     class_methods do
-      def denormalizes(*attribute_names, from: nil, to: nil, through: nil, inverse_of: nil, prefix: nil, as: nil)
+      def denormalizes(*attribute_names, from: nil, to: nil, through: nil, polymorphic: nil, inverse_of: nil, prefix: nil, as: nil)
         raise ArgumentError, 'must provide either :from or :to (but not both)' unless
           from.present? ^ to.present?
+
+        raise ArgumentError, 'must provide :through when using :polymorphic' if
+          polymorphic.present? && through.blank?
 
         raise ArgumentError, 'must provide :to and :through when using :inverse_of' if
           inverse_of.present? && (to.blank? || through.blank?)
@@ -32,9 +35,9 @@ module Denormalizable
 
         attribute_names.each do |attribute_name|
           denormalization = if from.present?
-                              Denormalization::From.new(self, attribute: attribute_name, association: Association.build(self, from, kind: :from, through:), prefix:, as:)
+                              Denormalization::From.new(self, attribute: attribute_name, association: Association.build(self, from, kind: :from, through:, polymorphic:), prefix:, as:)
                             else
-                              Denormalization::To.new(self, attribute: attribute_name, association: Association.build(self, to, kind: :to, through:, inverse_of:), prefix:, as:)
+                              Denormalization::To.new(self, attribute: attribute_name, association: Association.build(self, to, kind: :to, through:, polymorphic:, inverse_of:), prefix:, as:)
                             end
 
           denormalization.instrument!
@@ -59,7 +62,7 @@ module Denormalizable
     # Collection for an association declared on the model itself, or a
     # Through when the records are resolved via a method on the :through
     # association's record.
-    def self.build(model, name, kind:, through: nil, inverse_of: nil)
+    def self.build(model, name, kind:, through: nil, polymorphic: nil, inverse_of: nil)
       if through.present?
         reflection = model.reflect_on_association(through)
         raise ArgumentError, "invalid :through association: #{through.inspect}" if
@@ -68,18 +71,42 @@ module Denormalizable
         raise ArgumentError, "must be a singular association: #{through.inspect}" if
           reflection.collection?
 
-        # NB(ezekg) when the :through association is reflectable, i.e. not
-        #           polymorphic, the resolved records' arity is reflected on
-        #           like a direct association, otherwise the direction
-        #           decides: a :from source is singular, and a :to target
-        #           defaults to a collection
-        collection = case
-                     when reflection.polymorphic?
-                       kind == :to
-                     when (target_reflection = reflection.klass.reflect_on_association(name))
-                       target_reflection.collection?
+        collection = if reflection.polymorphic?
+                       # NB(ezekg) a polymorphic :through can't be reflected on, so the
+                       #           resolved records' macro must be explicitly declared
+                       #           via :polymorphic (a :from source is singular by
+                       #           definition, so it may be omitted there)
+                       raise ArgumentError, "invalid :polymorphic macro: #{polymorphic.inspect}" unless
+                         polymorphic in nil | true | :has_many | :has_one | :belongs_to
+
+                       case kind
+                       in :from
+                         raise ArgumentError, "must be a singular association: #{name.inspect}" if
+                           polymorphic in true | :has_many
+
+                         false
+                       in :to
+                         raise ArgumentError, "must provide :polymorphic for a polymorphic :through association: #{through.inspect}" if
+                           polymorphic.nil?
+
+                         polymorphic in true | :has_many
+                       end
                      else
-                       kind == :to
+                       raise ArgumentError, "cannot use :polymorphic for a non-polymorphic :through association: #{through.inspect}" if
+                         polymorphic.present?
+
+                       target_reflection = reflection.klass.reflect_on_association(name)
+
+                       case
+                       when target_reflection.present?
+                         target_reflection.collection?
+                       when kind == :from
+                         # a :from source may be a plain method on the :through record
+                         # and is singular by definition
+                         false
+                       else
+                         raise ArgumentError, "invalid :to association: #{name.inspect} for #{reflection.klass}"
+                       end
                      end
 
         raise ArgumentError, "must be a singular association: #{name.inspect}" if

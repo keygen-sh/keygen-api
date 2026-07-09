@@ -43,7 +43,7 @@ class Role < ApplicationRecord
   # NB(ezekg) an explicit :inverse_of is required because Environment#tokens is
   #           scoped to the environment, not to the environment as a bearer
   denormalizes :name,
-    to: :tokens, through: :resource, inverse_of: :bearer, as: :bearer_role
+    to: :tokens, through: :resource, polymorphic: true, inverse_of: :bearer, as: :bearer_role
 
   # FIXME(ezekg) replace with accountable concern i.e. an association
   delegate :default_permissions, :default_permission_ids,
