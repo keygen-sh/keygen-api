@@ -4,12 +4,9 @@ class SeedBearerRoleForTokens < ActiveRecord::Migration[8.1]
   disable_ddl_transaction!
   verbose!
 
-  INDEX_NAME = :tmp_idx_tokens_id_bearer_role_null
   BATCH_SIZE = 10_000
 
   def up
-    add_index :tokens, :id, name: INDEX_NAME, where: 'bearer_role IS NULL', algorithm: :concurrently, if_not_exists: true
-
     update_count = nil
     batch_count  = 0
 
@@ -42,8 +39,6 @@ class SeedBearerRoleForTokens < ActiveRecord::Migration[8.1]
         /* batch=:batch_count */
       SQL
     end
-  ensure
-    remove_index :tokens, name: INDEX_NAME, algorithm: :concurrently, if_exists: true
   end
 
   def down
