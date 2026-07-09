@@ -43,6 +43,7 @@ describe Denormalizable do
       include Denormalizable::Model
 
       belongs_to :publisher
+      has_one :contract
       has_many :reviews
     end
 
@@ -61,6 +62,10 @@ describe Denormalizable do
 
       it 'should raise for collection :from association' do
         expect { Book.denormalizes :name, from: :reviews }.to raise_error ArgumentError
+      end
+
+      it 'should raise for has_one :from association' do
+        expect { Book.denormalizes :name, from: :contract }.to raise_error ArgumentError
       end
 
       it 'should not raise with true :prefix' do
@@ -109,6 +114,10 @@ describe Denormalizable do
 
       it 'should raise for collection :through association' do
         expect { Book.denormalizes :name, from: :imprint, through: :reviews }.to raise_error ArgumentError
+      end
+
+      it 'should raise for has_one :through association' do
+        expect { Book.denormalizes :name, from: :imprint, through: :contract }.to raise_error ArgumentError
       end
 
       it 'should not raise with true :prefix' do

@@ -327,6 +327,13 @@ module Denormalizable
       raise ArgumentError, "must be a singular association: #{association.name.inspect}" if
         association.collection?
 
+      # NB(ezekg) change tracking via changed_condition relies on the watched
+      #           reflection's foreign keys and <name>_changed? living on the
+      #           declaring model, which is only the case for a belongs_to --
+      #           for a has_one, both live on the other side
+      raise ArgumentError, "must be a belongs_to association: #{association.reflection.name.inspect}" unless
+        association.reflection.belongs_to?
+
       denormalization = self
       source_changed  = association.changed_condition
 
