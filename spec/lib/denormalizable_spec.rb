@@ -43,7 +43,6 @@ describe Denormalizable do
       include Denormalizable::Model
 
       belongs_to :publisher
-      belongs_to :owner, polymorphic: true, optional: true
       has_many :reviews
     end
 
@@ -112,10 +111,6 @@ describe Denormalizable do
         expect { Book.denormalizes :name, from: :imprint, through: :reviews }.to raise_error ArgumentError
       end
 
-      it 'should raise for collection :from association' do
-        expect { Book.denormalizes :name, from: :books, through: :publisher }.to raise_error ArgumentError
-      end
-
       it 'should not raise with true :prefix' do
         expect { Book.denormalizes :name, from: :imprint, through: :publisher, prefix: true }.to_not raise_error
       end
@@ -161,10 +156,6 @@ describe Denormalizable do
       it 'should not raise for singular :to association' do
         expect { Book.denormalizes :name, to: :contract, through: :publisher }.to_not raise_error
       end
-
-      it 'should raise with :inverse_of for singular :to association' do
-        expect { Book.denormalizes :name, to: :contract, through: :publisher, inverse_of: :book }.to raise_error ArgumentError
-      end
     end
 
     context 'when denormalizing with :inverse_of' do
@@ -174,52 +165,6 @@ describe Denormalizable do
 
       it 'should raise without :to' do
         expect { Book.denormalizes :name, from: :imprint, through: :publisher, inverse_of: :book }.to raise_error ArgumentError
-      end
-    end
-
-    context 'when denormalizing with :polymorphic' do
-      it 'should raise without :through' do
-        expect { Book.denormalizes :name, to: :reviews, polymorphic: true }.to raise_error ArgumentError
-      end
-
-      it 'should raise for non-polymorphic :through association' do
-        expect { Book.denormalizes :name, to: :books, through: :publisher, polymorphic: true }.to raise_error ArgumentError
-      end
-
-      it 'should raise for invalid macro' do
-        expect { Book.denormalizes :name, to: :things, through: :owner, polymorphic: :foo }.to raise_error ArgumentError
-      end
-
-      it 'should not raise for :to with true' do
-        expect { Book.denormalizes :name, to: :things, through: :owner, polymorphic: true }.to_not raise_error
-      end
-
-      it 'should not raise for :to with :has_many' do
-        expect { Book.denormalizes :name, to: :things, through: :owner, polymorphic: :has_many }.to_not raise_error
-      end
-
-      it 'should not raise for :to with :has_one' do
-        expect { Book.denormalizes :name, to: :thing, through: :owner, polymorphic: :has_one }.to_not raise_error
-      end
-
-      it 'should not raise for :to with :belongs_to' do
-        expect { Book.denormalizes :name, to: :thing, through: :owner, polymorphic: :belongs_to }.to_not raise_error
-      end
-
-      it 'should raise for :to without :polymorphic' do
-        expect { Book.denormalizes :name, to: :things, through: :owner }.to raise_error ArgumentError
-      end
-
-      it 'should not raise for :from without :polymorphic' do
-        expect { Book.denormalizes :name, from: :thing, through: :owner }.to_not raise_error
-      end
-
-      it 'should not raise for :from with :has_one' do
-        expect { Book.denormalizes :name, from: :thing, through: :owner, polymorphic: :has_one }.to_not raise_error
-      end
-
-      it 'should raise for :from with collection macro' do
-        expect { Book.denormalizes :name, from: :things, through: :owner, polymorphic: :has_many }.to raise_error ArgumentError
       end
     end
 
@@ -260,8 +205,8 @@ describe Denormalizable do
 
       expect(Book.denormalizations[:publisher_name].association).to be_an_instance_of Denormalizable::Association::Singular
       expect(Book.denormalizations[:name].association).to be_an_instance_of Denormalizable::Association::Collection
-      expect(Book.denormalizations[:imprint_name].association).to be_an_instance_of Denormalizable::Association::Through::Singular
-      expect(Book.denormalizations[:id].association).to be_an_instance_of Denormalizable::Association::Through::Collection
+      expect(Book.denormalizations[:imprint_name].association).to be_an_instance_of Denormalizable::Association::Through
+      expect(Book.denormalizations[:id].association).to be_an_instance_of Denormalizable::Association::Through
 
       expect(Book.denormalizations.values).to all be_frozen
       expect(Book.denormalized_attributes).to eq Set[:publisher_name, :name, :imprint_name, :id]
@@ -714,7 +659,7 @@ describe Denormalizable do
 
       belongs_to :client, polymorphic: true
 
-      denormalizes :name, to: :contracts, through: :client, polymorphic: true, inverse_of: :party, as: :agent_name
+      denormalizes :name, to: :contracts, through: :client, inverse_of: :party, as: :agent_name
     end
 
     temporary_model :contract do
@@ -825,7 +770,7 @@ describe Denormalizable do
 
         belongs_to :client, polymorphic: true
 
-        denormalizes :name, to: :books, through: :client, polymorphic: true, as: :agent_name
+        denormalizes :name, to: :books, through: :client, as: :agent_name
       end
 
       it 'should raise when no inverse association is resolvable' do

@@ -17,12 +17,9 @@ module Denormalizable
     end
 
     class_methods do
-      def denormalizes(*attribute_names, from: nil, to: nil, through: nil, polymorphic: nil, inverse_of: nil, prefix: nil, as: nil)
+      def denormalizes(*attribute_names, from: nil, to: nil, through: nil, inverse_of: nil, prefix: nil, as: nil)
         raise ArgumentError, 'must provide either :from or :to (but not both)' unless
           from.present? ^ to.present?
-
-        raise ArgumentError, 'must provide :through when using :polymorphic' if
-          polymorphic.present? && through.blank?
 
         raise ArgumentError, 'must provide :to and :through when using :inverse_of' if
           inverse_of.present? && (to.blank? || through.blank?)
@@ -35,9 +32,13 @@ module Denormalizable
 
         attribute_names.each do |attribute_name|
           denormalization = if from.present?
-                              Denormalization::From.new(self, attribute: attribute_name, association: Association.build(self, from, kind: :from, through:, polymorphic:), prefix:, as:)
+                              association = Association.build(self, from, kind: :from, through:)
+
+                              Denormalization::From.new(self, attribute: attribute_name, association:, prefix:, as:)
                             else
-                              Denormalization::To.new(self, attribute: attribute_name, association: Association.build(self, to, kind: :to, through:, polymorphic:, inverse_of:), prefix:, as:)
+                              association = Association.build(self, to, kind: :to, through:, inverse_of:)
+
+                              Denormalization::To.new(self, attribute: attribute_name, association:, prefix:, as:)
                             end
 
           denormalization.instrument!
@@ -56,71 +57,44 @@ module Denormalizable
   # ownership so that denormalizations don't need to care how records are
   # reached.
   class Association
-    attr_reader :model, :name, :reflection
+    class << self
+      # build returns the association for the given name: a Singular or
+      # Collection for an association declared on the model itself, or a
+      # Through when the records are resolved via a method on the :through
+      # association's record.
+      def build(model, name, kind:, through: nil, inverse_of: nil)
+        if through.present?
+          build_through_association(model, name, kind:, through:, inverse_of:)
+        else
+          build_association(model, name, kind:, inverse_of:)
+        end
+      end
 
-    # build returns the association for the given name: a Singular or
-    # Collection for an association declared on the model itself, or a
-    # Through when the records are resolved via a method on the :through
-    # association's record.
-    def self.build(model, name, kind:, through: nil, polymorphic: nil, inverse_of: nil)
-      if through.present?
+      private
+
+      # NB(ezekg) unlike the direct builder below, we can't split a Through
+      #           into singular/collection variants at declaration time: the
+      #           resolved records live on the :through record's class, and
+      #           for a polymorphic :through there is no class to reflect on
+      #           until we have a record in hand -- so Through resolves the
+      #           records' arity at runtime, per-owner, instead
+      def build_through_association(model, name, kind:, through:, inverse_of:)
         reflection = model.reflect_on_association(through)
         raise ArgumentError, "invalid :through association: #{through.inspect}" if
           reflection.nil?
 
-        raise ArgumentError, "must be a singular association: #{through.inspect}" if
+        # NB(ezekg) unlike the resolved records, the :through association is
+        #           declared on the model itself, so it's always reflectable
+        #           here -- and it must be singular, since records are
+        #           resolved via a single :through record, e.g. fanning out
+        #           through a collection is not supported
+        raise ArgumentError, "must be a singular :through association: #{through.inspect}" if
           reflection.collection?
 
-        collection = if reflection.polymorphic?
-                       # NB(ezekg) a polymorphic :through can't be reflected on, so the
-                       #           resolved records' macro must be explicitly declared
-                       #           via :polymorphic (a :from source is singular by
-                       #           definition, so it may be omitted there)
-                       raise ArgumentError, "invalid :polymorphic macro: #{polymorphic.inspect}" unless
-                         polymorphic in nil | true | :has_many | :has_one | :belongs_to
+        Through.new(model, name, reflection:, inverse_of:)
+      end
 
-                       case kind
-                       in :from
-                         raise ArgumentError, "must be a singular association: #{name.inspect}" if
-                           polymorphic in true | :has_many
-
-                         false
-                       in :to
-                         raise ArgumentError, "must provide :polymorphic for a polymorphic :through association: #{through.inspect}" if
-                           polymorphic.nil?
-
-                         polymorphic in true | :has_many
-                       end
-                     else
-                       raise ArgumentError, "cannot use :polymorphic for a non-polymorphic :through association: #{through.inspect}" if
-                         polymorphic.present?
-
-                       target_reflection = reflection.klass.reflect_on_association(name)
-
-                       case
-                       when target_reflection.present?
-                         target_reflection.collection?
-                       when kind == :from
-                         # a :from source may be a plain method on the :through record
-                         # and is singular by definition
-                         false
-                       else
-                         raise ArgumentError, "invalid :to association: #{name.inspect} for #{reflection.klass}"
-                       end
-                     end
-
-        raise ArgumentError, "must be a singular association: #{name.inspect}" if
-          collection && kind == :from
-
-        raise ArgumentError, "must be a collection association when using :inverse_of: #{name.inspect}" if
-          inverse_of.present? && !collection
-
-        if collection
-          Through::Collection.new(model, name, reflection:, inverse_of:)
-        else
-          Through::Singular.new(model, name, reflection:)
-        end
-      else
+      def build_association(model, name, kind:, inverse_of:)
         reflection = model.reflect_on_association(name)
         raise ArgumentError, "invalid :#{kind} association: #{name.inspect}" if
           reflection.nil?
@@ -132,6 +106,8 @@ module Denormalizable
         end
       end
     end
+
+    attr_reader :model, :name, :reflection
 
     def initialize(model, name, reflection:)
       @model      = model
@@ -186,73 +162,76 @@ module Denormalizable
   ##
   # Association::Through is an association resolved via a method on the
   # :through association's record, e.g. a role through a polymorphic bearer,
-  # so an unpersisted :through record is supported. subclasses implement the
-  # arity of the resolved records.
-  class Association::Through < Association
-    # the :through association's name, i.e. our reflection is the :through
-    # association, not the resolved association itself
-    def through = reflection.name
-
-    def owner(record)   = record.public_send(through)
-    def resolve(record) = owner(record)&.public_send(name)
-  end
-
-  ##
-  # Association::Through::Singular is a singular association resolved through
-  # another, e.g. a role through a polymorphic bearer.
-  class Association::Through::Singular < Association::Through
-    def each_loaded(record, &block)
-      target = resolve(record)
-
-      block.call(target) unless target.nil?
-    end
-
-    # singular targets are denormalized inline, not in batches
-    def async_relation(record) = nil
-  end
-
-  ##
-  # Association::Through::Collection is a collection association resolved
-  # through another, e.g. tokens through a role's resource. records are
+  # so an unpersisted :through record is supported. collection records are
   # scoped to those owned by the :through record (see owner_reflection). use
   # :inverse_of to explicitly name the owner association when the resolved
   # relation's inverse is not the ownership edge.
-  class Association::Through::Collection < Association::Through
+  #
+  # NB(ezekg) unlike Direct's declaration-time Singular/Collection split, the
+  #           resolved records' arity is resolved at runtime, per-owner, since
+  #           a polymorphic :through has no class to reflect on until we have
+  #           a record in hand (see Association.build).
+  class Association::Through < Association
     def initialize(model, name, inverse_of: nil, **)
       super(model, name, **)
 
       @inverse_of = inverse_of
     end
 
-    # each_loaded only yields records already in memory -- any writes are
-    # never saved, so loading the entire collection just to write attributes
-    # on discarded copies would be wasted work (persisted records are
-    # denormalized via async_relation and the records' own denormalization
-    # callbacks)
+    # the :through association's name, i.e. our reflection is the :through
+    # association, not the resolved association itself
+    def through = reflection.name
+
+    def owner(record)   = record.public_send(through)
+    def resolve(record) = owner(record)&.public_send(name)
+
+    # each_loaded only yields records already in memory -- for a collection,
+    # any writes are never saved, so loading the entire collection just to
+    # write attributes on discarded copies would be wasted work (persisted
+    # records are denormalized via async_relation and the records' own
+    # denormalization callbacks)
     def each_loaded(record, &block)
-      owner    = owner(record)
-      relation = resolve(record)
-      return unless
-        relation&.loaded?
+      owner  = owner(record)
+      target = resolve(record)
+      return if
+        target.nil?
 
-      reflection = owner_reflection(owner)
+      if collection_for?(owner)
+        return unless
+          target.loaded?
 
-      relation.each do |target|
-        block.call(target) if owned_by?(target, owner, reflection)
+        reflection = owner_reflection(owner)
+
+        target.each do |record|
+          block.call(record) if owned_by?(record, owner, reflection)
+        end
+      else
+        block.call(target)
       end
     end
 
     def async_relation(record)
-      owner    = owner(record)
-      relation = resolve(record)
+      owner  = owner(record)
+      target = resolve(record)
       return if
-        relation.nil?
+        target.nil?
+
+      # singular targets are denormalized inline, not in batches
+      return unless
+        collection_for?(owner)
 
       # explicitly scope the relation to records owned by the :through record
-      relation.where(owner_reflection(owner).name => owner)
+      target.where(owner_reflection(owner).name => owner)
     end
 
     private
+
+    # collection_for? returns true when the resolved association is a
+    # collection on the owner's class (an unreflectable name, e.g. a plain
+    # method, is treated as singular)
+    def collection_for?(owner)
+      owner.class.reflect_on_association(name)&.collection? || false
+    end
 
     # owner_reflection reflects on the resolved records' owner association,
     # i.e. their belongs_to association that points back at the :through
