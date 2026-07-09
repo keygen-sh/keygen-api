@@ -474,13 +474,9 @@ class Token < ApplicationRecord
         on_duplicate: :skip,
       )
 
-      # NB(ezekg) reset stale associations after the bulk upsert, so that the next
-      #           access queries fresh records (vs a reload, which would also clear
-      #           our dirty state mid-save, e.g. previous_changes) -- we go through
-      #           association() because our readers are overridden to return
-      #           transient relations while nested attributes are assigned
-      association(:token_permissions).tap { it.reset; it.reset_scope }
-      association(:permissions).tap { it.reset; it.reset_scope }
+      # reset stale associations after the bulk upsert
+      token_permissions.reset
+      permissions.reset
     end
   end
 end
