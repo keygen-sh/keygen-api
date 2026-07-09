@@ -265,9 +265,11 @@ class Role < ApplicationRecord
 
       # NB(ezekg) reset stale associations after the bulk upsert, so that the next
       #           access queries fresh records (vs a reload, which would also clear
-      #           our dirty state mid-save, e.g. previous_changes)
-      role_permissions.reset
-      permissions.reset
+      #           our dirty state mid-save, e.g. previous_changes) -- we go through
+      #           association() because our readers are overridden to return
+      #           transient relations while nested attributes are assigned
+      association(:role_permissions).tap { it.reset; it.reset_scope }
+      association(:permissions).tap { it.reset; it.reset_scope }
     end
   end
 end
