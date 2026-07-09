@@ -465,13 +465,15 @@ module Denormalizable
       options[:source_attribute_value_was] = record.public_send(:"#{attribute}_previously_was") unless
         record.previously_new_record?
 
-      relation.ids.each_slice(DENORMALIZE_ASSOCIATION_ASYNC_BATCH_SIZE) do |ids|
+      # NB(ezekg) in_batches so we never materialize the full id set in
+      #           memory, e.g. for a source with millions of targets
+      relation.in_batches(of: DENORMALIZE_ASSOCIATION_ASYNC_BATCH_SIZE) do |batch|
         DenormalizeAssociationAsyncJob.perform_later(
           source_class_name: record.class.name,
           source_id: record.id,
           source_attribute_name: attribute,
           target_class_name: relation.klass.name,
-          target_ids: ids,
+          target_ids: batch.ids,
           target_attribute_name: column,
           **options,
         )
