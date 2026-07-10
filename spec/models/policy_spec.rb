@@ -82,7 +82,7 @@ describe Policy, type: :model do
         product = create(:product, account:)
         policy  = create(:policy, account:, licenses: build_list(:license, 10, account:))
 
-        perform_enqueued_jobs only: Denormalizable::DenormalizeAssociationAsyncJob do
+        perform_enqueued_jobs only: Denormalizable::DenormalizeAsyncJob do
           policy.update!(product:)
         end
 

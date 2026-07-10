@@ -55,6 +55,12 @@ module Denormalizable
   # written to, encapsulating reflection, resolution, change tracking and
   # ownership so that denormalizations don't need to care how records are
   # reached.
+  #
+  # subclasses implement the resolution interface -- resolve, each_loaded and
+  # async_relation. Direct associations are declared on the model itself and
+  # split into Singular and Collection at declaration time, while Through
+  # associations are resolved via the :through record, with arity determined
+  # at runtime (see Association.build).
   class Association
     class << self
       # build returns the association for the given name: a Singular or
@@ -113,6 +119,23 @@ module Denormalizable
       @name       = name
       @reflection = reflection
     end
+
+    # resolve returns the resolved source or target record(s) for the given
+    # record.
+    def resolve(record) = raise NotImplementedError
+
+    # each_loaded yields the resolved records already in memory, for
+    # denormalizing without loading the full collection.
+    def each_loaded(record, &block) = raise NotImplementedError
+
+    # async_relation returns the resolved records as a batchable relation, or
+    # nil when the records don't resolve to a persisted collection, i.e.
+    # singular targets are denormalized inline instead.
+    def async_relation(record) = raise NotImplementedError
+
+    # async? returns true when the resolved records denormalize
+    # asynchronously, i.e. they resolve to a batchable relation.
+    def async?(record) = !async_relation(record).nil?
 
     def collection? = reflection.collection?
 
@@ -448,52 +471,87 @@ module Denormalizable
     # records -- asynchronously in batches for collection targets, inline
     # for singular targets.
     def denormalize_persisted(record)
-      if relation = association.async_relation(record)
-        denormalize_association_async(record, relation)
+      if association.async?(record)
+        denormalize_association_async(record)
       else
         denormalize_association(record)
       end
     end
 
-    def denormalize_association_async(record, relation)
-      options = {}
-
-      # NB(ezekg) on create there's no previous value to guard against lost
-      #           updates, and targets may carry stale values, e.g. from a
-      #           previously destroyed source, so we skip the filter
-      options[:source_attribute_value_was] = record.public_send(:"#{attribute}_previously_was") unless
-        record.previously_new_record?
-
-      # NB(ezekg) in_batches so we never materialize the full id set in
-      #           memory, e.g. for a source with millions of targets -- and
-      #           since primary keys are not necessarily k-sortable, e.g.
-      #           UUIDv4, cursor on insertion order when possible so that
-      #           records inserted mid-enumeration land ahead of the cursor
-      #           instead of being skipped behind it
-      relation.in_batches(of: DENORMALIZE_ASSOCIATION_ASYNC_BATCH_SIZE, cursor: %i[created_at id]) do |batch|
-        DenormalizeAssociationAsyncJob.perform_later(
-          source_class_name: record.class.name,
-          source_id: record.id,
-          source_attribute_name: attribute,
-          target_class_name: relation.klass.name,
-          target_ids: batch.ids,
-          target_attribute_name: column,
-          **options,
-        )
-      end
+    def denormalize_association_async(record)
+      DenormalizeAsyncJob.perform_later(
+        source_class_name: record.class.name,
+        source_id: record.id,
+        denormalization_key: key.to_s,
+      )
     end
 
     def denormalize_association(record)
       target = association.resolve(record)
 
-      # NB(ezekg) update_column so the write is unconditional, symmetric with
-      #           the async job's update_all -- update would silently leave
-      #           the column stale when the target is invalid for unrelated
-      #           reasons
       target&.update_column(column, record.read_attribute(attribute))
     end
   end
 
+  ##
+  # DenormalizeAsyncJob denormalizes a source record's attribute onto its
+  # current targets, i.e. it makes the targets match the source. the target
+  # relation is derived at perform-time, not enqueue-time, so targets created
+  # or reassigned while the job was queued are resolved correctly -- and
+  # performing the same job any number of times is safe, since it always
+  # converges on the source's current committed value.
+  class DenormalizeAsyncJob < ActiveJob::Base
+    # NB(ezekg) we're enqueued from after_save, i.e. inside the transaction, so
+    #           we need to defer the enqueue until after commit, otherwise the
+    #           job may run before the source's new value is committed and
+    #           denormalize a stale value
+    self.enqueue_after_transaction_commit = true
+
+    queue_as { ActiveRecord.queues[:denormalize] }
+
+    def perform(source_class_name:, source_id:, denormalization_key:)
+      source_class    = source_class_name.constantize
+      denormalization = source_class.denormalizations.fetch(denormalization_key.to_sym)
+      primary_key     = source_class.primary_key
+
+      source = source_class.find_by(primary_key => source_id)
+      return if
+        source.nil?
+
+      relation = denormalization.association.async_relation(source)
+      return if
+        relation.nil?
+
+      attribute = denormalization.attribute
+      column    = denormalization.column
+
+      # cursor on insertion order since primary keys are not necessarily
+      # k-sortable, e.g. UUIDv4 -- records inserted mid-enumeration land
+      # ahead of the cursor instead of being skipped behind it
+      relation.in_batches(of: DENORMALIZE_ASSOCIATION_ASYNC_BATCH_SIZE, cursor: %i[created_at id]) do |batch|
+        source_class.transaction do
+          # NB(ezekg) FOR SHARE pins the source's latest committed value until
+          #           the batch commits, i.e. what we read is what we write,
+          #           and concurrent jobs can only ever write the same value
+          id, value = source_class.where(primary_key => source_id)
+                                  .lock('FOR SHARE')
+                                  .pick(
+                                    primary_key,
+                                    attribute,
+                                  )
+
+          # source was deleted mid-run
+          return if
+            id.nil?
+
+          batch.update_all(column => value)
+        end
+      end
+    end
+  end
+
+  # FIXME(ezekg) superseded by DenormalizeAsyncJob -- remove after the queue
+  #              drains, since jobs enqueued with these args may be in-flight
   class DenormalizeAssociationAsyncJob < ActiveJob::Base
     NOT_PROVIDED = Class.new
 

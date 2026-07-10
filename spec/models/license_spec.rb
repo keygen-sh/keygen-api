@@ -153,7 +153,7 @@ describe License, type: :model do
         policy  = create(:policy, account:)
         license = create(:license, account:, machines: build_list(:machine, 10, account:))
 
-        perform_enqueued_jobs only: Denormalizable::DenormalizeAssociationAsyncJob do
+        perform_enqueued_jobs only: Denormalizable::DenormalizeAsyncJob do
           license.update!(policy:)
         end
 
