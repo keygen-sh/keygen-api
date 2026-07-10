@@ -35,7 +35,8 @@ class SeedBearerRoleForTokens < ActiveRecord::Migration[8.1]
         FROM
           batch
         WHERE
-          tokens.id = batch.token_id
+          tokens.id = batch.token_id AND
+          tokens.bearer_role IS NULL
         /* batch=:batch_count */
       SQL
     end
