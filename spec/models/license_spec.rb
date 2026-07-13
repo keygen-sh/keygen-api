@@ -161,6 +161,23 @@ describe License, type: :model do
           expect(machine.policy_id).to eq license.policy_id
         end
       end
+
+      it "should not denormalize policy to other licenses' machines" do
+        license = create(:license, account:, machines: build_list(:machine, 3, account:))
+        other   = create(:license, account:, machines: build_list(:machine, 3, account:))
+
+        perform_enqueued_jobs only: Denormalizable::DenormalizeAsyncJob do
+          license.update!(policy: create(:policy, account:))
+        end
+
+        license.reload.machines.each do |machine|
+          expect(machine.policy_id).to eq license.policy_id
+        end
+
+        other.reload.machines.each do |machine|
+          expect(machine.policy_id).to eq other.policy_id
+        end
+      end
     end
   end
 

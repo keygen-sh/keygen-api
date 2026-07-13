@@ -235,6 +235,21 @@ describe Token, type: :model do
         expect(token.reload.bearer_role).to eq 'admin'
       end
 
+      it "should not denormalize role to other bearers' tokens" do
+        bearer = create(:user, account:)
+        token  = create(:token, account:, bearer:)
+
+        other       = create(:user, account:)
+        other_token = create(:token, account:, bearer: other)
+
+        Current.set(token:) do
+          bearer.change_role! :admin
+        end
+
+        expect(token.reload.bearer_role).to eq 'admin'
+        expect(other_token.reload.bearer_role).to eq 'user'
+      end
+
       it 'should raise when modified directly' do
         token = create(:token, account:, bearer: create(:user, account:))
 

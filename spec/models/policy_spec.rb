@@ -90,6 +90,23 @@ describe Policy, type: :model do
           expect(license.product_id).to eq policy.product_id
         end
       end
+
+      it "should not denormalize product to other policies' licenses" do
+        policy = create(:policy, account:, licenses: build_list(:license, 3, account:))
+        other  = create(:policy, account:, licenses: build_list(:license, 3, account:))
+
+        perform_enqueued_jobs only: Denormalizable::DenormalizeAsyncJob do
+          policy.update!(product: create(:product, account:))
+        end
+
+        policy.reload.licenses.each do |license|
+          expect(license.product_id).to eq policy.product_id
+        end
+
+        other.reload.licenses.each do |license|
+          expect(license.product_id).to eq other.product_id
+        end
+      end
     end
   end
 end

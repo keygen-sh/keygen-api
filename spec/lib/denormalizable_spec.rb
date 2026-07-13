@@ -537,6 +537,19 @@ describe Denormalizable do
         expect(contract.reload.author_name).to eq 'Jane Doe'
       end
 
+      it "should not denormalize to other sources' targets" do
+        author   = Author.create!(name: 'Jane')
+        contract = author.create_contract!(author_name: 'Jane')
+
+        other          = Author.create!(name: 'John')
+        other_contract = other.create_contract!(author_name: 'John')
+
+        author.update!(name: 'Jane Doe')
+
+        expect(contract.reload.author_name).to eq 'Jane Doe'
+        expect(other_contract.reload.author_name).to eq 'John'
+      end
+
       it 'should denormalize inline, not via the async job' do
         author   = Author.create!(name: 'Jane')
         contract = author.create_contract!(author_name: 'Jane')
@@ -609,6 +622,21 @@ describe Denormalizable do
         expect(books.map { it.reload.publisher_name }).to all eq 'Penguin Random House'
       end
 
+      it "should not denormalize to other sources' targets" do
+        publisher = Publisher.create!(name: 'Penguin')
+        books     = 3.times.map { publisher.books.create!(publisher_name: 'Penguin') }
+
+        other       = Publisher.create!(name: 'Macmillan')
+        other_books = 3.times.map { other.books.create!(publisher_name: 'Macmillan') }
+
+        perform_enqueued_jobs only: Denormalizable::DenormalizeAsyncJob do
+          publisher.update!(name: 'Penguin Random House')
+        end
+
+        expect(books.map { it.reload.publisher_name }).to all eq 'Penguin Random House'
+        expect(other_books.map { it.reload.publisher_name }).to all eq 'Macmillan'
+      end
+
       it 'should denormalize to concurrently modified targets' do
         publisher = Publisher.create!(name: 'Penguin')
         book      = publisher.books.create!(publisher_name: 'Penguin')
@@ -671,13 +699,24 @@ describe Denormalizable do
         stub_const('Denormalizable::DENORMALIZE_ASSOCIATION_ASYNC_BATCH_SIZE', 2)
 
         publisher = Publisher.create!(name: 'Penguin')
-        books     = 3.times.map { publisher.books.create!(publisher_name: 'Penguin') }
+        other     = Publisher.create!(name: 'Macmillan')
+
+        # interleave creation so the batch cursor would sweep the other
+        # publisher's books in if the relation weren't scoped
+        books       = []
+        other_books = []
+
+        3.times do
+          books       << publisher.books.create!(publisher_name: 'Penguin')
+          other_books << other.books.create!(publisher_name: 'Macmillan')
+        end
 
         expect { publisher.update!(name: 'Penguin Random House') }.to have_enqueued_job(Denormalizable::DenormalizeAsyncJob).exactly(:once)
 
         perform_enqueued_jobs only: Denormalizable::DenormalizeAsyncJob
 
         expect(books.map { it.reload.publisher_name }).to all eq 'Penguin Random House'
+        expect(other_books.map { it.reload.publisher_name }).to all eq 'Macmillan'
       end
     end
   end
@@ -748,6 +787,20 @@ describe Denormalizable do
         book.update!(name: 'The Stand')
 
         expect(contract.reload.book_name).to eq 'The Stand'
+      end
+
+      it "should not denormalize to other owners' targets" do
+        publisher = Publisher.create!(name: 'Penguin')
+        contract  = publisher.create_contract!
+        book      = Book.create!(publisher:, name: 'It')
+
+        other          = Publisher.create!(name: 'Macmillan')
+        other_contract = other.create_contract!(book_name: 'Misery')
+
+        book.update!(name: 'The Stand')
+
+        expect(contract.reload.book_name).to eq 'The Stand'
+        expect(other_contract.reload.book_name).to eq 'Misery'
       end
 
       it 'should not raise without a target' do
@@ -889,6 +942,24 @@ describe Denormalizable do
         end
 
         expect(contract.reload.agent_name).to eq 'CAA'
+      end
+
+      it 'should not denormalize to records owned by another :through record of the same type' do
+        author = Author.create!(name: 'Jane')
+        agent  = author.create_agent!(name: 'WME')
+
+        other = Author.create!(name: 'John')
+        other.create_agent!(name: 'CAA')
+
+        contract       = Contract.create!(party: author, agent_name: 'WME')
+        other_contract = Contract.create!(party: other, agent_name: 'CAA')
+
+        perform_enqueued_jobs only: Denormalizable::DenormalizeAsyncJob do
+          agent.update!(name: 'UTA')
+        end
+
+        expect(contract.reload.agent_name).to eq 'UTA'
+        expect(other_contract.reload.agent_name).to eq 'CAA'
       end
     end
 
