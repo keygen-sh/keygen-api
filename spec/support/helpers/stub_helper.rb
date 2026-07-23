@@ -39,9 +39,14 @@ def stub_slack!
   )
 end
 
+def stub_dns!
+  allow(Resolv).to receive(:getaddresses) { %w[1.1.1.1] }
+end
+
 def stub_everything!
   stub_keygens!
   stub_cache!
   stub_s3!
   stub_slack!
+  stub_dns!
 end

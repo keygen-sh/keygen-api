@@ -45,6 +45,10 @@ class WebhookWorker < BaseWorker
     return unless
       endpoint.subscribed?(event_type.event)
 
+    # revalidate webhook i.e. namely to re-resolve DNS and assert it's still acceptable
+    raise InvalidEndpointError if
+      endpoint.invalid?
+
     # migrate event payload in case anything has changed e.g. endpoint API version
     current_version = event.api_version || CURRENT_API_VERSION
     target_version  = endpoint.api_version || account.api_version
@@ -172,6 +176,16 @@ class WebhookWorker < BaseWorker
     end
 
     Keygen.logger.info "[webhook_worker] Delivered webhook event: type=#{event_type.event} account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=#{res.code}"
+  rescue InvalidEndpointError
+    Keygen.logger.warn "[webhook_worker] Failed webhook event: type=#{event_type.event} account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=RESOLV_ERROR"
+
+    event.update!(
+      last_response_code: nil,
+      last_response_body: 'RESOLV_ERROR',
+      status: 'FAILED',
+    )
+
+    raise FailedRequestError # retry in case of transient DNS issue
   rescue HTTParty::RedirectionTooDeep => e
     Keygen.logger.warn "[webhook_worker] Failed webhook event: type=#{event_type.event} account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=REDIRECT_ERROR"
 
@@ -180,6 +194,8 @@ class WebhookWorker < BaseWorker
       last_response_body: 'REDIRECT_ERROR',
       status: 'FAILED',
     )
+
+    raise FailedRequestError # retry in case of transient issue
   rescue OpenSSL::SSL::SSLError # Endpoint's SSL certificate is not showing as valid
     Keygen.logger.warn "[webhook_worker] Failed webhook event: type=#{event_type.event} account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=SSL_ERROR"
 
@@ -252,6 +268,7 @@ class WebhookWorker < BaseWorker
     )
   end
 
+  class InvalidEndpointError < StandardError; end
   class FailedRequestError < StandardError
     # Silence backtrace for failed webhooks (not needed, too noisy)
     def backtrace = nil
