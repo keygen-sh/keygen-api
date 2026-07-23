@@ -205,4 +205,44 @@ describe UrlValidator do
 
     it { is_expected.to_not be_valid }
   end
+
+  context 'when private addresses are allowed' do
+    with_env KEYGEN_ALLOW_PRIVATE_ADDRESSES: '1' do
+      context 'with a host resolving to a private address' do
+        let(:url) { 'https://webhooks.example' }
+
+        before { stub_resolv!('webhooks.example', '10.0.0.1') }
+
+        it { is_expected.to be_valid }
+      end
+
+      context 'with a host resolving to a link-local address' do
+        let(:url) { 'https://webhooks.example' }
+
+        before { stub_resolv!('webhooks.example', '169.254.169.254') }
+
+        it { is_expected.to be_valid }
+      end
+
+      context 'with an unresolvable host' do
+        let(:url) { 'https://webhooks.example' }
+
+        before { stub_resolv!('webhooks.example') }
+
+        it { is_expected.to be_valid }
+      end
+
+      context 'with a blacklisted host' do
+        let(:url) { 'https://api.keygen.sh' }
+
+        it { is_expected.to_not be_valid }
+      end
+
+      context 'with an invalid protocol' do
+        let(:url) { 'ftp://ftp.example' }
+
+        it { is_expected.to_not be_valid }
+      end
+    end
+  end
 end
