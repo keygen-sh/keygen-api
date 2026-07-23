@@ -206,8 +206,8 @@ describe UrlValidator do
     it { is_expected.to_not be_valid }
   end
 
-  context 'when private addresses are allowed' do
-    with_env KEYGEN_ALLOW_PRIVATE_ADDRESSES: '1' do
+  context 'when all addresses are allowed' do
+    with_env KEYGEN_ALLOWED_PRIVATE_ADDRESSES: '0.0.0.0/0, ::/0' do
       context 'with a host resolving to a private address' do
         let(:url) { 'https://webhooks.example' }
 
@@ -229,7 +229,7 @@ describe UrlValidator do
 
         before { stub_resolv!('webhooks.example') }
 
-        it { is_expected.to be_valid }
+        it { is_expected.to_not be_valid }
       end
 
       context 'with a blacklisted host' do
@@ -240,6 +240,60 @@ describe UrlValidator do
 
       context 'with an invalid protocol' do
         let(:url) { 'ftp://ftp.example' }
+
+        it { is_expected.to_not be_valid }
+      end
+    end
+  end
+
+  context 'when private addresses are restricted to an allowlist' do
+    with_env KEYGEN_ALLOWED_PRIVATE_ADDRESSES: '10.0.0.0/8, fd00::/8' do
+      context 'with a host resolving to an allowed private range' do
+        let(:url) { 'https://webhooks.example' }
+
+        before { stub_resolv!('webhooks.example', '10.1.2.3') }
+
+        it { is_expected.to be_valid }
+      end
+
+      context 'with a host resolving to an allowed private IPv6 range' do
+        let(:url) { 'https://webhooks.example' }
+
+        before { stub_resolv!('webhooks.example', 'fd00::1') }
+
+        it { is_expected.to be_valid }
+      end
+
+      context 'with a host resolving to a private range outside the allowlist' do
+        let(:url) { 'https://webhooks.example' }
+
+        before { stub_resolv!('webhooks.example', '192.168.1.1') }
+
+        it { is_expected.to_not be_valid }
+      end
+
+      context 'with a host resolving to a public address' do
+        let(:url) { 'https://webhooks.example' }
+
+        before { stub_resolv!('webhooks.example', '93.184.215.14') }
+
+        it { is_expected.to be_valid }
+      end
+
+      context 'with a mix of allowed and disallowed private addresses' do
+        let(:url) { 'https://webhooks.example' }
+
+        before { stub_resolv!('webhooks.example', '10.1.2.3', '192.168.1.1') }
+
+        it { is_expected.to_not be_valid }
+      end
+    end
+
+    context 'with a malformed allowlist entry' do
+      with_env KEYGEN_ALLOWED_PRIVATE_ADDRESSES: 'not-a-cidr' do
+        let(:url) { 'https://webhooks.example' }
+
+        before { stub_resolv!('webhooks.example', '93.184.215.14') }
 
         it { is_expected.to_not be_valid }
       end
