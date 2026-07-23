@@ -172,6 +172,14 @@ class WebhookWorker < BaseWorker
     end
 
     Keygen.logger.info "[webhook_worker] Delivered webhook event: type=#{event_type.event} account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=#{res.code}"
+  rescue HTTParty::RedirectionTooDeep => e
+    Keygen.logger.warn "[webhook_worker] Failed webhook event: type=#{event_type.event} account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=REDIRECT_ERROR"
+
+    event.update!(
+      last_response_code: e.response.code,
+      last_response_body: 'REDIRECT_ERROR',
+      status: 'FAILED',
+    )
   rescue OpenSSL::SSL::SSLError # Endpoint's SSL certificate is not showing as valid
     Keygen.logger.warn "[webhook_worker] Failed webhook event: type=#{event_type.event} account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=SSL_ERROR"
 
@@ -251,5 +259,7 @@ class WebhookWorker < BaseWorker
 
   class Request
     include HTTParty
+
+    no_follow true
   end
 end
