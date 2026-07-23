@@ -124,11 +124,11 @@ describe UrlValidator do
         else
           it { is_expected.to_not be_valid }
 
-          it 'should add a host_private error' do
+          it 'should add an invalid address error' do
             subject.validate
 
             expect(subject.errors.details[:url]).to include(
-              hash_including(error: :host_private),
+              hash_including(error: :address_invalid),
             )
           end
         end

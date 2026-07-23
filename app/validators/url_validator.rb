@@ -32,7 +32,7 @@ class UrlValidator < ActiveModel::EachValidator
 
     record.errors.add attribute, :protocol_invalid, message: "must be a valid URL using one of the following protocols: #{protocols.join(", ")}" unless valid_protocol?(uri)
     record.errors.add attribute, :host_invalid, message: 'must be a URL with a valid host' unless valid_host?(uri)
-    record.errors.add attribute, :host_private, message: 'must not resolve to a private address' unless public_host?(uri)
+    record.errors.add attribute, :address_invalid, message: 'must resolve to a public address' unless public_address?(uri)
   rescue URI::InvalidURIError,
          URI::InvalidComponentError,
          URI::BadURIError
@@ -73,7 +73,7 @@ class UrlValidator < ActiveModel::EachValidator
     end
   end
 
-  def public_host?(uri)
+  def public_address?(uri)
     addrs = Resolv.getaddresses(uri.host)
     return false if
       addrs.empty?
