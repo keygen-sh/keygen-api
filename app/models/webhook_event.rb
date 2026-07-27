@@ -16,8 +16,6 @@ class WebhookEvent < ApplicationRecord
   has_environment
   has_account
 
-  validates :endpoint, url: true, presence: true
-
   validates :api_version,
     allow_nil: true,
     inclusion: {
