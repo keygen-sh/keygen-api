@@ -74,6 +74,9 @@ class UrlValidator < ActiveModel::EachValidator
   end
 
   def valid_address?(uri)
+    return false if
+      uri.nil? || uri.host.nil?
+
     addrs = Resolv.getaddresses(uri.host)
     return false if
       addrs.empty?
