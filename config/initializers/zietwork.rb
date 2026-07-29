@@ -11,6 +11,8 @@ Rails.autoloaders.each do |autoloader|
     autoloader.do_not_eager_load(
       Rails.root.join('app/models/clickhouse_record.rb'),
       Rails.root.join('app/models/clickhouse'),
+      # FIXME(ezekg) https://github.com/fxn/zeitwerk/issues/337
+      *Rails.root.glob('app/models/clickhouse/**/*'),
     )
   end
 

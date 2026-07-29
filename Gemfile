@@ -4,10 +4,6 @@ source 'https://rubygems.org'
 ruby '3.4.9'
 
 gem 'rails', '~> 8.1.3.1'
-# FIXME(ezekg) zeitwerk >= 2.8 ignores do_not_eager_load() for collapsed directories,
-#              causing our clickhouse models to be eager loaded in environments
-#              without clickhouse (see config/initializers/zietwork.rb)
-gem 'zeitwerk', '2.7.3'
 gem 'pg', '~> 1.3.4'
 gem 'puma', '~> 6.6'
 gem 'bcrypt', '3.1.17'
