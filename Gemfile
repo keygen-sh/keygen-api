@@ -72,6 +72,8 @@ gem 'rails-pattern_matching'
 
 # Background jobs
 gem 'sidekiq', '~> 7.3'
+# FIXME(ezekg) connection_pool v3 breaks sidekiq v7's scheduler
+gem 'connection_pool', '< 3'
 gem 'sidekiq-cron', '~> 1.12.0'
 gem 'sidekiq-cronitor', '~> 3.8.0'
 
