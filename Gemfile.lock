@@ -304,7 +304,7 @@ GEM
     minitest (6.0.6)
       drb (~> 2.0)
       prism (~> 1.5)
-    msgpack (1.7.2)
+    msgpack (1.8.4)
     multi_json (1.15.0)
     multi_test (1.1.0)
     multi_xml (0.7.1)
@@ -549,7 +549,7 @@ DEPENDENCIES
   lograge
   memory_profiler
   minitar
-  msgpack (~> 1.7)
+  msgpack (>= 1.8.2)
   nokogiri (~> 1.16.5)
   null_association
   oj

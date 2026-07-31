@@ -32,7 +32,7 @@ gem 'json', '~> 2.3.0'
 gem 'jsonapi-rails', '0.4.0'
 gem 'oj'
 gem 'nokogiri', '~> 1.16.5'
-gem 'msgpack', '~> 1.7'
+gem 'msgpack', '>= 1.8.2'
 
 # Templates
 gem 'erb', '~> 6.0.1.1'
