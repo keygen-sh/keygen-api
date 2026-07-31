@@ -15,6 +15,8 @@ end
 gem 'rack-cors'
 gem 'uri', '>= 0.12.2'
 gem 'ostruct'
+# FIXME(ezekg) https://github.com/fxn/zeitwerk/issues/337
+gem 'zeitwerk', '~> 2.7.3'
 
 # Redis for caching and background jobs
 gem 'redis', '~> 4.7.1'
