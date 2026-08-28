@@ -84,6 +84,32 @@ Feature: Event spark analytics
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
 
+  Scenario: Admin retrieves event spark series without an event
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And time is frozen at "2100-08-30T00:00:00.000Z"
+    And the current account has the following "event_spark" rows:
+      | event           | count | created_date | created_at           |
+      | license.created | 10    | 2100-08-23   | 2100-08-23T00:00:00Z |
+      | license.created | 5     | 2100-08-24   | 2100-08-24T00:00:00Z |
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/analytics/sparks/events"
+    Then the response status should be "400"
+    And the response body should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "is invalid",
+        "source": {
+          "parameter": "event"
+        }
+      }
+      """
+    And sidekiq should have 0 "request-log" jobs
+    And sidekiq should have 0 "event-log" jobs
+    And time is unfrozen
+
   Scenario: Admin retrieves event spark series with start date too old
     Given I am an admin of account "test1"
     And the current account is "test1"

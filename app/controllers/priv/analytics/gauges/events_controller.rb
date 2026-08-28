@@ -19,6 +19,11 @@ module Priv::Analytics::Gauges
         render_bad_request *gauge.errors.as_jsonapi(
           title: 'Bad request',
           source: :parameter,
+          sources: {
+            parameters: {
+              metrics: 'event',
+            },
+          },
         )
 
         return

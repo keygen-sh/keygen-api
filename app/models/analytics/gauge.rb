@@ -24,6 +24,10 @@ module Analytics
 
     validates :account, presence: true
 
+    validate do
+      errors.add :metrics, 'is invalid' if metrics.empty?
+    end
+
     def initialize(metric, **options)
       @counter_name = metric = metric.to_s.underscore.to_sym
 

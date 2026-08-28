@@ -89,6 +89,33 @@ Feature: Event gauge analytics
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
 
+  Scenario: Admin retrieves event gauge without an event
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has the following "license" rows:
+      | id                                   | name      |
+      | df0beed9-1ab2-4097-9558-cd0adddf321a | License 1 |
+    And the current account has the following "event_log" rows:
+      | id                                   | event           | resource_type | resource_id                          |
+      | d00998f9-d224-4ee7-ac4e-f1e5fe318ff7 | license.created | License       | df0beed9-1ab2-4097-9558-cd0adddf321a |
+      | 96faacd6-16e6-4661-8e16-9e8064fbeb0a | license.created | License       | df0beed9-1ab2-4097-9558-cd0adddf321a |
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/analytics/gauges/events"
+    Then the response status should be "400"
+    And the response body should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "is invalid",
+        "source": {
+          "parameter": "event"
+        }
+      }
+      """
+    And sidekiq should have 0 "request-log" jobs
+    And sidekiq should have 0 "event-log" jobs
+
   Scenario: Admin retrieves event gauge for isolated environment
     Given the current account is "test1"
     And the current account has the following "environment" rows:
