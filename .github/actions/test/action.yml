@@ -12,6 +12,7 @@ runs:
       with:
         ruby-version: '3.4.9'
         bundler-cache: true
+        cache-version: 1
     - name: Setup
       shell: bash
       run: bundle exec rake test:setup
