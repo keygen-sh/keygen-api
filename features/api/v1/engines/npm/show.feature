@@ -24,6 +24,8 @@ Feature: npm package metadata
       | 9baf459d-1bfe-429e-884e-926597b1d32f | cad3c65c-b6a5-4b3d-bce6-c2280953b8b8 | npm    | @test/qux | 2024-10-06T01:23:45.000Z | 2024-10-06T01:23:45.000Z |
       | 5666d47e-936e-4d48-8dd7-382d32462b4e | 6198261a-48b5-4445-a045-9fed4afc7735 | raw    | quxx      | 2024-10-07T01:23:45.000Z | 2024-10-07T01:23:45.000Z |
       | 3d771f82-a0ed-48fd-914a-f5ecda9b4044 | 6727d2a2-626c-4270-880c-3f7f378ea37a | npm    | corge     | 2024-10-08T01:23:45.000Z | 2024-10-08T01:23:45.000Z |
+      | 4c9f5efc-3b1c-4423-a071-a17f9dc239a1 | cad3c65c-b6a5-4b3d-bce6-c2280953b8b8 | npm    | garply    | 2024-10-09T01:23:45.000Z | 2024-10-09T01:23:45.000Z |
+      | 6f2acdbc-8f4a-4d9e-b0f4-6f4f4c2a9e51 | cad3c65c-b6a5-4b3d-bce6-c2280953b8b8 | npm    | waldo     | 2024-10-10T01:23:45.000Z | 2024-10-10T01:23:45.000Z |
     And the current account has the following "release" rows:
       | id                                   | product_id                           | release_package_id                   | version      | channel  | tag    | status    | entitlements |
       | 757e0a41-835e-42ad-bad8-84cabd29c72a | 6198261a-48b5-4445-a045-9fed4afc7735 | 46e034fe-2312-40f8-bbeb-7d9957fb6fcf | 1.0.0        | stable   |        | PUBLISHED |              |
@@ -40,6 +42,8 @@ Feature: npm package metadata
       | d1bb5fca-0afc-4464-b321-4bd45cca8c7a | 6198261a-48b5-4445-a045-9fed4afc7735 | 5666d47e-936e-4d48-8dd7-382d32462b4e | 1.0.0        | stable   |        | PUBLISHED |              |
       | 70c40946-4b23-408c-aa1c-fa35421ff46a | 6198261a-48b5-4445-a045-9fed4afc7735 | 5666d47e-936e-4d48-8dd7-382d32462b4e | 1.1.0        | stable   |        | PUBLISHED |              |
       | 04d3d9da-4e91-4634-9aa0-41e39a23658c | 6198261a-48b5-4445-a045-9fed4afc7735 |                                      | 0.0.1        | stable   |        | PUBLISHED |              |
+      | dcbba69d-0f68-4b3f-97ee-8a0808f81df8 | cad3c65c-b6a5-4b3d-bce6-c2280953b8b8 | 4c9f5efc-3b1c-4423-a071-a17f9dc239a1 | 1.0.0        | stable   |        | PUBLISHED |              |
+      | 9c67ee08-5aa4-4d4b-8f5e-2f0a6ae1f0d3 | cad3c65c-b6a5-4b3d-bce6-c2280953b8b8 | 6f2acdbc-8f4a-4d9e-b0f4-6f4f4c2a9e51 | 1.0.0        | stable   |        | YANKED    |              |
     And the current account has the following "artifact" rows:
       | id                                   | release_id                           | filename                  | filetype | checksum                                                                                 | status   | created_at               | updated_at               |
       | 5762c549-7f5b-4a73-9873-3acdb1213fe8 | 757e0a41-835e-42ad-bad8-84cabd29c72a | foo-1.0.0.tgz             | tgz      | ad4d7c2a5b16c146ff6514327e43958aa9b8cc8d                                                 | UPLOADED | 2024-10-01T01:42:00.000Z | 2024-10-01T01:42:00.000Z |
@@ -56,6 +60,7 @@ Feature: npm package metadata
       | e7c08c5d-0e1a-439f-8730-3cc5ed8399b9 | d1bb5fca-0afc-4464-b321-4bd45cca8c7a | quxx-1.0.0.tgz            | tgz      | 7f5fce1ecd30ec0b65dc5d9ee8768c0980421c3f                                                 | FAILED   | 2024-10-12T01:42:00.000Z | 2024-10-12T01:42:00.000Z |
       | 5acc0c22-0b7e-43f5-8168-8d341cccbaa6 | 70c40946-4b23-408c-aa1c-fa35421ff46a | quxx-1.1.0.tgz            | tgz      | b92b806b08a8dd817ae6205b52759fc57c4dff19                                                 | UPLOADED | 2024-10-13T01:42:00.000Z | 2024-10-13T01:42:00.000Z |
       | 22af171a-be06-47b1-bec3-3b2f8974990a | 04d3d9da-4e91-4634-9aa0-41e39a23658c | corge-1.1.0.tgz           | tgz      |                                                                                          | UPLOADED | 2024-10-14T01:42:00.000Z | 2024-10-14T01:42:00.000Z |
+      | 48a52926-005c-46bd-8004-6c69e4d51ada | 9c67ee08-5aa4-4d4b-8f5e-2f0a6ae1f0d3 | waldo-1.0.0.tgz           | tgz      |                                                                                          | UPLOADED | 2024-10-15T01:42:00.000Z | 2024-10-15T01:42:00.000Z |
     And the current account has the following "manifest" rows:
       | release_artifact_id                  | release_id                           | content                                                                                                                                                                                                                                                               |
       | 5762c549-7f5b-4a73-9873-3acdb1213fe8 | 757e0a41-835e-42ad-bad8-84cabd29c72a | {"name":"foo","version":"1.0.0","description":"A basic mock package for testing","main":"index.js","author":"Test Author","license":"MIT","dependencies":{"lodash":"^4.17.21"},"scripts":{"start":"node index.js"}}                                                   |
@@ -69,6 +74,7 @@ Feature: npm package metadata
       | df4474cb-2a7b-4f75-8f27-2b99320e0164 | 00c9c981-8a75-494b-9207-71a829665729 | {"name":"qux","version":"1.0.0","description":"A simple package with minimal setup","main":"main.js","author":"Jane Doe","license":"BSD-2-Clause"}                                                                                                                    |
       | 200ef3e5-00f2-4eed-92fd-8f41cd19e8ed | 34c126d5-1a1f-4571-acfb-77ca33e8ddd0 | {"name":"@test/qux","version":"1.0.0","description":"A scoped package with dependencies","main":"dist/index.js","author":"Beta Tester","license":"MIT","dependencies":{"axios":"^0.21.1"},"scripts":{"build":"webpack --config webpack.config.js"}}                   |
       | 22af171a-be06-47b1-bec3-3b2f8974990a | 04d3d9da-4e91-4634-9aa0-41e39a23658c | {"name":"corge","version":"1.0.0","description":"A package with both peer and dev dependencies","main":"src/app.js","author":"John Smith","license":"MIT","peerDependencies":{"vue":"^3.0.0"},"devDependencies":{"rollup":"^2.52.7"},"scripts":{"build":"rollup -c"}} |
+      | 48a52926-005c-46bd-8004-6c69e4d51ada | 9c67ee08-5aa4-4d4b-8f5e-2f0a6ae1f0d3 | {"name":"waldo","version":"1.0.0","description":"A yanked package","main":"index.js","author":"Test Author","license":"MIT"}                                                                                                                                          |
     And I send the following raw headers:
       """
       User-Agent: npm/10.8.1 node/v22.3.0 linux x64 workspaces/false
@@ -339,6 +345,12 @@ Feature: npm package metadata
     Given I am an admin of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/engines/npm/@test/baz"
+    Then the response status should be "404"
+
+  Scenario: Endpoint should return an error for a package without any artifacts
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/engines/npm/garply"
     Then the response status should be "404"
 
   Scenario: Endpoint should return an error for a package that doesn't exist
@@ -1324,6 +1336,10 @@ Feature: npm package metadata
 
   Scenario: Anon retrieves a licensed package
     When I send a GET request to "/accounts/test1/engines/npm/foo"
+    Then the response status should be "404"
+
+  Scenario: Anon retrieves an open package without any accessible versions
+    When I send a GET request to "/accounts/test1/engines/npm/waldo"
     Then the response status should be "404"
 
   Scenario: Anon retrieves an open package

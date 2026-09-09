@@ -20,7 +20,7 @@ module Api::V1::ReleaseEngines
 
       # FIXME(ezekg) https://github.com/brianhempel/active_record_union/issues/35
       last_modified = artifacts.collect(&:updated_at).max
-      latest        = artifacts.first
+      latest        = artifacts.first! # bearer authz scope may be empty e.g. a sole yanked artifact
       metadata      = artifacts.reduce(
         name: package.key,
         time: { created: package.created_at, modified: last_modified },
