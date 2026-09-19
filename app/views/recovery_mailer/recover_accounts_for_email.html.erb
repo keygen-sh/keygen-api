@@ -12,12 +12,12 @@
       <br>
       <span>
         <strong>Recover:</strong>
-        <a href="https://app.keygen.sh/recover/password?account=<%= user.account.slug %>&email=<%= user.email %>">click here</a>
+        <a href="https://beta.portal.keygen.sh/<%= user.account.id %>/auth/forgot?email=<%= user.email %>">click here</a>
       </span>
       <br>
       <span>
         <strong>Login:</strong>
-        <a href="https://app.keygen.sh/login?account=<%= user.account.slug %>">click here</a>
+        <a href="https://beta.portal.keygen.sh/<%= user.account.id %>/auth/login">click here</a>
       </span>
     </li>
   <% end %>

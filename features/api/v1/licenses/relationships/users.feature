@@ -1185,7 +1185,7 @@ Feature: License users relationship
       """
       {
         "title": "Unprocessable resource",
-        "detail": "Your tier's active licensed user limit of 50 has been reached for your account. Please upgrade to a paid tier and add a payment method at https://app.keygen.sh/billing.",
+        "detail": "Your tier's active licensed user limit of 50 has been reached for your account. Please upgrade to a paid tier and add a payment method at https://beta.portal.keygen.sh/goto/billing.",
         "code": "ACCOUNT_ALU_LIMIT_EXCEEDED",
         "source": {
           "pointer": "/data/relationships/account"
