@@ -127,6 +127,24 @@ class ReleaseArtifact < ApplicationRecord
       maximum_keys: 64,
     }
 
+  scope :search_id, -> (term) {
+    identifier = term.to_s
+    return none if
+      identifier.empty?
+
+    return where(id: identifier) if
+      UUID_RE.match?(identifier)
+
+    where('release_artifacts.id::text ILIKE ?', "%#{sanitize_sql_like(identifier)}%")
+  }
+
+  scope :search_filename, -> (term) {
+    return none if
+      term.blank?
+
+    where('release_artifacts.filename ILIKE ?', "%#{sanitize_sql_like(term)}%")
+  }
+
   scope :order_by_version, -> (order = :desc) {
     sql = case order
           in :desc

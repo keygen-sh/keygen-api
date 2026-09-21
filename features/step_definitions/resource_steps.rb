@@ -307,6 +307,10 @@ Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:with|for|in) (
         @account.release_packages
       when 'engines'
         @account.release_engines
+      when 'platforms'
+        @account.release_platforms
+      when 'arches'
+        @account.release_arches
       else
         @account.send(assoc_name.pluralize.underscore)
       end
@@ -691,6 +695,10 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "(
       @account.release_artifacts.send(named_idx)
     when "package"
       @account.release_packages.send(named_idx)
+    when "platform"
+      @account.release_platforms.send(named_idx)
+    when "arch"
+      @account.release_arches.send(named_idx)
     else
       @account.send(resource.pluralize.underscore).send(named_idx)
     end

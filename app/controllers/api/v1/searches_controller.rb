@@ -19,8 +19,18 @@ module Api::V1
       'Machine',
       'User',
       'Release',
+      'ReleasePackage',
+      'ReleaseArtifact',
+      'ReleaseArch',
+      'ReleasePlatform',
       'Group',
     ].freeze
+    SEARCH_MAPPING        = {
+      'packages'  => 'ReleasePackage',
+      'artifacts' => 'ReleaseArtifact',
+      'arches'    => 'ReleaseArch',
+      'platforms' => 'ReleasePlatform',
+    }.freeze
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
@@ -38,10 +48,7 @@ module Api::V1
     def search
       query, type = search_meta.fetch_values(:query, :type)
       op          = search_meta.fetch(:op) { :and }.to_s.upcase.to_sym
-      model       = type.underscore.classify.safe_constantize
-
-      raise UnsupportedSearchTypeError if
-        model.nil?
+      model_name  = SEARCH_MAPPING.fetch(type.underscore.pluralize) { type.underscore.classify }
 
       raise EmptyQueryError if
         query.empty?
@@ -50,7 +57,12 @@ module Api::V1
         SEARCH_OPS.include?(op)
 
       raise UnsupportedSearchTypeError unless
-        SEARCH_MODELS.include?(model.name)
+        SEARCH_MODELS.include?(model_name)
+
+      model = model_name.safe_constantize
+
+      raise UnsupportedSearchTypeError if
+        model.nil?
 
       raise UnsupportedSearchTypeError unless
         model < Accountable

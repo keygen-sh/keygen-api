@@ -34,6 +34,31 @@ class ReleaseArch < ApplicationRecord
 
   before_create -> { self.key = key&.downcase&.strip }
 
+  scope :search_id, -> (term) {
+    identifier = term.to_s
+    return none if
+      identifier.empty?
+
+    return where(id: identifier) if
+      UUID_RE.match?(identifier)
+
+    where('release_arches.id::text ILIKE ?', "%#{sanitize_sql_like(identifier)}%")
+  }
+
+  scope :search_key, -> (term) {
+    return none if
+      term.blank?
+
+    where('release_arches.key ILIKE ?', "%#{sanitize_sql_like(term)}%")
+  }
+
+  scope :search_name, -> (term) {
+    return none if
+      term.blank?
+
+    where('release_arches.name ILIKE ?', "%#{sanitize_sql_like(term)}%")
+  }
+
   scope :for_environment, -> environment, strict: environment.nil? {
     joins(:artifacts)
       .reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER)

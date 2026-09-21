@@ -65,6 +65,31 @@ class ReleasePackage < ApplicationRecord
       maximum_keys: 64,
     }
 
+  scope :search_id, -> (term) {
+    identifier = term.to_s
+    return none if
+      identifier.empty?
+
+    return where(id: identifier) if
+      UUID_RE.match?(identifier)
+
+    where('release_packages.id::text ILIKE ?', "%#{sanitize_sql_like(identifier)}%")
+  }
+
+  scope :search_key, -> (term) {
+    return none if
+      term.blank?
+
+    where('release_packages.key ILIKE ?', "%#{sanitize_sql_like(term)}%")
+  }
+
+  scope :search_name, -> (term) {
+    return none if
+      term.blank?
+
+    where('release_packages.name ILIKE ?', "%#{sanitize_sql_like(term)}%")
+  }
+
   scope :for_product, -> id {
     joins(:product).where(product: { id: })
   }

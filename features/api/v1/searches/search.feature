@@ -2269,6 +2269,463 @@ Feature: Search
     And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  Scenario: Admin performs a search by package type on ID (full)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "packages"
+    And the first "package" has the following attributes:
+      """
+      { "id": "e1fbdc0e-ff25-490b-a92f-93880a21723b" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "packages",
+          "query": {
+            "id": "e1fbdc0e-ff25-490b-a92f-93880a21723b"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 1 "package"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "event-log" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by package type on ID (partial)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "packages"
+    And the first "package" has the following attributes:
+      """
+      { "id": "e1fbdc0e-ff25-490b-a92f-93880a21723b" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "packages",
+          "query": {
+            "id": "e1fbdc0e"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 1 "package"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "event-log" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by package type on key
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "packages"
+    And the first "package" has the following attributes:
+      """
+      { "key": "acme-cli" }
+      """
+    And the second "package" has the following attributes:
+      """
+      { "key": "foo-cli" }
+      """
+    And the third "package" has the following attributes:
+      """
+      { "key": "acme-app" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "packages",
+          "query": {
+            "key": "acme"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 2 "packages"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "event-log" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by package type on name
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "packages"
+    And the first "package" has the following attributes:
+      """
+      { "name": "ACME CLI" }
+      """
+    And the second "package" has the following attributes:
+      """
+      { "name": "Foo CLI" }
+      """
+    And the third "package" has the following attributes:
+      """
+      { "name": "ACME App" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "packages",
+          "query": {
+            "name": "ACME"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 2 "packages"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "event-log" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by artifact type on ID (full)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "release"
+    And the current account has 5 "artifacts" for the last "release"
+    And the first "artifact" has the following attributes:
+      """
+      { "id": "e1fbdc0e-ff25-490b-a92f-93880a21723b" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "artifacts",
+          "query": {
+            "id": "e1fbdc0e-ff25-490b-a92f-93880a21723b"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 1 "artifact"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "event-log" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by artifact type on ID (partial)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "release"
+    And the current account has 5 "artifacts" for the last "release"
+    And the first "artifact" has the following attributes:
+      """
+      { "id": "e1fbdc0e-ff25-490b-a92f-93880a21723b" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "artifacts",
+          "query": {
+            "id": "e1fbdc0e"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 1 "artifact"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "event-log" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by artifact type on filename
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "release"
+    And the current account has 5 "artifacts" for the last "release"
+    And the first "artifact" has the following attributes:
+      """
+      { "filename": "acme-1.0.0.zip" }
+      """
+    And the second "artifact" has the following attributes:
+      """
+      { "filename": "foo-1.0.0.zip" }
+      """
+    And the third "artifact" has the following attributes:
+      """
+      { "filename": "acme-1.0.0.tar.gz" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "artifacts",
+          "query": {
+            "filename": "acme"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 2 "artifacts"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "event-log" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by arch type on ID (full)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "arches"
+    And the first "arch" has the following attributes:
+      """
+      { "id": "e1fbdc0e-ff25-490b-a92f-93880a21723b" }
+      """
+    And the current account has 1 "artifact" for each "arch"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "arches",
+          "query": {
+            "id": "e1fbdc0e-ff25-490b-a92f-93880a21723b"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 1 "arch"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "event-log" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by arch type on ID (partial)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "arches"
+    And the first "arch" has the following attributes:
+      """
+      { "id": "e1fbdc0e-ff25-490b-a92f-93880a21723b" }
+      """
+    And the current account has 1 "artifact" for each "arch"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "arches",
+          "query": {
+            "id": "e1fbdc0e"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 1 "arch"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "event-log" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by arch type on key
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "arches"
+    And the current account has 1 "artifact" for each "arch"
+    And the first "arch" has the following attributes:
+      """
+      { "key": "acme-1" }
+      """
+    And the second "arch" has the following attributes:
+      """
+      { "key": "foo-1" }
+      """
+    And the third "arch" has the following attributes:
+      """
+      { "key": "acme-2" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "arches",
+          "query": {
+            "key": "acme"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 2 "arches"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "event-log" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by arch type on name
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "arches"
+    And the current account has 1 "artifact" for each "arch"
+    And the first "arch" has the following attributes:
+      """
+      { "name": "ACME 1" }
+      """
+    And the second "arch" has the following attributes:
+      """
+      { "name": "Foo 1" }
+      """
+    And the third "arch" has the following attributes:
+      """
+      { "name": "ACME 2" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "arches",
+          "query": {
+            "name": "ACME"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 2 "arches"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "event-log" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by platform type on ID (full)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "platforms"
+    And the first "platform" has the following attributes:
+      """
+      { "id": "e1fbdc0e-ff25-490b-a92f-93880a21723b" }
+      """
+    And the current account has 1 "artifact" for each "platform"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "platforms",
+          "query": {
+            "id": "e1fbdc0e-ff25-490b-a92f-93880a21723b"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 1 "platform"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "event-log" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by platform type on ID (partial)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "platforms"
+    And the first "platform" has the following attributes:
+      """
+      { "id": "e1fbdc0e-ff25-490b-a92f-93880a21723b" }
+      """
+    And the current account has 1 "artifact" for each "platform"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "platforms",
+          "query": {
+            "id": "e1fbdc0e"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 1 "platform"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "event-log" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by platform type on key
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "platforms"
+    And the current account has 1 "artifact" for each "platform"
+    And the first "platform" has the following attributes:
+      """
+      { "key": "acme-1" }
+      """
+    And the second "platform" has the following attributes:
+      """
+      { "key": "foo-1" }
+      """
+    And the third "platform" has the following attributes:
+      """
+      { "key": "acme-2" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "platforms",
+          "query": {
+            "key": "acme"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 2 "platforms"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "event-log" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by platform type on name
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "platforms"
+    And the current account has 1 "artifact" for each "platform"
+    And the first "platform" has the following attributes:
+      """
+      { "name": "ACME 1" }
+      """
+    And the second "platform" has the following attributes:
+      """
+      { "name": "Foo 1" }
+      """
+    And the third "platform" has the following attributes:
+      """
+      { "name": "ACME 2" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "platforms",
+          "query": {
+            "name": "ACME"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 2 "platforms"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "event-log" jobs
+    And sidekiq should have 0 "request-log" jobs
+
   Scenario: Admin performs a search by group type on ID (full)
     Given I am an admin of account "test1"
     And the current account is "test1"
