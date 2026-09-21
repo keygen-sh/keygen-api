@@ -2269,6 +2269,58 @@ Feature: Search
     And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  Scenario: Admin performs a search by group type on ID (full)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "groups"
+    And the first "group" has the following attributes:
+      """
+      { "id": "e1fbdc0e-ff25-490b-a92f-93880a21723b" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "groups",
+          "query": {
+            "id": "e1fbdc0e-ff25-490b-a92f-93880a21723b"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 1 "group"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "event-log" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by group type on ID (partial)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "groups"
+    And the first "group" has the following attributes:
+      """
+      { "id": "e1fbdc0e-ff25-490b-a92f-93880a21723b" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "groups",
+          "query": {
+            "id": "e1fbdc0e"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 1 "group"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "event-log" jobs
+    And sidekiq should have 0 "request-log" jobs
+
   Scenario: Admin performs a search by group type on name
     Given I am an admin of account "test1"
     And the current account is "test1"

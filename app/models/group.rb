@@ -56,7 +56,18 @@ class Group < ApplicationRecord
     joins(:machines).where(machines: { id: m })
   }
 
-  scope :search_name, -> term {
+  scope :search_id, -> (term) {
+    identifier = term.to_s
+    return none if
+      identifier.empty?
+
+    return where(id: identifier) if
+      UUID_RE.match?(identifier)
+
+    where('groups.id::text ILIKE ?', "%#{sanitize_sql_like(identifier)}%")
+  }
+
+  scope :search_name, -> (term) {
     return none if
       term.blank?
 
