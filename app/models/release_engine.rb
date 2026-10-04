@@ -14,6 +14,7 @@ class ReleaseEngine < ApplicationRecord
     rubygems
     npm
     oci
+    electron
   ]
 
   has_many :packages,
@@ -118,6 +119,7 @@ class ReleaseEngine < ApplicationRecord
   def rubygems? = key == 'rubygems'
   def npm?      = key == 'npm'
   def oci?      = key == 'oci'
+  def electron? = key == 'electron'
 
   ##
   # deconstruct allows pattern pattern matching like:
