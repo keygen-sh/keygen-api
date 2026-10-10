@@ -4,6 +4,14 @@ require 'rails_helper'
 require 'spec_helper'
 
 describe LicenseCheckoutService do
+  within_ce do
+    it_behaves_like 'a duration-aware checkout', :license
+  end
+
+  within_ee do
+    it_behaves_like 'a duration-aware checkout', :license
+  end
+
   let(:account) { create(:account) }
   let(:license) { create(:license, account: account) }
 

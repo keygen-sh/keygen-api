@@ -80,6 +80,11 @@ class Policy < ApplicationRecord
     FROM_FIRST_USE
   ].freeze
 
+  DURATION_STRATEGIES = %w[
+    CALENDAR
+    SECONDS
+  ].freeze
+
   RENEWAL_BASES = %w[
     FROM_EXPIRY
     FROM_NOW
@@ -166,6 +171,7 @@ class Policy < ApplicationRecord
   before_create -> { self.component_matching_strategy = 'MATCH_ANY' }, if: -> { component_matching_strategy.nil? }
   before_create -> { self.expiration_strategy = 'RESTRICT_ACCESS' }, if: -> { expiration_strategy.nil? }
   before_create -> { self.expiration_basis = 'FROM_CREATION' }, if: -> { expiration_basis.nil? }
+  before_create -> { self.duration_strategy = 'CALENDAR' }, if: -> { duration_strategy.nil? }
   before_create -> { self.renewal_basis = 'FROM_EXPIRY' }, if: -> { renewal_basis.nil? }
   before_create -> { self.transfer_strategy = 'KEEP_EXPIRY' }, if: -> { transfer_strategy.nil? }
   before_create -> { self.authentication_strategy = 'TOKEN' }, if: -> { authentication_strategy.nil? }
@@ -203,6 +209,7 @@ class Policy < ApplicationRecord
   validates :component_matching_strategy, inclusion: { in: COMPONENT_MATCHING_STRATEGIES, message: "unsupported component matching strategy" }, allow_nil: true
   validates :expiration_strategy, inclusion: { in: EXPIRATION_STRATEGIES, message: "unsupported expiration strategy" }, allow_nil: true
   validates :expiration_basis, inclusion: { in: EXPIRATION_BASES, message: "unsupported expiration basis" }, allow_nil: true
+  validates :duration_strategy, inclusion: { in: DURATION_STRATEGIES, message: "unsupported duration strategy" }, allow_nil: true
   validates :renewal_basis, inclusion: { in: RENEWAL_BASES, message: "unsupported renewal basis" }, allow_nil: true
 
   validates :metadata,
@@ -570,6 +577,18 @@ class Policy < ApplicationRecord
       expiration_basis.nil?
 
     expiration_basis == 'FROM_CREATION'
+  end
+
+  # Existing policies (including those with a nil strategy) retain calendar arithmetic.
+  # Use the same strategy for license durations and offline certificate TTLs.
+  def duration_for(value = duration)
+    if duration_strategy == 'SECONDS'
+      value = value.value if ActiveSupport::Duration === value
+
+      ActiveSupport::Duration.seconds(value)
+    else
+      ActiveSupport::Duration.build(value)
+    end
   end
 
   def expire_from_first_validation?
