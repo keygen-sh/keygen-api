@@ -11,6 +11,171 @@ describe License, type: :model do
   it_behaves_like :encryptable
   it_behaves_like :dirtyable
 
+  describe 'duration strategy' do
+    shared_examples 'duration-aware license expiry' do
+      let(:duration) { 90 * 86_400 }
+      let(:start) { Time.utc(2026, 10, 9) }
+      let(:policy) { create(:policy, account:, duration:, duration_strategy:, expiration_basis:) }
+      let(:expiration_basis) { 'FROM_CREATION' }
+
+      around { |example| travel_to(start) { example.run } }
+
+      {
+        nil => Time.utc(2027, 1, 7, 3, 1, 48),
+        'CALENDAR' => Time.utc(2027, 1, 7, 3, 1, 48),
+        'SECONDS' => Time.utc(2027, 1, 7),
+      }.each do |strategy, expected|
+        context "with #{strategy || 'legacy'} durations" do
+          let(:duration_strategy) { strategy }
+
+          # Simulate policies created before the strategy column existed.
+          before { policy.update_column(:duration_strategy, nil) } if strategy.nil?
+
+          it 'should calculate expiry on creation' do
+            license = create(:license, account:, policy:)
+
+            expect(license.reload.expiry).to eq expected
+          end
+
+          {
+            'FROM_FIRST_VALIDATION' => 'license.validation.succeeded',
+            'FROM_FIRST_ACTIVATION' => 'machine.created',
+            'FROM_FIRST_USE' => 'license.usage.incremented',
+            'FROM_FIRST_DOWNLOAD' => 'release.downloaded',
+          }.each do |basis, event|
+            context "when expiring #{basis}" do
+              let(:expiration_basis) { basis }
+
+              it 'should leave expiry unset for an unrelated event' do
+                license = create(:license, account:, policy:)
+
+                license.notify!('license.created')
+
+                expect(license.reload.expiry).to be_nil
+              end
+
+              it 'should calculate expiry from the first matching event after a delay' do
+                license      = create(:license, account:, policy:)
+                event_expiry = strategy == 'SECONDS' ? Time.utc(2027, 5, 1) : Time.utc(2027, 4, 29, 3, 1, 48)
+
+                expect(license.expiry).to be_nil
+
+                # Moving to month end also distinguishes calendar arithmetic from seconds.
+                travel_to Time.utc(2027, 1, 31)
+                license.notify!(event)
+
+                expect(license.reload.expiry).to eq event_expiry
+
+                travel 1.day
+                license.notify!(event)
+
+                expect(license.reload.expiry).to eq event_expiry
+              end
+
+              it 'should preserve an explicitly assigned expiry' do
+                license = create(:license, account:, policy:, expiry: start + 10 * 86_400)
+
+                license.notify!(event)
+
+                expect(license.reload.expiry).to eq start + 10 * 86_400
+              end
+            end
+          end
+
+          %w[FROM_EXPIRY FROM_NOW FROM_NOW_IF_EXPIRED].each do |basis|
+            [false, true].each do |expired|
+              it "should renew #{expired ? 'expired' : 'unexpired'} licenses #{basis}" do
+                policy.update!(renewal_basis: basis)
+                expiry  = expired ? start - 10 * 86_400 : start + 10 * 86_400
+                license = create(:license, account:, policy:, expiry:)
+                base    = case basis
+                          when 'FROM_NOW' then start
+                          when 'FROM_NOW_IF_EXPIRED' then expired ? start : expiry
+                          else expiry
+                          end
+                renewed = strategy == 'SECONDS' ? base + duration : base + ActiveSupport::Duration.build(duration)
+
+                license.renew!
+
+                expect(license.reload.expiry).to eq renewed
+              end
+            end
+          end
+
+          it 'should use the destination policy strategy when resetting expiry on transfer' do
+            source_policy = create(:policy, account:, duration_strategy: strategy == 'SECONDS' ? 'CALENDAR' : 'SECONDS')
+            license       = create(:license, account:, policy: source_policy)
+            policy.update!(transfer_strategy: 'RESET_EXPIRY')
+
+            license.transfer!(policy)
+
+            expect(license.reload.expiry).to eq expected
+          end
+
+          it 'should preserve expiry when transferring without a reset' do
+            license = create(:license, account:, expiry: start + 10 * 86_400)
+
+            license.transfer!(policy)
+
+            expect(license.reload.expiry).to eq start + 10 * 86_400
+          end
+
+          it 'should preserve licenses without a duration' do
+            policy.update!(duration: nil)
+            license = create(:license, account:, policy:)
+
+            expect(license.expiry).to be_nil
+            expect(license.renew!).to be false
+            expect(license.reload.expiry).to be_nil
+          end
+        end
+      end
+
+      context 'when opting an existing policy into seconds' do
+        let(:duration_strategy) { 'CALENDAR' }
+
+        it 'should preserve stored license expiries' do
+          license = create(:license, account:, policy:)
+          expiry  = license.expiry
+
+          policy.update!(duration_strategy: 'SECONDS')
+          license.reload.save!
+
+          expect(license.reload.expiry).to eq expiry
+        end
+
+        it 'should use seconds for subsequent renewals' do
+          license = create(:license, account:, policy:)
+          expiry  = license.expiry
+
+          policy.update!(duration_strategy: 'SECONDS')
+          license.reload.renew!
+
+          expect(license.reload.expiry).to eq expiry + duration
+        end
+
+        it 'should use seconds for licenses awaiting their first activation' do
+          policy.update!(expiration_basis: 'FROM_FIRST_ACTIVATION')
+          license = create(:license, account:, policy:)
+
+          policy.update!(duration_strategy: 'SECONDS')
+          travel 121.seconds
+          license.reload.notify!('machine.created')
+
+          expect(license.reload.expiry).to eq start + 121 + duration
+        end
+      end
+    end
+
+    within_ce do
+      it_behaves_like 'duration-aware license expiry'
+    end
+
+    within_ee do
+      it_behaves_like 'duration-aware license expiry'
+    end
+  end
+
   describe '#environment=', only: :ee do
     context 'on create' do
       it 'should apply default environment matching policy' do

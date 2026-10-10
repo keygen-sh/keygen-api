@@ -56,7 +56,7 @@ class MachineCheckoutService < AbstractCheckoutService
   def call
     issued_at  = Time.current
     expires_at = if ttl?
-                   issued_at + ActiveSupport::Duration.build(ttl)
+                   issued_at + license.policy.duration_for(ttl)
                  else
                    nil
                  end
