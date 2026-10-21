@@ -399,11 +399,15 @@ class Permission < ApplicationRecord
 
     token.generate
     token.read
+    token.revoke
 
     user.password.reset
     user.password.update
     user.read
+    user.second-factors.create
+    user.second-factors.delete
     user.second-factors.read
+    user.second-factors.update
 
     webhook-endpoint.read
     webhook-event.read
