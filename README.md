@@ -167,6 +167,23 @@ To start a console, run:
 bundle exec rails console
 ```
 
+### Duration arithmetic
+
+Policies use calendar arithmetic by default. To opt a policy into exact elapsed
+seconds, set its API attribute `durationStrategy` to `SECONDS` (`CALENDAR` restores
+calendar arithmetic). This applies to license creation, first activation,
+validation, use or download, renewal, expiry-resetting transfers, and offline
+license and machine certificate TTLs. For example, a duration of `7776000` is
+exactly 90 days under `SECONDS`, regardless of the start date or daylight saving.
+
+Existing policies, including those without a strategy, retain calendar arithmetic.
+Changing a policy's strategy affects subsequent expiry calculations for licenses
+on that policy; it does not rewrite stored license expiries or issued certificates.
+Use a separate policy for new licenses if existing licenses must retain their
+renewal and checkout timing. Under `SECONDS`, the default certificate TTL is
+`2629746` elapsed seconds; pass an explicit `ttl` for a fixed number of days.
+Run `bundle exec rails db:migrate` before starting the updated API and workers.
+
 ### Testing
 
 To setup the test environment, run:

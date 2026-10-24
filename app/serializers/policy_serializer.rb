@@ -5,6 +5,7 @@ class PolicySerializer < BaseSerializer
 
   attribute :name
   attribute :duration
+  attribute :duration_strategy
   attribute :strict
   attribute :floating
   attribute :use_pool

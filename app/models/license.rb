@@ -924,7 +924,7 @@ class License < ApplicationRecord
     return false if
       expiry.nil? || policy.duration.nil?
 
-    duration = ActiveSupport::Duration.build(policy.duration)
+    duration = policy.duration_for
     now      = Time.current
 
     case
@@ -947,7 +947,7 @@ class License < ApplicationRecord
 
     if new_policy.present? && new_policy.reset_expiry_on_transfer?
       if new_policy.duration?
-        self.expiry = Time.current + ActiveSupport::Duration.build(new_policy.duration)
+        self.expiry = Time.current + new_policy.duration_for
       else
         self.expiry = nil
       end
@@ -1000,7 +1000,7 @@ class License < ApplicationRecord
       duration.present? &&
       expiry.nil?
 
-    self.expiry = Time.current + ActiveSupport::Duration.build(duration)
+    self.expiry = Time.current + policy.duration_for
   end
 
   def set_expiry_on_first_validation!
@@ -1009,7 +1009,7 @@ class License < ApplicationRecord
       duration.present? &&
       expiry.nil?
 
-    update!(expiry: Time.current + ActiveSupport::Duration.build(duration))
+    update!(expiry: Time.current + policy.duration_for)
   end
 
   def set_expiry_on_first_activation!
@@ -1018,7 +1018,7 @@ class License < ApplicationRecord
       duration.present? &&
       expiry.nil?
 
-    update!(expiry: Time.current + ActiveSupport::Duration.build(duration))
+    update!(expiry: Time.current + policy.duration_for)
   end
 
   def set_expiry_on_first_use!
@@ -1027,7 +1027,7 @@ class License < ApplicationRecord
       duration.present? &&
       expiry.nil?
 
-    update!(expiry: Time.current + ActiveSupport::Duration.build(duration))
+    update!(expiry: Time.current + policy.duration_for)
   end
 
   def set_expiry_on_first_download!
@@ -1036,7 +1036,7 @@ class License < ApplicationRecord
       duration.present? &&
       expiry.nil?
 
-    update!(expiry: Time.current + ActiveSupport::Duration.build(duration))
+    update!(expiry: Time.current + policy.duration_for)
   end
 
   def autogenerate_key
