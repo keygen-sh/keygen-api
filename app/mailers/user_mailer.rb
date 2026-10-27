@@ -11,6 +11,7 @@ class UserMailer < ApplicationMailer
     @account = @user.account
     @expiry  = @user.password_reset_sent_at + 24.hours
     @token   = [@account.id.remove('-'), @user.id.remove('-'), token].join('.')
+    @env     = "&env=#{CGI.escape(@user.environment.code)}" if @user.environment.present?
 
     subject = if @user.password?
                 "Password reset requested for your #{@account.name} account"
