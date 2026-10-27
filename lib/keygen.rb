@@ -98,14 +98,16 @@ module Keygen
     HOST   = ENV.fetch('KEYGEN_PORTAL_HOST') { "portal.#{DOMAIN}" }
     ORIGIN = "https://#{HOST}"
 
-    def self.url_for(record_or_path = nil, **)
+    def self.url_for(record_or_path = nil, host: HOST, **)
+      origin = "https://#{host}"
+
       case record_or_path
       in Account => account
-        super(ORIGIN, path: account.slug, **)
+        super(origin, path: account.slug, **)
       in String | Symbol => path
-        super(ORIGIN, path:, **)
+        super(origin, path:, **)
       else
-        super(ORIGIN, **)
+        super(origin, **)
       end
     end
   end
