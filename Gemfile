@@ -3,7 +3,7 @@
 source 'https://rubygems.org'
 ruby '3.4.12'
 
-gem 'rails', '~> 8.1.3.1'
+gem 'rails', '~> 8.1.4.1'
 gem 'pg', '~> 1.3.4'
 gem 'puma', '~> 6.6'
 gem 'bcrypt', '3.1.17'
@@ -31,7 +31,7 @@ gem 'typed_params', '~> 1.5'
 gem 'json', '~> 2.3.0'
 gem 'jsonapi-rails', '0.4.0'
 gem 'oj'
-gem 'nokogiri', '~> 1.16.5'
+gem 'nokogiri', '>= 1.19.5'
 gem 'msgpack', '>= 1.8.2'
 
 # Templates
