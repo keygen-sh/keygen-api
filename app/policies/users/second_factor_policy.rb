@@ -40,10 +40,6 @@ module Users
       verify_permissions!('user.second-factors.create')
       verify_environment!
 
-      # TODO(ezekg) Remove this and use permissions
-      deny! if
-        bearer.has_role?(:read_only)
-
       case bearer
       in role: Role(:admin)
         allow!
@@ -58,10 +54,6 @@ module Users
       verify_permissions!('user.second-factors.update')
       verify_environment!
 
-      # TODO(ezekg) Remove this and use permissions
-      deny! if
-        bearer.has_role?(:read_only)
-
       case bearer
       in role: Role(:admin)
         allow!
@@ -75,10 +67,6 @@ module Users
     def destroy?
       verify_permissions!('user.second-factors.delete')
       verify_environment!
-
-      # TODO(ezekg) Remove this and use permissions
-      deny! if
-        bearer.has_role?(:read_only)
 
       case bearer
       in role: Role(:admin)
