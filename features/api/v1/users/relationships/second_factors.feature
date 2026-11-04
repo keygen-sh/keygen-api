@@ -357,6 +357,26 @@ Feature: Manage second factors for user
     And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Read only creates a second factor while having no other second factor and providing a correct password
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "read-only"
+    And I am a read only of account "test1"
+    And I do not have 2FA
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users/$current/second-factors" with the following:
+      """
+      {
+        "meta": {
+          "password": "password"
+        }
+      }
+      """
+    Then the response status should be "201"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "event-log" job
+    And sidekiq should have 1 "request-log" job
+
   @ee
   Scenario: Environment creates a second factor for an isolated user with no other second factor and provides a correct password
     Given the current account is "test1"
@@ -737,6 +757,32 @@ Feature: Manage second factors for user
     And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Read only enables a second factor while having 2FA disabled and providing a correct OTP
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "read-only"
+    And I am a read only of account "test1"
+    And I have 2FA disabled
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/users/$current/second-factors/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "second-factors",
+          "attributes": {
+            "enabled": true
+          }
+        },
+        "meta": {
+          "otp": "$otp"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "event-log" job
+    And sidekiq should have 1 "request-log" job
+
   @ee
   Scenario: Environment attempts to enable a shared user's second factor
     Given the current account is "test1"
@@ -941,6 +987,32 @@ Feature: Manage second factors for user
     And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Read only disables a second factor while having 2FA enabled and providing a correct OTP
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "read-only"
+    And I am a read only of account "test1"
+    And I have 2FA enabled
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/users/$current/second-factors/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "second-factors",
+          "attributes": {
+            "enabled": false
+          }
+        },
+        "meta": {
+          "otp": "$otp"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "event-log" job
+    And sidekiq should have 1 "request-log" job
+
   @ee
   Scenario: Environment attempts to disable a shared user's second factor
     Given the current account is "test1"
@@ -1070,6 +1142,26 @@ Feature: Manage second factors for user
     And I have 2FA enabled
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/users/$1/second-factors/$0" with the following:
+      """
+      {
+        "meta": {
+          "otp": "$otp"
+        }
+      }
+      """
+    Then the response status should be "204"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "event-log" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Read only deletes a second factor while having 2FA enabled and providing a correct OTP
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "read-only"
+    And I am a read only of account "test1"
+    And I have 2FA enabled
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/users/$current/second-factors/$0" with the following:
       """
       {
         "meta": {

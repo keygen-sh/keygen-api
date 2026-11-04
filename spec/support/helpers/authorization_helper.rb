@@ -56,6 +56,15 @@ module AuthorizationHelper
       end
     end
 
+    def as_read_only(scenarios)
+      case scenarios
+      in []
+        let(:account)     { create(:account, *account_traits) }
+        let(:environment) { nil }
+        let(:bearer)      { create(:read_only, *authn_traits, account:, permissions: bearer_permissions) }
+      end
+    end
+
     def as_group_owner(scenarios)
       case scenarios
       in [:as_user, :accessing_a_group, *]
@@ -91,7 +100,7 @@ module AuthorizationHelper
       in [:as_license, *]
         let(:license) { bearer }
         let(:record)  { bearer }
-      in [:as_user, *]
+      in [:as_user | :as_read_only, *]
         let(:user)   { bearer }
         let(:record) { bearer }
       end
@@ -552,7 +561,7 @@ module AuthorizationHelper
         let(:second_factors) { create_list(:second_factor, 1, account: user.account, user:) }
       in [*, :accessing_its_owner, *]
         let(:second_factors) { create_list(:second_factor, 1, account: user.account, user: owner) }
-      in [:as_admin | :as_user, :accessing_itself, *]
+      in [:as_admin | :as_user | :as_read_only, :accessing_itself, *]
         let(:second_factors) { create_list(:second_factor, 1, account:, user: bearer) }
       end
 
@@ -565,7 +574,7 @@ module AuthorizationHelper
         let(:second_factor) { create(:second_factor, account: user.account, user:) }
       in [*, :accessing_its_owner, *]
         let(:second_factor) { create(:second_factor, account: user.account, user: owner) }
-      in [:as_admin | :as_user, :accessing_itself, *]
+      in [:as_admin | :as_user | :as_read_only, :accessing_itself, *]
         let(:second_factor) { create(:second_factor, account:, user: bearer) }
       end
 
