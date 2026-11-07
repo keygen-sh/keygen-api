@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_07_121901) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_09_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_catalog.plpgsql"
@@ -423,6 +423,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_07_121901) do
     t.boolean "concurrent", default: true
     t.datetime "created_at", precision: nil, null: false
     t.integer "duration"
+    t.string "duration_strategy"
     t.boolean "encrypted", default: false
     t.uuid "environment_id"
     t.string "expiration_basis"

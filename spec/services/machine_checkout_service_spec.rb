@@ -4,6 +4,14 @@ require 'rails_helper'
 require 'spec_helper'
 
 describe MachineCheckoutService do
+  within_ce do
+    it_behaves_like 'a duration-aware checkout', :machine
+  end
+
+  within_ee do
+    it_behaves_like 'a duration-aware checkout', :machine
+  end
+
   let(:account) { create(:account) }
   let(:license) { create(:license, account: account) }
   let(:machine) { create(:machine, license: license, account: account) }

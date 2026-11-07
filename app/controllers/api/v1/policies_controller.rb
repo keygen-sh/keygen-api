@@ -33,6 +33,7 @@ module Api::V1
           param :use_pool, type: :boolean, optional: true
           param :name, type: :string, optional: true
           param :duration, type: :integer, allow_nil: true, optional: true
+          param :duration_strategy, type: :string, optional: true
           param :strict, type: :boolean, optional: true
           param :floating, type: :boolean, optional: true
           param :protected, type: :boolean, optional: true
@@ -125,6 +126,7 @@ module Api::V1
         param :attributes, type: :hash do
           param :name, type: :string, optional: true
           param :duration, type: :integer, allow_nil: true, optional: true
+          param :duration_strategy, type: :string, optional: true
           param :strict, type: :boolean, optional: true
           param :floating, type: :boolean, optional: true
           param :protected, type: :boolean, optional: true
