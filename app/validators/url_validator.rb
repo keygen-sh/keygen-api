@@ -39,7 +39,7 @@ class UrlValidator < ActiveModel::EachValidator
 
     record.errors.add attribute, :protocol_invalid, message: "must be a valid URL using one of the following protocols: #{protocols.join(", ")}" unless valid_protocol?(uri)
     record.errors.add attribute, :host_invalid, message: 'must be a URL with a valid host' unless valid_host?(uri)
-    record.errors.add attribute, :address_invalid, message: 'must resolve to a valid address' unless valid_address?(uri)
+    record.errors.add attribute, :address_invalid, message: 'must resolve to a valid address' if resolve? && !valid_address?(uri)
   rescue URI::InvalidURIError,
          URI::InvalidComponentError,
          URI::BadURIError
@@ -49,10 +49,11 @@ class UrlValidator < ActiveModel::EachValidator
   private
 
   def default_options
-    @default_options ||= { protocols: %w(http https) }
+    @default_options ||= { protocols: %w(http https), resolve: true }
   end
 
   def protocols = default_options.merge(options)[:protocols]
+  def resolve?  = default_options.merge(options)[:resolve]
 
   def valid_protocol?(uri)
     return false if

@@ -241,6 +241,54 @@ describe UrlValidator do
     end
   end
 
+  context 'with resolution disabled' do
+    let(:model) do
+      Class.new do
+        include ActiveModel::Model
+
+        def self.name = 'UrlValidatorModel'
+
+        attr_accessor :url
+
+        validates :url, url: { resolve: false }
+      end
+    end
+
+    before do
+      allow(UrlValidator::DNS_RESOLVER).to receive(:getaddresses).and_raise('unexpected DNS query')
+    end
+
+    context 'with a valid URL' do
+      let(:url) { 'https://product.example' }
+
+      it { is_expected.to be_valid }
+    end
+
+    context 'with an invalid URL' do
+      let(:url) { 'https://foo bar.example' }
+
+      it { is_expected.to_not be_valid }
+    end
+
+    context 'with an invalid protocol' do
+      let(:url) { 'ftp://product.example' }
+
+      it { is_expected.to_not be_valid }
+    end
+
+    context 'with a blacklisted host' do
+      let(:url) { 'https://api.keygen.sh' }
+
+      it { is_expected.to_not be_valid }
+    end
+
+    context 'with a host without a TLD' do
+      let(:url) { 'https://product' }
+
+      it { is_expected.to_not be_valid }
+    end
+  end
+
   context 'with an unparseable resolved address' do
     let(:url) { 'https://webhooks.example' }
 
