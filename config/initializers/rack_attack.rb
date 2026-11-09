@@ -251,6 +251,31 @@ unless ENV.key?('NO_RACK_ATTACK')
     nil
   end
 
+  # Rate limit webhook endpoint mutations
+  Rack::Attack.throttle("req/ip/mutweb", limit: 10, period: 1.minute) do |rack_req|
+    next unless
+      (rack_req.post? && rack_req.path.ends_with?('/webhook-endpoints')) ||
+      (rack_req.patch? && rack_req.path.include?('/webhook-endpoints/')) ||
+      (rack_req.put? && rack_req.path.include?('/webhook-endpoints/'))
+
+    req = ActionDispatch::Request.new(rack_req.env)
+    ip  = req.remote_ip
+
+    matches = req.path.match(/^\/v\d+\/accounts\/([^\/]+)\//)
+    next if
+      matches.nil?
+
+    account = matches[1]
+    next unless
+      account.present?
+
+    "#{account}/#{ip}"
+  rescue => e
+    Keygen.logger.exception(e)
+
+    nil
+  end
+
   Rack::Attack.throttled_responder = -> req {
     match_data = req.env["rack.attack.match_data"] || {}
     match_key  = req.env['rack.attack.matched'] || ''
