@@ -51,7 +51,7 @@ class Product < ApplicationRecord
     allow_nil: true
 
   validates :name, presence: true, length: { maximum: 255 }
-  validates :url, url: { protocols: %w[https http] }, length: { maximum: 255 }, allow_nil: true
+  validates :url, url: { protocols: %w[https http], resolve: false }, length: { maximum: 255 }, allow_nil: true
   validates :distribution_strategy, inclusion: { in: DISTRIBUTION_STRATEGIES, message: "unsupported distribution strategy" }, allow_nil: true
 
   validates :metadata,
