@@ -40,7 +40,7 @@ def stub_slack!
 end
 
 def stub_dns!
-  allow(Resolv).to receive(:getaddresses) { %w[1.1.1.1] }
+  allow(UrlValidator::DNS_RESOLVER).to receive(:getaddresses) { %w[1.1.1.1] }
 end
 
 def stub_everything!

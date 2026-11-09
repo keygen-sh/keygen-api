@@ -27,6 +27,13 @@ class UrlValidator < ActiveModel::EachValidator
   ].map { IPAddr.new(it) }
    .freeze
 
+  DNS_ATTEMPT_TIMEOUTS = [1, 2].freeze # seconds
+  DNS_TIMEOUT          = 3.seconds
+  DNS_RESOLVER         = Resolv.new([
+    Resolv::Hosts.new,
+    Resolv::DNS.new.tap { it.timeouts = DNS_ATTEMPT_TIMEOUTS },
+  ])
+
   def validate_each(record, attribute, value)
     uri = URI.parse(value)
 
@@ -77,7 +84,7 @@ class UrlValidator < ActiveModel::EachValidator
     return false if
       uri.nil? || uri.host.nil?
 
-    addrs = Resolv.getaddresses(uri.host)
+    addrs = Timeout.timeout(DNS_TIMEOUT) { DNS_RESOLVER.getaddresses(uri.host) }
     return false if
       addrs.empty?
 
@@ -103,7 +110,8 @@ class UrlValidator < ActiveModel::EachValidator
       end
     end
   rescue IPAddr::InvalidAddressError,
-         Resolv::ResolvError
+         Resolv::ResolvError,
+         Timeout::Error
     false
   end
 
