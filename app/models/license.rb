@@ -572,11 +572,11 @@ class License < ApplicationRecord
                           .arel
                           .exists
 
-    # NOTE(ezekg) Suspended licenses are not renewed
+    # NOTE(ezekg) Suspended and canceled licenses are not renewed
     if ActiveRecord::Type::Boolean.new.cast(status)
-      where(suspended: [false, nil]).where(auto_renewing)
+      where(suspended: [false, nil], canceled_at: nil).where(auto_renewing)
     else
-      where(suspended: true).or(where.not(auto_renewing))
+      where(suspended: true).or(where.not(canceled_at: nil)).or(where.not(auto_renewing))
     end
   }
   scope :expiring, -> (status = true) {
@@ -931,9 +931,13 @@ class License < ApplicationRecord
   end
 
   # Whether or not the license will be auto-renewed when it's due, i.e. a
-  # policy without a duration cannot be renewed, and suspended licenses
-  # are not renewed.
-  def auto_renewing? = policy.present? && policy.auto_renewing? && !suspended?
+  # policy without a duration cannot be renewed, and suspended or canceled
+  # licenses are not renewed.
+  def auto_renewing? = policy.present? && policy.auto_renewing? && !suspended? && !canceled?
+
+  # Whether or not the license's auto-renewal has been canceled, i.e. the
+  # license will expire, not renew, at the end of its current period.
+  def canceled? = canceled_at?
 
   # Whether or not the license is still waiting on an auto-renewal that
   # was due, i.e. its expiry is in the past but it is not expired.
@@ -998,6 +1002,7 @@ class License < ApplicationRecord
     save!
   end
 
+  def cancel!    = update!(canceled_at: Time.current)
   def suspend!   = update!(suspended: true)
   def reinstate! = update!(suspended: false)
 

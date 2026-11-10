@@ -158,6 +158,24 @@ describe LicenseExpirationsWorker do
       expect { worker.perform_async; worker.drain }.to_not change { license.reload.expiry }
     end
 
+    it 'should send a license.expired webhook event for a canceled license' do
+      expect(BroadcastEventService).to receive(:call) { expect(it).to include(event: 'license.expired') }.exactly(1).time
+
+      create :license, account:, policy:, expiry: 5.minutes.ago, canceled_at: 1.day.ago
+
+      worker.perform_async
+      worker.drain
+    end
+
+    it 'should send a license.expiring-soon webhook event for a canceled license' do
+      expect(BroadcastEventService).to receive(:call) { expect(it).to include(event: 'license.expiring-soon') }.exactly(1).time
+
+      create :license, account:, policy:, expiry: 2.days.from_now, canceled_at: 1.day.ago
+
+      worker.perform_async
+      worker.drain
+    end
+
     it 'should send a license.expired webhook event for a suspended license' do
       expect(BroadcastEventService).to receive(:call) { expect(it).to include(event: 'license.expired') }.exactly(1).time
 

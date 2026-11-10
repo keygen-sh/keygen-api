@@ -25,7 +25,7 @@ class RenameOwnerRelationshipToUserForLicenseMigration < BaseMigration
                                                           'api/v1/machine_components/relationships/licenses' | 'api/v1/machine_processes/relationships/licenses',
                                               action: 'show' | 'create' | 'update' |
                                                       'quick_validate_by_id' | 'validate_by_key' | 'validate_by_id' |
-                                                      'check_in' | 'renew' | 'revoke' | 'suspend' | 'reinstate' |
+                                                      'check_in' | 'renew' | 'cancel' | 'revoke' | 'suspend' | 'reinstate' |
                                                       'increment' | 'decrement' | 'reset' } do |res|
     body = JSON.parse(res.body, symbolize_names: true)
 

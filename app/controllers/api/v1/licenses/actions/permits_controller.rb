@@ -45,6 +45,26 @@ module Api::V1::Licenses::Actions
       end
     end
 
+    def cancel
+      authorize! license
+
+      if !license.policy.auto_renewing?
+        render_unprocessable_entity detail: 'cannot be canceled because the policy does not auto-renew'
+      elsif license.canceled?
+        render_unprocessable_entity detail: 'is already canceled'
+      elsif license.cancel!
+        BroadcastEventService.call(
+          event: 'license.canceled',
+          account: current_account,
+          resource: license,
+        )
+
+        render jsonapi: license
+      else
+        render_unprocessable_resource license
+      end
+    end
+
     def revoke
       authorize! license
 

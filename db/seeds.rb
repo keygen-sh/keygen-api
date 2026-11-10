@@ -66,6 +66,7 @@ permissions = %w[
   key.read
   key.update
 
+  license.cancel
   license.check-in
   license.check-out
   license.create
@@ -215,6 +216,7 @@ events = %w[
   key.deleted
   key.updated
 
+  license.canceled
   license.check-in-overdue
   license.check-in-required-soon
   license.checked-in

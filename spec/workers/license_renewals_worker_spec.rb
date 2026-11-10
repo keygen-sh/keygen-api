@@ -135,6 +135,14 @@ describe LicenseRenewalsWorker do
       expect { worker.perform_async; worker.drain }.to_not change { license.reload.expiry }
     end
 
+    it 'should not renew a canceled license' do
+      expect(BroadcastEventService).to_not receive(:call)
+
+      license = create(:license, account:, policy:, expiry: 5.minutes.from_now, canceled_at: 1.day.ago)
+
+      expect { worker.perform_async; worker.drain }.to_not change { license.reload.expiry }
+    end
+
     it 'should not renew a license without an expiry' do
       expect(BroadcastEventService).to_not receive(:call)
 
@@ -224,6 +232,15 @@ describe LicenseRenewalsWorker do
       expect(BroadcastEventService).to_not receive(:call)
 
       create :license, account:, policy:, expiry: 2.days.from_now, suspended: true
+
+      worker.perform_async
+      worker.drain
+    end
+
+    it 'should not send a license.renewing-soon webhook event for a canceled license' do
+      expect(BroadcastEventService).to_not receive(:call)
+
+      create :license, account:, policy:, expiry: 2.days.from_now, canceled_at: 1.day.ago
 
       worker.perform_async
       worker.drain

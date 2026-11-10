@@ -255,6 +255,7 @@ Rails.application.routes.draw do
             post :validate,                                 to: 'validations#validate_by_id'
             delete :revoke,                                 to: 'permits#revoke'
             post :renew,                                    to: 'permits#renew'
+            post :cancel,                                   to: 'permits#cancel'
             post :suspend,                                  to: 'permits#suspend'
             post :reinstate,                                to: 'permits#reinstate'
             post :check_in,        path: 'check-in',        to: 'permits#check_in'
