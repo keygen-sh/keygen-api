@@ -716,6 +716,30 @@ Feature: License permit actions
     And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin renews a license (auto renewal strategy)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "duration": $time.1.month.to_i,
+        "renewalStrategy": "AUTO_RENEW"
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "expiry": "2021-07-19T00:00:00.000Z" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/renew"
+    Then the response status should be "200"
+    And the response body should be a "license" with the expiry "2021-08-19T00:00:00.000Z"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "event-log" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin renews a license (manual renewal strategy)
     Given I am an admin of account "test1"
     And the current account is "test1"

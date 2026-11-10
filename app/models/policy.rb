@@ -87,6 +87,7 @@ class Policy < ApplicationRecord
   ].freeze
 
   RENEWAL_STRATEGIES = %w[
+    AUTO_RENEW
     MANUAL_RENEW
     NO_RENEW
   ].freeze
@@ -617,7 +618,8 @@ class Policy < ApplicationRecord
     renewal_strategy == 'MANUAL_RENEW'
   end
 
-  def no_renew? = renewal_strategy == 'NO_RENEW'
+  def auto_renew? = renewal_strategy == 'AUTO_RENEW'
+  def no_renew?   = renewal_strategy == 'NO_RENEW'
 
   def supports_token_auth?
     # NOTE(ezekg) Backwards compat

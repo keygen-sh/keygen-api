@@ -714,7 +714,7 @@ class License < ApplicationRecord
     :expire_from_first_use?,
     :expire_from_first_download?,
     :renew_from_expiry?, :renew_from_now?, :renew_from_now_if_expired?,
-    :manual_renew?, :no_renew?,
+    :auto_renew?, :manual_renew?, :no_renew?,
     :supports_token_auth?,
     :supports_license_auth?,
     :supports_session_auth?,

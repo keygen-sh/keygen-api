@@ -1162,6 +1162,38 @@ Feature: Create policy
     And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates a policy that has an auto renewal strategy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Auto Renewal Strategy",
+            "renewalStrategy": "AUTO_RENEW"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response body should be a "policy" with the renewalStrategy "AUTO_RENEW"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "event-log" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates a policy that has a manual renewal strategy
     Given I am an admin of account "test1"
     And the current account is "test1"
