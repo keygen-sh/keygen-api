@@ -80,7 +80,7 @@ class LicenseExpirationsWorker < BaseWorker
   # Whether or not the license will be auto-renewed, i.e. suspended licenses
   # are left to expire, and a policy without a duration cannot be renewed.
   def auto_renews?(license)
-    license.auto_renew? && license.policy.duration? && !license.suspended?
+    license.auto_renewing? && !license.suspended?
   end
 
   # Whether or not the license is due to be auto-renewed right now.

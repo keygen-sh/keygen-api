@@ -725,7 +725,7 @@ Feature: Show license
     Then the response status should be "200"
     And the response body should be a "license" with the following attributes:
       """
-      { "status": "EXPIRING" }
+      { "status": "ACTIVE" }
       """
 
   Scenario: Admin attempts to retrieves a suspended license for their account

@@ -568,14 +568,21 @@ class License < ApplicationRecord
     end
   }
   scope :expiring, -> (status = true) {
+    # NOTE(ezekg) Auto-renewing licenses are renewing, not expiring
+    auto_renewing = Policy.auto_renewing.where('policies.id = licenses.policy_id')
+                          .arel
+                          .exists
+
     if ActiveRecord::Type::Boolean.new.cast(status)
-      where 'expiry IS NOT NULL AND expiry > ? AND expiry < ?', Time.current, 3.days.from_now
+      where('licenses.expiry IS NOT NULL AND licenses.expiry > ? AND licenses.expiry < ?', Time.current, 3.days.from_now)
+        .where.not(auto_renewing)
     else
-      where 'expiry IS NULL OR expiry < ? OR expiry > ?', Time.current, 3.days.from_now
+      where('licenses.expiry IS NULL OR licenses.expiry < ? OR licenses.expiry > ?', Time.current, 3.days.from_now)
+        .or(where(auto_renewing))
     end
   }
   scope :renewing, -> {
-    joins(:policy).where(policies: { renewal_strategy: 'AUTO_RENEW' })
+    joins(:policy).merge(Policy.auto_renewing)
                   .where('licenses.expiry IS NOT NULL AND licenses.expiry > ? AND licenses.expiry < ?', Time.current, 1.hour.from_now)
   }
   scope :expired, -> (status = true, within: nil, in: nil, before: nil, after: nil, on: nil) {
@@ -893,15 +900,23 @@ class License < ApplicationRecord
     return false if
       expiry.nil?
 
+    # NOTE(ezekg) Auto-renewing licenses are renewing, not expiring
+    return false if
+      auto_renewing?
+
     expiry > Time.current && expiry < 3.days.from_now
   end
 
   def renewing?
     return false if
-      expiry.nil? || policy.nil?
+      expiry.nil?
 
-    auto_renew? && expiry > Time.current && expiry < 1.hour.from_now
+    auto_renewing? && expiry > Time.current && expiry < 1.hour.from_now
   end
+
+  # Whether or not the license will be auto-renewed when it's due, i.e. a
+  # policy without a duration cannot be renewed.
+  def auto_renewing? = policy.present? && policy.auto_renewing?
 
   def active?(t = 90.days.ago)
     created_at >= t ||
