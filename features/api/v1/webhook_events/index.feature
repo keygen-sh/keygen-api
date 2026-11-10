@@ -27,6 +27,25 @@ Feature: List webhook events
     And the response should contain a valid signature header for "test1"
     And the response body should be an array with 3 "webhook-events"
 
+  Scenario: Admin retrieves all webhook events with sensitive payloads for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-events" with the following attributes:
+      """
+      {
+        "payload": "{\"data\":{\"type\":\"users\",\"attributes\":{\"email\":\"user@example.com\"}},\"meta\":{\"passwordResetToken\":\"abcdefghijklmnopqrstuvwxyz\"}}"
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/webhook-events"
+    Then the response status should be "200"
+    And the response body should be an array of 2 "webhook-events" with the following attributes:
+      """
+      {
+        "payload": "{\"data\":{\"type\":\"users\",\"attributes\":{\"email\":\"user@example.com\"}},\"meta\":{\"passwordResetToken\":\"abcd...wxyz\"}}"
+      }
+      """
+
   @ee
   Scenario: Environment retrieves all isolated webhook events for their account
     Given the current account is "test1"

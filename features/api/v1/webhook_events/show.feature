@@ -27,6 +27,45 @@ Feature: Show webhook event
     And the response should contain a valid signature header for "test1"
     And the response body should be a "webhook-event"
 
+  Scenario: Admin retrieves a webhook event with a sensitive payload for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-event" with the following attributes:
+      """
+      {
+        "payload": "{\"data\":{\"type\":\"users\",\"attributes\":{\"email\":\"user@example.com\"}},\"meta\":{\"passwordResetToken\":\"abcdefghijklmnopqrstuvwxyz\"}}"
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/webhook-events/$0"
+    Then the response status should be "200"
+    And the response body should be a "webhook-event" with the following attributes:
+      """
+      {
+        "payload": "{\"data\":{\"type\":\"users\",\"attributes\":{\"email\":\"user@example.com\"}},\"meta\":{\"passwordResetToken\":\"abcd...wxyz\"}}"
+      }
+      """
+
+  Scenario: Read-only retrieves a webhook event with a sensitive payload for their account
+    Given the current account is "test1"
+    And the current account has 1 "read-only"
+    And I am a read only of account "test1"
+    And the current account has 1 "webhook-event" with the following attributes:
+      """
+      {
+        "payload": "{\"data\":{\"type\":\"second-factors\",\"attributes\":{\"uri\":\"otpauth://totp/Keygen:user%40example.com?secret=JBSWY3DPEHPK3PXP&issuer=Keygen\",\"enabled\":false}}}"
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/webhook-events/$0"
+    Then the response status should be "200"
+    And the response body should be a "webhook-event" with the following attributes:
+      """
+      {
+        "payload": "{\"data\":{\"type\":\"second-factors\",\"attributes\":{\"uri\":\"otpa...ygen\",\"enabled\":false}}}"
+      }
+      """
+
   Scenario: Admin retrieves an invalid webhook event for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
