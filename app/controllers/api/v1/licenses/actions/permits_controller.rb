@@ -30,6 +30,8 @@ module Api::V1::Licenses::Actions
 
       if license.policy.duration.nil?
         render_unprocessable_entity detail: 'cannot be renewed because the policy does not have a duration'
+      elsif license.policy.no_renew?
+        render_unprocessable_entity detail: 'cannot be renewed because the policy does not allow renewals'
       elsif license.renew!
         BroadcastEventService.call(
           event: 'license.renewed',

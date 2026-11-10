@@ -53,6 +53,7 @@ module Api::V1
           param :expiration_strategy, type: :string, optional: true
           param :expiration_basis, type: :string, optional: true
           param :renewal_basis, type: :string, optional: true
+          param :renewal_strategy, type: :string, optional: true
           param :transfer_strategy, type: :string, optional: true
           param :authentication_strategy, type: :string, optional: true
           param :leasing_strategy, type: :string, optional: true, if: -> { current_api_version.in? %w[1.0 1.1 1.2 1.3 1.4 1.5 1.6] }, as: :process_leasing_strategy
@@ -145,6 +146,7 @@ module Api::V1
           param :expiration_strategy, type: :string, optional: true
           param :expiration_basis, type: :string, optional: true
           param :renewal_basis, type: :string, optional: true
+          param :renewal_strategy, type: :string, optional: true
           param :transfer_strategy, type: :string, optional: true
           param :authentication_strategy, type: :string, optional: true
           param :leasing_strategy, type: :string, optional: true, if: -> { current_api_version.in? %w[1.0 1.1 1.2 1.3 1.4 1.5 1.6] }, as: :process_leasing_strategy

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_07_121901) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_10_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_catalog.plpgsql"
@@ -453,6 +453,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_07_121901) do
     t.uuid "product_id", null: false
     t.boolean "protected"
     t.string "renewal_basis"
+    t.string "renewal_strategy"
     t.boolean "require_check_in", default: false
     t.boolean "require_checksum_scope", default: false, null: false
     t.boolean "require_components_scope", default: false, null: false
