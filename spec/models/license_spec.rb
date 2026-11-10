@@ -408,6 +408,46 @@ describe License, type: :model do
       expect(License.with_status(:renewing).count).to eq 1
     end
 
+    context 'when an auto-renewal is overdue' do
+      let(:policy)   { create(:policy, account:, renewal_strategy: 'AUTO_RENEW', duration: 1.month) }
+      let!(:license) { create(:license, account:, policy:, expiry: 3.days.ago) }
+
+      it 'should not be expired' do
+        expect(license.expired?).to be false
+        expect(license.renewal_overdue?).to be true
+        expect(license.status).to eq :RENEWING
+      end
+
+      it 'should not return the license as expired' do
+        expect(License.with_status(:expired)).to_not include license
+        expect(License.with_status(:renewing)).to include license
+        expect(License.expired).to_not include license
+        expect(License.expired(false)).to include license
+        expect(License.expired(within: '1w')).to_not include license
+        expect(License.expired(before: Time.current)).to_not include license
+        expect(License.expired(after: 1.week.ago)).to_not include license
+        expect(License.expired(on: 3.days.ago)).to_not include license
+      end
+
+      it 'should be expired when suspended' do
+        license.update!(suspended: true)
+
+        expect(license.expired?).to be true
+        expect(license.renewal_overdue?).to be false
+        expect(License.expired).to include license
+        expect(License.expired(false)).to_not include license
+        expect(License.with_status(:renewing)).to_not include license
+      end
+
+      it 'should be expired when the policy is not auto-renewing' do
+        policy.update!(renewal_strategy: 'MANUAL_RENEW')
+        license.reload
+
+        expect(license.expired?).to be true
+        expect(License.expired).to include license
+      end
+    end
+
     it 'should not return auto-renewing licenses as expiring' do
       expect(License.expiring.count).to eq 2
       expect(License.expiring(false).count).to eq License.count - 2

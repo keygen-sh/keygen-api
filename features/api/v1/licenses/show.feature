@@ -708,6 +708,26 @@ Feature: Show license
       { "status": "RENEWING" }
       """
 
+  Scenario: Admin attempts to retrieves an auto-renewing license that is overdue for renewal for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policy" with the following:
+      """
+      { "renewalStrategy": "AUTO_RENEW" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "$time.2.days.ago" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+    And the response body should be a "license" with the following attributes:
+      """
+      { "status": "RENEWING" }
+      """
+
   Scenario: Admin attempts to retrieves an auto-renewing license that is not yet renewing for their account
     Given I am an admin of account "test1"
     And the current account is "test1"

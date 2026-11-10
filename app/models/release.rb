@@ -587,6 +587,7 @@ class Release < ApplicationRecord
   scope :within_expiry_for, -> license {
     return none if license.nil?
     return all  unless license.expires?
+    return all  if license.renewal_overdue? # not expired, i.e. waiting on an auto-renewal
 
     case
     when license.revoke_access?

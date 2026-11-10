@@ -240,7 +240,7 @@ class ApplicationPolicy
       license.revoke_access? && license.expired?
 
     deny! 'license expiry falls outside of access window' if
-      license.expires? && !license.allow_access? && (release.backdated_to.presence || release.created_at) > license.expiry
+      license.expires? && !license.renewal_overdue? && !license.allow_access? && (release.backdated_to.presence || release.created_at) > license.expiry
 
     deny! 'license is missing entitlements' unless
       license.entitled?(release.entitlements)
