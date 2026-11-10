@@ -574,6 +574,10 @@ class License < ApplicationRecord
       where 'expiry IS NULL OR expiry < ? OR expiry > ?', Time.current, 3.days.from_now
     end
   }
+  scope :renewing, -> {
+    joins(:policy).where(policies: { renewal_strategy: 'AUTO_RENEW' })
+                  .where('licenses.expiry IS NOT NULL AND licenses.expiry > ? AND licenses.expiry < ?', Time.current, 1.hour.from_now)
+  }
   scope :expired, -> (status = true, within: nil, in: nil, before: nil, after: nil, on: nil) {
     within ||= binding.local_variable_get(:in)
 
@@ -652,6 +656,8 @@ class License < ApplicationRecord
       self.suspended
     when 'EXPIRED'
       self.expired
+    when 'RENEWING'
+      self.renewing
     when 'EXPIRING'
       self.expiring
     when 'INACTIVE'
@@ -806,6 +812,8 @@ class License < ApplicationRecord
       :SUSPENDED
     when expired?
       :EXPIRED
+    when renewing?
+      :RENEWING
     when expiring?
       :EXPIRING
     when inactive?
@@ -886,6 +894,13 @@ class License < ApplicationRecord
       expiry.nil?
 
     expiry > Time.current && expiry < 3.days.from_now
+  end
+
+  def renewing?
+    return false if
+      expiry.nil? || policy.nil?
+
+    auto_renew? && expiry > Time.current && expiry < 1.hour.from_now
   end
 
   def active?(t = 90.days.ago)

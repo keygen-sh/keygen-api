@@ -251,4 +251,78 @@ describe LicenseExpirationsWorker do
       expect { worker.perform_async; worker.drain }.to_not change { license.reload.expiry }
     end
   end
+
+  context 'when there is a license that is renewing soon' do
+    let(:event)  { 'license.renewing-soon' }
+    let(:policy) { create(:policy, account:, duration: 1.month, renewal_strategy: 'AUTO_RENEW') }
+
+    it 'should send a license.renewing-soon webhook event' do
+      expect(BroadcastEventService).to receive(:call) { expect(it).to include(event:) }.exactly(1).time
+
+      create :license, account:, policy:, expiry: 2.days.from_now
+
+      worker.perform_async
+      worker.drain
+    end
+
+    it 'should send multiple license.renewing-soon webhook events' do
+      expect(BroadcastEventService).to receive(:call) { expect(it).to include(event:) }.exactly(3).times
+
+      create :license, account:, policy:, expiry: 2.days.from_now
+      create :license, account:, policy:, expiry: 1.day.from_now
+      create :license, account:, policy:, expiry: 1.hour.from_now
+      create :license, account:, policy:, expiry: 5.days.from_now
+
+      worker.perform_async
+      worker.drain
+    end
+
+    it 'should limit license.renewing-soon webhook events to a daily interval' do
+      expect(BroadcastEventService).to receive(:call) { expect(it).to include(event:) }.exactly(1).time
+
+      create :license, account:, policy:, expiry: 2.days.from_now
+
+      2.times do
+        worker.perform_async
+        worker.drain
+      end
+    end
+
+    it 'should mark the license with the renewing soon event time' do
+      license = create(:license, account:, policy:, expiry: 1.day.from_now)
+
+      worker.perform_async
+      worker.drain
+
+      license.reload
+
+      expect(license.last_renewing_soon_event_sent_at).not_to eq nil
+      expect(license.last_expiring_soon_event_sent_at).to eq nil
+    end
+
+    it 'should send a license.expiring-soon webhook event for a suspended license' do
+      expect(BroadcastEventService).to receive(:call) { expect(it).to include(event: 'license.expiring-soon') }.exactly(1).time
+
+      create :license, account:, policy:, expiry: 2.days.from_now, suspended: true
+
+      worker.perform_async
+      worker.drain
+    end
+  end
+
+  context 'when there is not a license that is renewing soon' do
+    let(:event) { 'license.renewing-soon' }
+
+    it 'should not send a license.renewing-soon webhook event for a manual renewal policy' do
+      expect(BroadcastEventService).to receive(:call) { expect(it).to include(event: 'license.expiring-soon') }.exactly(1).time
+
+      policy  = create(:policy, account:, duration: 1.month, renewal_strategy: 'MANUAL_RENEW')
+      license = create(:license, account:, policy:, expiry: 2.days.from_now)
+
+      worker.perform_async
+      worker.drain
+
+      expect(license.reload.last_renewing_soon_event_sent_at).to eq nil
+    end
+  end
 end

@@ -47,6 +47,18 @@ class LicenseExpirationsWorker < BaseWorker
         )
 
         license.touch(:last_expiration_event_sent_at)
+      when license.expiry < 3.days.from_now && auto_renews?(license)
+        # Limit number of events we dispatch for each license to a daily interval
+        next if !license.last_renewing_soon_event_sent_at.nil? &&
+                license.last_renewing_soon_event_sent_at > 24.hours.ago
+
+        BroadcastEventService.call(
+          event: "license.renewing-soon",
+          account: license.account,
+          resource: license,
+        )
+
+        license.touch(:last_renewing_soon_event_sent_at)
       when license.expiry < 3.days.from_now
         # Limit number of events we dispatch for each license to a daily interval
         next if !license.last_expiring_soon_event_sent_at.nil? &&

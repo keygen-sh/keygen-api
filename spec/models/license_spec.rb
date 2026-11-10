@@ -379,6 +379,9 @@ describe License, type: :model do
       # old license expiring (inactive, expiring)
       create(:license, account:, created_at: 1.year.ago, expiry: 2.days.from_now)
 
+      # new license auto-renewing (active, expiring, renewing)
+      create(:license, account:, policy: create(:policy, account:, renewal_strategy: 'AUTO_RENEW'), expiry: 30.minutes.from_now)
+
       # new license with banned user (active, banned)
       create(:license, :banned, account:)
 
@@ -390,7 +393,7 @@ describe License, type: :model do
     end
 
     it 'should return active licenses' do
-      expect(License.with_status(:active).count).to eq 5
+      expect(License.with_status(:active).count).to eq 6
     end
 
     it 'should return inactive licenses' do
@@ -398,7 +401,11 @@ describe License, type: :model do
     end
 
     it 'should return expiring licenses' do
-      expect(License.with_status(:expiring).count).to eq 2
+      expect(License.with_status(:expiring).count).to eq 3
+    end
+
+    it 'should return renewing licenses' do
+      expect(License.with_status(:renewing).count).to eq 1
     end
 
     it 'should return expired licenses' do
