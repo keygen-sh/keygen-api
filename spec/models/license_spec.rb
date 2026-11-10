@@ -439,20 +439,6 @@ describe License, type: :model do
         expect(License.with_status(:renewing)).to_not include license
       end
 
-      it 'should be expired when canceled' do
-        license.cancel!
-
-        expect(license.canceled?).to be true
-        expect(license.auto_renewing?).to be false
-        expect(license.expired?).to be true
-        expect(license.status).to eq :EXPIRED
-        expect(License.expired).to include license
-        expect(License.expired(false)).to_not include license
-        expect(License.with_status(:renewing)).to_not include license
-        expect(License.auto_renewing).to_not include license
-        expect(License.auto_renewing(false)).to include license
-      end
-
       it 'should be expired when the policy is not auto-renewing' do
         policy.update!(renewal_strategy: 'MANUAL_RENEW')
         license.reload

@@ -73,7 +73,6 @@ class Permission < ApplicationRecord
     key.read
     key.update
 
-    license.cancel
     license.check-in
     license.check-out
     license.create
@@ -229,7 +228,6 @@ class Permission < ApplicationRecord
     key.read
     key.update
 
-    license.cancel
     license.check-in
     license.check-out
     license.create
@@ -455,7 +453,6 @@ class Permission < ApplicationRecord
     key.read
     key.update
 
-    license.cancel
     license.check-in
     license.check-out
     license.create
@@ -576,7 +573,6 @@ class Permission < ApplicationRecord
     group.read
     group.users.read
 
-    license.cancel
     license.check-in
     license.check-out
     license.create

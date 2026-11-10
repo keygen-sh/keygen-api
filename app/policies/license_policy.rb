@@ -185,22 +185,6 @@ class LicensePolicy < ApplicationPolicy
     end
   end
 
-  def cancel?
-    verify_permissions!('license.cancel')
-    verify_environment!
-
-    case bearer
-    in role: Role(:admin | :developer | :sales_agent | :environment)
-      allow!
-    in role: Role(:product) if record.product == bearer
-      allow!
-    in role: Role(:user) if record.owner == bearer
-      !record.policy.protected?
-    else
-      deny!
-    end
-  end
-
   def suspend?
     verify_permissions!('license.suspend')
     verify_environment!

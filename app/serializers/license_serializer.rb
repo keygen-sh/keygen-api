@@ -15,9 +15,6 @@ class LicenseSerializer < BaseSerializer
   attribute :status
   attribute :uses
   attribute :suspended
-  attribute :canceled do
-    @object.canceled?
-  end
   attribute :scheme
   attribute :encrypted do
     @object.encrypted?
