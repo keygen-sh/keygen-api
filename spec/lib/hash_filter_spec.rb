@@ -16,6 +16,21 @@ RSpec.describe HashFilter do
       expect { HashFilter.new(%i[token], mask: ->(v) { v }) }
         .not_to raise_error
     end
+
+    it 'raises when a value filter is not a regexp' do
+      expect { HashFilter.new(%i[token], values: %w[otpauth]) }
+        .to raise_error(ArgumentError, /values must be regexps/)
+    end
+
+    it 'raises when value filters are given without key filters' do
+      expect { HashFilter.new(values: [/\Aotpauth:/]) }
+        .to raise_error(ArgumentError, /values cannot be used without filters/)
+    end
+
+    it 'accepts regexp value filters' do
+      expect { HashFilter.new(%i[token], values: [/\Aotpauth:/]) }
+        .not_to raise_error
+    end
   end
 
   describe '#filter' do
@@ -167,6 +182,81 @@ RSpec.describe HashFilter do
           user: { token: 'abcd...wxyz' },
           post: { token: 'foo' },
         )
+      end
+    end
+
+    context 'with a matching value' do
+      let(:uri) { 'otpauth://totp/Keygen:user%40example.com?secret=JBSWY3DPEHPK3PXP&issuer=Keygen' }
+
+      it 'masks a matching value under a non-matching key' do
+        filterer = HashFilter.new(%i[token], values: [/\Aotpauth:/i])
+        filtered = filterer.filter(uri:)
+
+        expect(filtered).to eq(uri: 'otpa...ygen')
+      end
+
+      it 'leaves a non-matching value under a non-matching key untouched' do
+        filterer = HashFilter.new(%i[token], values: [/\Aotpauth:/i])
+        filtered = filterer.filter(uri: 'https://keygen.example')
+
+        expect(filtered).to eq(uri: 'https://keygen.example')
+      end
+
+      it 'still masks matching keys' do
+        filterer = HashFilter.new(%i[token], values: [/\Aotpauth:/i])
+        filtered = filterer.filter(token: 'abcdefghij', uri:)
+
+        expect(filtered).to eq(token: 'a...j', uri: 'otpa...ygen')
+      end
+
+      it 'masks matching values in nested hashes' do
+        filterer = HashFilter.new(%i[token], values: [/\Aotpauth:/i])
+        filtered = filterer.filter(data: { attributes: { uri:, name: 'foo' } })
+
+        expect(filtered).to eq(data: { attributes: { uri: 'otpa...ygen', name: 'foo' } })
+      end
+
+      it 'masks only matching values in nested arrays' do
+        filterer = HashFilter.new(%i[token], values: [/\Aotpauth:/i])
+        filtered = filterer.filter(uris: [uri, 'https://keygen.example', [uri], { uri: }])
+
+        expect(filtered).to eq(uris: ['otpa...ygen', 'https://keygen.example', ['otpa...ygen'], { uri: 'otpa...ygen' }])
+      end
+
+      it 'matches any of multiple value filters' do
+        filterer = HashFilter.new(%i[token], values: [/\Aotpauth:/i, /\Asecret:/])
+        filtered = filterer.filter(uri:, id: 'secret:abcdefghijklmnopqrstuvwxyz', name: 'foo')
+
+        expect(filtered).to eq(uri: 'otpa...ygen', id: 'secr...wxyz', name: 'foo')
+      end
+
+      it 'matches non-string scalars by coercing to a string' do
+        filterer = HashFilter.new(%i[token], values: [/\A\d{6}\z/])
+        filtered = filterer.filter(code: 123456, count: 42, sym: :'654321')
+
+        expect(filtered).to eq(code: '1...6', count: 42, sym: '6...1')
+      end
+
+      it 'passes through nil and bools' do
+        filterer = HashFilter.new(%i[token], values: [/\A(|true|false)\z/])
+        filtered = filterer.filter(a: nil, b: true, c: false)
+
+        expect(filtered).to eq(a: nil, b: true, c: false)
+      end
+
+      it 'matches the value when filtering a single param' do
+        filterer = HashFilter.new(%i[token], values: [/\Aotpauth:/i])
+
+        expect(filterer.filter_param('uri', uri)).to eq 'otpa...ygen'
+        expect(filterer.filter_param('uri', 'foo')).to eq 'foo'
+      end
+
+      it 'invokes a custom mask with the original value' do
+        mask     = ->(value) { "<#{value.to_s.length}>" }
+        filterer = HashFilter.new(%i[token], values: [/\Aotpauth:/i], mask:)
+        filtered = filterer.filter(uri:)
+
+        expect(filtered).to eq(uri: "<#{uri.length}>")
       end
     end
 

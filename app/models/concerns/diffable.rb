@@ -5,7 +5,7 @@ module Diffable
 
   included do
     def to_diff
-      filterer  = HashFilter.new(FILTER_KEYS)
+      filterer  = HashFilter.new(FILTER_KEYS, values: FILTER_VALUES)
       filtered  = filterer.filter(
         previous_changes,
       )

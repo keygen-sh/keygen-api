@@ -87,6 +87,43 @@ describe RequestLogger, type: :concern, only: :ee do
         },
       )
     end
+
+    it 'redacts sensitive values under benign keys from request body' do
+      allow(request).to receive(:request_parameters).and_return({
+        'data' => {
+          'type' => 'webhook-endpoints',
+          'attributes' => {
+            'url'  => 'https://example.com/webhooks',
+            'name' => 'prod-webhooks',
+          },
+        },
+        'meta' => {
+          'uri'    => 'otpauth://totp/Keygen:user%40example.com?secret=JBSWY3DPEHPK3PXP&issuer=Keygen',
+          'bearer' => "admin-#{'a1' * 32}v3",
+          'legacy' => ["prod-#{'b2' * 32}v2", "#{'c3' * 16}.#{'d4' * 16}.#{'e5' * 32}v1"],
+          'header' => "Bearer activ-#{'f6' * 16}v3",
+        },
+      }.with_indifferent_access)
+
+      body   = controller.send(:request_log_request_body)
+      parsed = JSON.parse(body)
+
+      expect(parsed).to eq(
+        'data' => {
+          'type' => 'webhook-endpoints',
+          'attributes' => {
+            'url'  => 'https://example.com/webhooks',
+            'name' => 'prod-webhooks',
+          },
+        },
+        'meta' => {
+          'uri'    => 'otpa...ygen',
+          'bearer' => 'admi...a1v3',
+          'legacy' => %w[prod...b2v2 c3c3...e5v1],
+          'header' => 'Bear...f6v3',
+        },
+      )
+    end
   end
 
   describe '#request_log_response_body' do
@@ -126,6 +163,40 @@ describe RequestLogger, type: :concern, only: :ee do
         },
         'meta' => {
           'secret' => 'tops...3456',
+        },
+      )
+    end
+
+    it 'redacts sensitive values under benign keys from response body' do
+      allow(response).to receive(:content_type).and_return('application/vnd.api+json')
+      allow(response).to receive(:body).and_return({
+        'data' => {
+          'type' => 'second-factors',
+          'attributes' => {
+            'uri'     => 'otpauth://totp/Keygen:user%40example.com?secret=JBSWY3DPEHPK3PXP&issuer=Keygen',
+            'enabled' => false,
+          },
+        },
+        'meta' => {
+          'bearer' => "env-#{'a1' * 32}v3",
+          'name'   => 'env-staging',
+        },
+      }.to_json)
+
+      result = controller.send(:request_log_response_body)
+      parsed = JSON.parse(result)
+
+      expect(parsed).to eq(
+        'data' => {
+          'type' => 'second-factors',
+          'attributes' => {
+            'uri'     => 'otpa...ygen',
+            'enabled' => false,
+          },
+        },
+        'meta' => {
+          'bearer' => 'env-...a1v3',
+          'name'   => 'env-staging',
         },
       )
     end

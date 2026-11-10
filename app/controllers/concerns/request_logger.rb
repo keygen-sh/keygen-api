@@ -175,7 +175,7 @@ module RequestLogger
       return nil unless
         params.present?
 
-      filterer = HashFilter.new(FILTER_KEYS)
+      filterer = HashFilter.new(FILTER_KEYS, values: FILTER_VALUES)
       filtered = filterer.filter(params)
 
       filtered.deep_transform_keys { it.to_s.camelize(:lower) }
@@ -202,7 +202,7 @@ module RequestLogger
       mime_type, * = Mime::Type.parse(response.content_type.to_s)
       filtered     = case mime_type
                      in symbol: :jsonapi | :json
-                       filterer = HashFilter.new(FILTER_KEYS)
+                       filterer = HashFilter.new(FILTER_KEYS, values: FILTER_VALUES)
                        params   = JSON.parse(body)
 
                        filterer.filter(params).to_json
