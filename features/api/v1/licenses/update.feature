@@ -130,6 +130,177 @@ Feature: Update license
     And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin overrides a license's renewal strategy (cancel at period end)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy" with the following:
+      """
+      { "duration": $time.1.month.to_i, "renewalStrategy": "AUTO_RENEW" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "$time.30.minutes.from_now" }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "id": "$licenses[0].id",
+          "attributes": { "renewalStrategy": "NO_RENEW" }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be a "license" with the following attributes:
+      """
+      { "renewalStrategy": "NO_RENEW", "status": "EXPIRING" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "event-log" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin overrides a license's renewal strategy and expiry (cancel now)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy" with the following:
+      """
+      { "duration": $time.1.month.to_i, "renewalStrategy": "AUTO_RENEW" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "$time.2.weeks.from_now" }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "id": "$licenses[0].id",
+          "attributes": { "renewalStrategy": "NO_RENEW", "expiry": "$time.1.minute.ago" }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be a "license" with the following attributes:
+      """
+      { "renewalStrategy": "NO_RENEW", "status": "EXPIRED" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "event-log" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin overrides a license's renewal strategy (auto-renew)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy" with the following:
+      """
+      { "duration": $time.1.month.to_i, "renewalStrategy": "MANUAL_RENEW" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "$time.1.day.ago" }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "id": "$licenses[0].id",
+          "attributes": { "renewalStrategy": "AUTO_RENEW" }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be a "license" with the following attributes:
+      """
+      { "renewalStrategy": "AUTO_RENEW", "status": "RENEWING" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "event-log" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin removes a license's renewal strategy override
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy" with the following:
+      """
+      { "duration": $time.1.month.to_i, "renewalStrategy": "AUTO_RENEW" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "$time.30.minutes.from_now", "renewalStrategy": "NO_RENEW" }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "id": "$licenses[0].id",
+          "attributes": { "renewalStrategy": null }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be a "license" with the following attributes:
+      """
+      { "renewalStrategy": "AUTO_RENEW", "status": "RENEWING" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "event-log" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin overrides a license's renewal strategy with an invalid strategy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy" with the following:
+      """
+      { "duration": $time.1.month.to_i, "renewalStrategy": "AUTO_RENEW" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "$time.2.weeks.from_now" }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "id": "$licenses[0].id",
+          "attributes": { "renewalStrategy": "NEVER_RENEW" }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "unsupported renewal strategy",
+        "source": {
+          "pointer": "/data/attributes/renewalStrategy"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "event-log" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin overrides a floating license's max machines
     Given I am an admin of account "test1"
     And the current account is "test1"

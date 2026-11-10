@@ -126,4 +126,83 @@ describe LicenseExpirationsWorker do
       expect(license.last_expiring_soon_event_sent_at).to eq nil
     end
   end
+
+  context 'when there is a license that is auto-renewing' do
+    let(:policy) { create(:policy, account:, duration: 1.month, renewal_strategy: 'AUTO_RENEW') }
+
+    it 'should not send a license.expired webhook event' do
+      expect(BroadcastEventService).to_not receive(:call)
+
+      license = create(:license, account:, policy:, expiry: 5.minutes.ago)
+
+      worker.perform_async
+      worker.drain
+
+      expect(license.reload.last_expiration_event_sent_at).to eq nil
+    end
+
+    it 'should not send a license.expiring-soon webhook event' do
+      expect(BroadcastEventService).to_not receive(:call)
+
+      license = create(:license, account:, policy:, expiry: 2.days.from_now)
+
+      worker.perform_async
+      worker.drain
+
+      expect(license.reload.last_expiring_soon_event_sent_at).to eq nil
+    end
+
+    it 'should not renew the license' do
+      license = create(:license, account:, policy:, expiry: 5.minutes.ago)
+
+      expect { worker.perform_async; worker.drain }.to_not change { license.reload.expiry }
+    end
+
+    it 'should send a license.expired webhook event for a license that overrides its policy' do
+      expect(BroadcastEventService).to receive(:call) { expect(it).to include(event: 'license.expired') }.exactly(1).time
+
+      create :license, account:, policy:, expiry: 5.minutes.ago, renewal_strategy: 'NO_RENEW'
+
+      worker.perform_async
+      worker.drain
+    end
+
+    it 'should send a license.expiring-soon webhook event for a license that overrides its policy' do
+      expect(BroadcastEventService).to receive(:call) { expect(it).to include(event: 'license.expiring-soon') }.exactly(1).time
+
+      create :license, account:, policy:, expiry: 2.days.from_now, renewal_strategy: 'NO_RENEW'
+
+      worker.perform_async
+      worker.drain
+    end
+
+    it 'should not send a license.expired webhook event for a license that overrides its policy to auto-renew' do
+      expect(BroadcastEventService).to_not receive(:call)
+
+      policy = create(:policy, account:, duration: 1.month, renewal_strategy: 'NO_RENEW')
+
+      create :license, account:, policy:, expiry: 5.minutes.ago, renewal_strategy: 'AUTO_RENEW'
+
+      worker.perform_async
+      worker.drain
+    end
+
+    it 'should send a license.expired webhook event for a suspended license' do
+      expect(BroadcastEventService).to receive(:call) { expect(it).to include(event: 'license.expired') }.exactly(1).time
+
+      create :license, account:, policy:, expiry: 5.minutes.ago, suspended: true
+
+      worker.perform_async
+      worker.drain
+    end
+
+    it 'should send a license.expiring-soon webhook event for a suspended license' do
+      expect(BroadcastEventService).to receive(:call) { expect(it).to include(event: 'license.expiring-soon') }.exactly(1).time
+
+      create :license, account:, policy:, expiry: 2.days.from_now, suspended: true
+
+      worker.perform_async
+      worker.drain
+    end
+  end
 end

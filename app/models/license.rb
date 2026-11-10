@@ -260,6 +260,10 @@ class License < ApplicationRecord
   validates :name,
     length: { maximum: 1.kilobyte }
 
+  validates :renewal_strategy,
+    inclusion: { in: Policy::RENEWAL_STRATEGIES, message: 'unsupported renewal strategy' },
+    if: -> { renewal_strategy_override? }
+
   validates :max_machines,
     numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 2_147_483_647 },
     allow_nil: true,
@@ -567,40 +571,65 @@ class License < ApplicationRecord
       none
     end
   }
-  scope :expiring, -> (status = true) {
+  scope :auto_renewing, -> (status = true) {
+    # NOTE(ezekg) A license may override its policy's renewal strategy, and a
+    #             policy without a duration cannot be renewed.
+    auto_renewing = Policy.where('policies.id = licenses.policy_id')
+                          .where("COALESCE(licenses.renewal_strategy_override, policies.renewal_strategy) = 'AUTO_RENEW'")
+                          .where.not(duration: nil)
+                          .arel
+                          .exists
+
+    # NOTE(ezekg) Suspended licenses are not renewed
     if ActiveRecord::Type::Boolean.new.cast(status)
-      where 'expiry IS NOT NULL AND expiry > ? AND expiry < ?', Time.current, 3.days.from_now
+      where(suspended: [false, nil]).where(auto_renewing)
     else
-      where 'expiry IS NULL OR expiry < ? OR expiry > ?', Time.current, 3.days.from_now
+      where(suspended: true).or(where.not(auto_renewing))
     end
+  }
+  scope :expiring, -> (status = true) {
+    # NOTE(ezekg) Auto-renewing licenses are renewing, not expiring
+    if ActiveRecord::Type::Boolean.new.cast(status)
+      where('licenses.expiry IS NOT NULL AND licenses.expiry > ? AND licenses.expiry < ?', Time.current, 3.days.from_now)
+        .auto_renewing(false)
+    else
+      where('licenses.expiry IS NULL OR licenses.expiry < ? OR licenses.expiry > ?', Time.current, 3.days.from_now)
+        .or(auto_renewing)
+    end
+  }
+  scope :renewing, -> {
+    # NOTE(ezekg) Includes overdue renewals, i.e. an expiry in the past
+    auto_renewing.where('licenses.expiry IS NOT NULL AND licenses.expiry < ?', 1.hour.from_now)
   }
   scope :expired, -> (status = true, within: nil, in: nil, before: nil, after: nil, on: nil) {
     within ||= binding.local_variable_get(:in)
 
+    # NOTE(ezekg) Auto-renewing licenses never expire, even when a renewal is
+    #             overdue, i.e. an expiry in the past.
     begin
       case
       when within.present?
         s = within.to_s.match?(/\A\d+\z/) ? "PT#{within.to_s}S".upcase : "P#{within.to_s.delete_prefix('P').upcase}"
         d = ActiveSupport::Duration.parse(s)
 
-        where 'expiry IS NOT NULL AND expiry < ? AND expiry >= ?', Time.current, d.ago
+        where('expiry IS NOT NULL AND expiry < ? AND expiry >= ?', Time.current, d.ago).auto_renewing(false)
       when before.present?
         t = before.to_s.match?(/\A\d+\z/) ? Time.at(before.to_i) : before.to_time
 
-        where 'expiry IS NOT NULL AND expiry < ? AND expiry <= ?', Time.current, t
+        where('expiry IS NOT NULL AND expiry < ? AND expiry <= ?', Time.current, t).auto_renewing(false)
       when after.present?
         t = after.to_s.match?(/\A\d+\z/) ? Time.at(after.to_i) : after.to_time
 
-        where 'expiry IS NOT NULL AND expiry < ? AND expiry >= ?', Time.current, t
+        where('expiry IS NOT NULL AND expiry < ? AND expiry >= ?', Time.current, t).auto_renewing(false)
       when on.present?
         d = on.to_date
 
-        where 'expiry IS NOT NULL AND expiry < ? AND expiry >= ? AND expiry <= ?', Time.current, d.beginning_of_day, d.end_of_day
+        where('expiry IS NOT NULL AND expiry < ? AND expiry >= ? AND expiry <= ?', Time.current, d.beginning_of_day, d.end_of_day).auto_renewing(false)
       else
         if ActiveRecord::Type::Boolean.new.cast(status) # general expired/unexpired scopes
-          where 'expiry IS NOT NULL AND expiry < ?', Time.current
+          where('expiry IS NOT NULL AND expiry < ?', Time.current).auto_renewing(false)
         else
-          where 'expiry IS NULL OR expiry >= ?', Time.current
+          where('expiry IS NULL OR expiry >= ?', Time.current).or(auto_renewing)
         end
       end
     rescue ActiveSupport::Duration::ISO8601Parser::ParsingError,
@@ -652,6 +681,8 @@ class License < ApplicationRecord
       self.suspended
     when 'EXPIRED'
       self.expired
+    when 'RENEWING'
+      self.renewing
     when 'EXPIRING'
       self.expiring
     when 'INACTIVE'
@@ -805,6 +836,8 @@ class License < ApplicationRecord
       :SUSPENDED
     when expired?
       :EXPIRED
+    when renewing?
+      :RENEWING
     when expiring?
       :EXPIRING
     when inactive?
@@ -813,6 +846,25 @@ class License < ApplicationRecord
       :ACTIVE
     end
   end
+
+  # The license's renewal strategy, i.e. the policy's renewal strategy unless
+  # overridden for the license.
+  def renewal_strategy  = renewal_strategy_override? ? renewal_strategy_override : policy&.renewal_strategy
+  def renewal_strategy? = renewal_strategy.present?
+  def renewal_strategy=(value)
+    self.renewal_strategy_override = value
+  end
+
+  def manual_renew?
+    # NOTE(ezekg) Backwards compat
+    return true if
+      renewal_strategy.nil?
+
+    renewal_strategy == 'MANUAL_RENEW'
+  end
+
+  def auto_renew? = renewal_strategy == 'AUTO_RENEW'
+  def no_renew?   = renewal_strategy == 'NO_RENEW'
 
   def max_machines  = max_machines_override? ? max_machines_override : policy_max_machines
   def max_machines? = max_machines.present?
@@ -877,6 +929,11 @@ class License < ApplicationRecord
   def expired?
     return false if expiry.nil?
 
+    # NOTE(ezekg) Auto-renewing licenses never expire, even when a renewal is
+    #             overdue, e.g. due to a queue delay.
+    return false if
+      auto_renewing?
+
     expiry < Time.current
   end
 
@@ -884,8 +941,29 @@ class License < ApplicationRecord
     return false if
       expiry.nil?
 
+    # NOTE(ezekg) Auto-renewing licenses are renewing, not expiring
+    return false if
+      auto_renewing?
+
     expiry > Time.current && expiry < 3.days.from_now
   end
+
+  def renewing?
+    return false if
+      expiry.nil?
+
+    # NOTE(ezekg) Includes overdue renewals, i.e. an expiry in the past
+    auto_renewing? && expiry < 1.hour.from_now
+  end
+
+  # Whether or not the license will be auto-renewed when it's due, i.e. a
+  # policy without a duration cannot be renewed, and suspended licenses
+  # are not renewed.
+  def auto_renewing? = auto_renew? && policy.present? && policy.timed? && !suspended?
+
+  # Whether or not the license is still waiting on an auto-renewal that
+  # was due, i.e. its expiry is in the past but it is not expired.
+  def renewal_overdue? = auto_renewing? && expiry? && expiry < Time.current
 
   def active?(t = 90.days.ago)
     created_at >= t ||
@@ -920,20 +998,27 @@ class License < ApplicationRecord
     update!(last_check_in_at: Time.current)
   end
 
-  def renew!
+  def renew!(catch_up: false)
     return false if
-      expiry.nil? || policy.duration.nil?
+      expiry.nil? || policy.perpetual? || no_renew?
 
     duration = ActiveSupport::Duration.build(policy.duration)
     now      = Time.current
 
-    case
-    when renew_from_expiry?
-      self.expiry = expiry + duration
-    when renew_from_now?
-      self.expiry = now + duration
-    when renew_from_now_if_expired?
-      self.expiry = (expired? ? now : expiry) + duration
+    loop do
+      case
+      when renew_from_expiry?
+        self.expiry = expiry + duration
+      when renew_from_now?
+        self.expiry = now + duration
+      when renew_from_now_if_expired?
+        self.expiry = (expiry < now ? now : expiry) + duration
+      end
+
+      # When catching up, e.g. for an overdue auto-renewal, we renew until
+      # the expiry is no longer in the past.
+      break unless
+        catch_up && expiry <= now
     end
 
     save!
@@ -946,7 +1031,7 @@ class License < ApplicationRecord
     self.policy = new_policy
 
     if new_policy.present? && new_policy.reset_expiry_on_transfer?
-      if new_policy.duration?
+      if new_policy.timed?
         self.expiry = Time.current + ActiveSupport::Duration.build(new_policy.duration)
       else
         self.expiry = nil

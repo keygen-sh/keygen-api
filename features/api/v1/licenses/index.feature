@@ -2768,6 +2768,32 @@ Feature: List license
     Then the response status should be "200"
     And the response body should be an array with 1 "license"
 
+  Scenario: Admin retrieves licenses filtered by status (renewing)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policy" with the following:
+      """
+      { "renewalStrategy": "AUTO_RENEW" }
+      """
+    And the current account has 2 "licenses" for the last "policy"
+    And the current account has 2 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "$time.30.minutes.from_now" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "expiry": "$time.2.days.from_now" }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "expiry": "$time.30.minutes.from_now" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?status=RENEWING"
+    Then the response status should be "200"
+    And the response body should be an array with 1 "license"
+
   Scenario: Admin retrieves licenses filtered by status (expired)
     Given I am an admin of account "test1"
     And the current account is "test1"

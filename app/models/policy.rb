@@ -86,6 +86,12 @@ class Policy < ApplicationRecord
     FROM_NOW_IF_EXPIRED
   ].freeze
 
+  RENEWAL_STRATEGIES = %w[
+    AUTO_RENEW
+    MANUAL_RENEW
+    NO_RENEW
+  ].freeze
+
   TRANSFER_STRATEGIES = %w[
     RESET_EXPIRY
     KEEP_EXPIRY
@@ -167,6 +173,7 @@ class Policy < ApplicationRecord
   before_create -> { self.expiration_strategy = 'RESTRICT_ACCESS' }, if: -> { expiration_strategy.nil? }
   before_create -> { self.expiration_basis = 'FROM_CREATION' }, if: -> { expiration_basis.nil? }
   before_create -> { self.renewal_basis = 'FROM_EXPIRY' }, if: -> { renewal_basis.nil? }
+  before_create -> { self.renewal_strategy = 'MANUAL_RENEW' }, if: -> { renewal_strategy.nil? }
   before_create -> { self.transfer_strategy = 'KEEP_EXPIRY' }, if: -> { transfer_strategy.nil? }
   before_create -> { self.authentication_strategy = 'TOKEN' }, if: -> { authentication_strategy.nil? }
   before_create -> { self.heartbeat_cull_strategy = 'DEACTIVATE_DEAD' }, if: -> { heartbeat_cull_strategy.nil? }
@@ -229,6 +236,10 @@ class Policy < ApplicationRecord
 
   validates :heartbeat_basis,
     inclusion: { in: HEARTBEAT_BASES, message: "unsupported heartbeat basis" },
+    allow_nil: true
+
+  validates :renewal_strategy,
+    inclusion: { in: RENEWAL_STRATEGIES, message: 'unsupported renewal strategy' },
     allow_nil: true
 
   validates :transfer_strategy,
@@ -588,6 +599,9 @@ class Policy < ApplicationRecord
     expiration_basis == 'FROM_FIRST_DOWNLOAD'
   end
 
+  def perpetual? = duration.nil?
+  def timed?     = duration?
+
   def renew_from_expiry?
     # NOTE(ezekg) Backwards compat
     return true if
@@ -598,6 +612,17 @@ class Policy < ApplicationRecord
 
   def renew_from_now?            = renewal_basis == 'FROM_NOW'
   def renew_from_now_if_expired? = renewal_basis == 'FROM_NOW_IF_EXPIRED'
+
+  def manual_renew?
+    # NOTE(ezekg) Backwards compat
+    return true if
+      renewal_strategy.nil?
+
+    renewal_strategy == 'MANUAL_RENEW'
+  end
+
+  def auto_renew? = renewal_strategy == 'AUTO_RENEW'
+  def no_renew?   = renewal_strategy == 'NO_RENEW'
 
   def supports_token_auth?
     # NOTE(ezekg) Backwards compat

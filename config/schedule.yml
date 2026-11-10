@@ -2,6 +2,10 @@ check_for_license_expirations:
   cron: "*/10 * * * *" # Every 10 mins (https://crontab.guru/every-10-minutes)
   class: "LicenseExpirationsWorker"
 
+check_for_license_renewals:
+  cron: "*/5 * * * *" # Every 5 mins
+  class: "LicenseRenewalsWorker"
+
 check_for_license_overdue_check_ins:
   cron: "*/10 * * * *" # Every 10 mins
   class: "LicenseOverdueCheckInsWorker"

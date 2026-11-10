@@ -63,6 +63,7 @@ module Api::V1
             param :protected, type: :boolean, optional: true
             param :expiry, type: :time, optional: true, coerce: true, allow_nil: true
             param :suspended, type: :boolean, optional: true
+            param :renewal_strategy, type: :string, allow_nil: true, optional: true
             param :max_machines, type: :integer, allow_nil: true, optional: true
             param :max_cores, type: :integer, allow_nil: true, optional: true
             param :max_memory, type: :integer, allow_nil: true, optional: true
@@ -145,6 +146,7 @@ module Api::V1
             param :expiry, type: :time, optional: true, coerce: true, allow_nil: true
             param :protected, type: :boolean, optional: true
             param :suspended, type: :boolean, optional: true
+            param :renewal_strategy, type: :string, allow_nil: true, optional: true
             param :max_machines, type: :integer, allow_nil: true, optional: true
             param :max_cores, type: :integer, allow_nil: true, optional: true
             param :max_memory, type: :integer, allow_nil: true, optional: true

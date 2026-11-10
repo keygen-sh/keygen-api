@@ -5,7 +5,10 @@ class LicenseExpirationsWorker < BaseWorker
                   cronitor_enabled: true
 
   def perform
+    # NOTE(ezekg) Auto-renewing licenses never expire, i.e. see the license
+    #             renewals worker.
     licenses = License.preload(:account, :policy)
+                      .auto_renewing(false)
                       .where.not(expiry: nil)
                       .where(expiry: 3.days.ago..3.days.from_now)
                       .reorder(nil)

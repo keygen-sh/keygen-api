@@ -230,6 +230,7 @@ events = %w[
   license.policy.updated
   license.reinstated
   license.renewed
+  license.renewing-soon
   license.revoked
   license.suspended
   license.updated

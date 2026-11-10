@@ -15,6 +15,7 @@ class LicenseSerializer < BaseSerializer
   attribute :status
   attribute :uses
   attribute :suspended
+  attribute :renewal_strategy
   attribute :scheme
   attribute :encrypted do
     @object.encrypted?

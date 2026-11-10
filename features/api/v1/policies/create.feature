@@ -92,6 +92,7 @@ Feature: Create policy
         "expirationStrategy": "RESTRICT_ACCESS",
         "expirationBasis": "FROM_CREATION",
         "renewalBasis": "FROM_EXPIRY",
+        "renewalStrategy": "MANUAL_RENEW",
         "transferStrategy": "KEEP_EXPIRY",
         "authenticationStrategy": "TOKEN",
         "heartbeatCullStrategy": "DEACTIVATE_DEAD",
@@ -1154,6 +1155,145 @@ Feature: Create policy
         "code": "RENEWAL_BASIS_NOT_ALLOWED",
         "source": {
           "pointer": "/data/attributes/renewalBasis"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "event-log" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that has an auto renewal strategy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Auto Renewal Strategy",
+            "renewalStrategy": "AUTO_RENEW"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response body should be a "policy" with the renewalStrategy "AUTO_RENEW"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "event-log" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that has a manual renewal strategy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Manual Renewal Strategy",
+            "renewalStrategy": "MANUAL_RENEW"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response body should be a "policy" with the renewalStrategy "MANUAL_RENEW"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "event-log" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that has a no renewal strategy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "No Renewal Strategy",
+            "renewalStrategy": "NO_RENEW"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response body should be a "policy" with the renewalStrategy "NO_RENEW"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "event-log" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that has an invalid renewal strategy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Invalid Renewal Strategy",
+            "renewalStrategy": "NEVER_RENEW"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the response body should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "unsupported renewal strategy",
+        "code": "RENEWAL_STRATEGY_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/attributes/renewalStrategy"
         }
       }
       """

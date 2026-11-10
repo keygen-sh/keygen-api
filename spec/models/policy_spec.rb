@@ -109,4 +109,22 @@ describe Policy, type: :model do
       end
     end
   end
+
+  describe '#perpetual?' do
+    it 'should be perpetual without a duration' do
+      policy = create(:policy, account:, duration: nil)
+
+      expect(policy.perpetual?).to be true
+      expect(policy.timed?).to be false
+    end
+  end
+
+  describe '#timed?' do
+    it 'should be timed with a duration' do
+      policy = create(:policy, account:, duration: 1.month)
+
+      expect(policy.timed?).to be true
+      expect(policy.perpetual?).to be false
+    end
+  end
 end

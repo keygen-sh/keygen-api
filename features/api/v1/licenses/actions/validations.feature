@@ -3252,6 +3252,90 @@ Feature: License validation actions
     And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin validates a license that is overdue for auto-renewal
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "duration": $time.1.month.to_i,
+        "renewalStrategy": "AUTO_RENEW"
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "webhook-endpoint"
+    And the last "license" has the following attributes:
+      """
+      { "expiry": "$time.1.day.ago" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "event-log" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a license that is expired for a manual renewal policy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "duration": $time.1.month.to_i,
+        "renewalStrategy": "MANUAL_RENEW"
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "webhook-endpoint"
+    And the last "license" has the following attributes:
+      """
+      { "expiry": "$time.1.day.ago" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "is expired", "code": "EXPIRED" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "event-log" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a license that is overdue for auto-renewal but suspended
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "duration": $time.1.month.to_i,
+        "renewalStrategy": "AUTO_RENEW"
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "webhook-endpoint"
+    And the last "license" has the following attributes:
+      """
+      { "expiry": "$time.1.day.ago", "suspended": true }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "is suspended", "code": "SUSPENDED" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "event-log" job
+    And sidekiq should have 1 "request-log" job
+
   @ee
   Scenario: An isolated admin validates a valid license scoped to a isolated environment
     Given the current account is "test1"
