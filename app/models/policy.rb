@@ -599,6 +599,9 @@ class Policy < ApplicationRecord
     expiration_basis == 'FROM_FIRST_DOWNLOAD'
   end
 
+  def perpetual? = duration.nil?
+  def timed?     = duration?
+
   def renew_from_expiry?
     # NOTE(ezekg) Backwards compat
     return true if

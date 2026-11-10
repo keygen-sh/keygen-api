@@ -959,7 +959,7 @@ class License < ApplicationRecord
   # Whether or not the license will be auto-renewed when it's due, i.e. a
   # policy without a duration cannot be renewed, and suspended licenses
   # are not renewed.
-  def auto_renewing? = auto_renew? && policy.present? && policy.duration? && !suspended?
+  def auto_renewing? = auto_renew? && policy.present? && policy.timed? && !suspended?
 
   # Whether or not the license is still waiting on an auto-renewal that
   # was due, i.e. its expiry is in the past but it is not expired.
@@ -1000,7 +1000,7 @@ class License < ApplicationRecord
 
   def renew!(catch_up: false)
     return false if
-      expiry.nil? || policy.duration.nil? || no_renew?
+      expiry.nil? || policy.perpetual? || no_renew?
 
     duration = ActiveSupport::Duration.build(policy.duration)
     now      = Time.current
@@ -1031,7 +1031,7 @@ class License < ApplicationRecord
     self.policy = new_policy
 
     if new_policy.present? && new_policy.reset_expiry_on_transfer?
-      if new_policy.duration?
+      if new_policy.timed?
         self.expiry = Time.current + ActiveSupport::Duration.build(new_policy.duration)
       else
         self.expiry = nil
