@@ -7,6 +7,14 @@ require 'active_support/parameter_filter'
 # fully redacting them, preserving enough of the original value and structure
 # to aid debugging, e.g. identifying a token or digest, without leaking the
 # full secret into things like request or event logs.
+#
+# In addition to matching on keys, values can be matched via the :values
+# option, e.g. to mask a sensitive value that lives under a benign key:
+#
+#   filterer = HashFilter.new(%i[token], values: [/\Aotpauth:/i])
+#   filterer.filter(uri: 'otpauth://totp/Keygen?secret=abc&issuer=Keygen')
+#   # => { uri: "otpa...ygen" }
+#
 class HashFilter < ActiveSupport::ParameterFilter
   EDGE_SIZE = 4
   ELLIPSIS  = '...'
@@ -39,11 +47,21 @@ class HashFilter < ActiveSupport::ParameterFilter
     end
   }
 
-  def initialize(filters = [], mask: DEFAULT_MASK)
+  def initialize(filters = [], values: [], mask: DEFAULT_MASK)
     raise ArgumentError, 'mask must be callable' unless
       mask.respond_to?(:call)
 
-    super
+    raise ArgumentError, 'values must be regexps' unless
+      values.all?(Regexp)
+
+    # NB(ezekg) the parent short-circuits when there are no key filters, so
+    #           value filters would otherwise be silently ignored
+    raise ArgumentError, 'values cannot be used without filters' if
+      filters.empty? && values.any?
+
+    super(filters, mask:)
+
+    @value_re = Regexp.union(values) unless values.empty?
   end
 
   private
@@ -54,10 +72,25 @@ class HashFilter < ActiveSupport::ParameterFilter
     # the parent assigns result = @mask when the key matches one of the
     # filters; if our mask is callable, invoke it with the original value
     # to produce a partial mask
-    if filtered_value.equal?(@mask)
+    if filtered_value.equal?(@mask) || value_matches?(filtered_value)
       @mask.call(value)
     else
       filtered_value
+    end
+  end
+
+  # NB(ezekg) the parent recurses into hashes and arrays via value_for_key, so
+  #           we only ever need to match scalars, i.e. the leafs. we coerce to
+  #           a string to match what the default mask considers sensitive.
+  def value_matches?(value)
+    return false if
+      @value_re.nil?
+
+    case value
+    when Hash, Array, NilClass, TrueClass, FalseClass
+      false
+    else
+      @value_re.match?(value.to_s)
     end
   end
 end
