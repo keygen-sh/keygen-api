@@ -74,6 +74,18 @@ describe LicenseRenewalsWorker do
       end
     end
 
+    it 'should renew a license that overrides its policy to auto-renew' do
+      expect(BroadcastEventService).to receive(:call) { expect(it).to include(event:) }.exactly(1).time
+
+      policy  = create(:policy, account:, duration: 1.month, renewal_strategy: 'MANUAL_RENEW')
+      license = create(:license, account:, policy:, expiry: 5.minutes.ago, renewal_strategy: 'AUTO_RENEW')
+
+      worker.perform_async
+      worker.drain
+
+      expect(license.reload.expiry).to be > Time.current
+    end
+
     it 'should renew multiple licenses' do
       expect(BroadcastEventService).to receive(:call) { expect(it).to include(event:) }.exactly(3).times
 
@@ -133,6 +145,19 @@ describe LicenseRenewalsWorker do
       license = create(:license, account:, policy:, expiry: 5.minutes.ago, suspended: true)
 
       expect { worker.perform_async; worker.drain }.to_not change { license.reload.expiry }
+    end
+
+    it 'should not renew a license that overrides its policy to not auto-renew' do
+      expect(BroadcastEventService).to_not receive(:call)
+
+      a = create(:license, account:, policy:, expiry: 5.minutes.ago, renewal_strategy: 'NO_RENEW')
+      b = create(:license, account:, policy:, expiry: 5.minutes.ago, renewal_strategy: 'MANUAL_RENEW')
+
+      worker.perform_async
+      worker.drain
+
+      expect(a.reload.expiry).to be < Time.current
+      expect(b.reload.expiry).to be < Time.current
     end
 
     it 'should not renew a license without an expiry' do
@@ -224,6 +249,15 @@ describe LicenseRenewalsWorker do
       expect(BroadcastEventService).to_not receive(:call)
 
       create :license, account:, policy:, expiry: 2.days.from_now, suspended: true
+
+      worker.perform_async
+      worker.drain
+    end
+
+    it 'should not send a license.renewing-soon webhook event for a license that overrides its policy' do
+      expect(BroadcastEventService).to_not receive(:call)
+
+      create :license, account:, policy:, expiry: 2.days.from_now, renewal_strategy: 'NO_RENEW'
 
       worker.perform_async
       worker.drain

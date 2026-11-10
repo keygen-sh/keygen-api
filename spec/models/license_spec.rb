@@ -439,6 +439,46 @@ describe License, type: :model do
         expect(License.with_status(:renewing)).to_not include license
       end
 
+      it 'should be expired when the renewal strategy is overridden' do
+        license.update!(renewal_strategy: 'NO_RENEW')
+
+        expect(license.renewal_strategy).to eq 'NO_RENEW'
+        expect(license.auto_renewing?).to be false
+        expect(license.expired?).to be true
+        expect(license.status).to eq :EXPIRED
+        expect(License.expired).to include license
+        expect(License.expired(false)).to_not include license
+        expect(License.with_status(:renewing)).to_not include license
+        expect(License.auto_renewing).to_not include license
+        expect(License.auto_renewing(false)).to include license
+      end
+
+      it 'should not be expired when the override is removed' do
+        license.update!(renewal_strategy: 'NO_RENEW')
+        license.update!(renewal_strategy: nil)
+
+        expect(license.renewal_strategy).to eq 'AUTO_RENEW'
+        expect(license.expired?).to be false
+        expect(License.auto_renewing).to include license
+      end
+
+      it 'should not be expired when overriding a policy that is not auto-renewing' do
+        policy.update!(renewal_strategy: 'NO_RENEW')
+        license.reload.update!(renewal_strategy: 'AUTO_RENEW')
+
+        expect(license.no_renew?).to be false
+        expect(license.expired?).to be false
+        expect(license.status).to eq :RENEWING
+        expect(License.expired).to_not include license
+        expect(License.auto_renewing).to include license
+      end
+
+      it 'should not allow an invalid renewal strategy override' do
+        license.renewal_strategy = 'NEVER_RENEW'
+
+        expect(license).to_not be_valid
+      end
+
       it 'should be expired when the policy is not auto-renewing' do
         policy.update!(renewal_strategy: 'MANUAL_RENEW')
         license.reload

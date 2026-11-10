@@ -260,6 +260,10 @@ class License < ApplicationRecord
   validates :name,
     length: { maximum: 1.kilobyte }
 
+  validates :renewal_strategy,
+    inclusion: { in: Policy::RENEWAL_STRATEGIES, message: 'unsupported renewal strategy' },
+    if: -> { renewal_strategy_override? }
+
   validates :max_machines,
     numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 2_147_483_647 },
     allow_nil: true,
@@ -568,7 +572,11 @@ class License < ApplicationRecord
     end
   }
   scope :auto_renewing, -> (status = true) {
-    auto_renewing = Policy.auto_renewing.where('policies.id = licenses.policy_id')
+    # NOTE(ezekg) A license may override its policy's renewal strategy, and a
+    #             policy without a duration cannot be renewed.
+    auto_renewing = Policy.where('policies.id = licenses.policy_id')
+                          .where("COALESCE(licenses.renewal_strategy_override, policies.renewal_strategy) = 'AUTO_RENEW'")
+                          .where.not(duration: nil)
                           .arel
                           .exists
 
@@ -737,7 +745,6 @@ class License < ApplicationRecord
     :expire_from_first_use?,
     :expire_from_first_download?,
     :renew_from_expiry?, :renew_from_now?, :renew_from_now_if_expired?,
-    :auto_renew?, :manual_renew?, :no_renew?,
     :supports_token_auth?,
     :supports_license_auth?,
     :supports_session_auth?,
@@ -840,6 +847,25 @@ class License < ApplicationRecord
     end
   end
 
+  # The license's renewal strategy, i.e. the policy's renewal strategy unless
+  # overridden for the license.
+  def renewal_strategy  = renewal_strategy_override? ? renewal_strategy_override : policy&.renewal_strategy
+  def renewal_strategy? = renewal_strategy.present?
+  def renewal_strategy=(value)
+    self.renewal_strategy_override = value
+  end
+
+  def manual_renew?
+    # NOTE(ezekg) Backwards compat
+    return true if
+      renewal_strategy.nil?
+
+    renewal_strategy == 'MANUAL_RENEW'
+  end
+
+  def auto_renew? = renewal_strategy == 'AUTO_RENEW'
+  def no_renew?   = renewal_strategy == 'NO_RENEW'
+
   def max_machines  = max_machines_override? ? max_machines_override : policy_max_machines
   def max_machines? = max_machines.present?
   def max_machines=(value)
@@ -933,7 +959,7 @@ class License < ApplicationRecord
   # Whether or not the license will be auto-renewed when it's due, i.e. a
   # policy without a duration cannot be renewed, and suspended licenses
   # are not renewed.
-  def auto_renewing? = policy.present? && policy.auto_renewing? && !suspended?
+  def auto_renewing? = auto_renew? && policy.present? && policy.duration? && !suspended?
 
   # Whether or not the license is still waiting on an auto-renewal that
   # was due, i.e. its expiry is in the past but it is not expired.

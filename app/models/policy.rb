@@ -396,7 +396,6 @@ class Policy < ApplicationRecord
   }
 
   scope :for_product, -> id { where product_id: id }
-  scope :auto_renewing, -> { where(renewal_strategy: 'AUTO_RENEW').where.not(duration: nil) }
   scope :for_license, -> id {
     joins(:licenses).where(licenses: { id: })
                     .distinct
@@ -620,7 +619,6 @@ class Policy < ApplicationRecord
   end
 
   def auto_renew? = renewal_strategy == 'AUTO_RENEW'
-  def auto_renewing? = auto_renew? && duration?
   def no_renew?   = renewal_strategy == 'NO_RENEW'
 
   def supports_token_auth?
