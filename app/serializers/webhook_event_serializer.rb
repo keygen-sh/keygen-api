@@ -6,8 +6,18 @@ class WebhookEventSerializer < BaseSerializer
   attribute :endpoint
   attribute :api_version
   attribute :payload do
-    if @object.respond_to?(:payload)
-      @object.payload
+    if @object.respond_to?(:payload) && @object.payload?
+      # NB(ezekg) webhook deliveries must be verbatim (anything else is filtered)
+      unless @context == :webhook
+        filterer = HashFilter.new(FILTER_KEYS, values: FILTER_VALUES)
+        filtered = filterer.filter(
+          JSON.parse(@object.payload),
+        )
+
+        filtered.to_json
+      else
+        @object.payload
+      end
     else
       nil
     end
