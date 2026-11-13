@@ -300,7 +300,7 @@ class Token < ApplicationRecord
       new_session = if session.present? && session.token == self
                       sessions.build(
                         environment: session.environment,
-                        parent: session,
+                        parent: session.parent, # grandparent survives delete_all
                         expiry: session.expiry, # don't implicitly extend session
                         user_agent: session.user_agent,
                         ip: session.ip,
