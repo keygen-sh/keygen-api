@@ -470,6 +470,31 @@ describe Token, type: :model do
       expect(token.sessions).to include new_session
     end
 
+    context 'with a parent session' do
+      before { Sidekiq::Testing.inline! }
+      after  { Sidekiq::Testing.fake! }
+
+      it 'should not orphan the regenerated session' do
+        parent      = create(:session, account:, bearer: token.bearer)
+        old_session = create(:session, token:, bearer: token.bearer, parent:)
+        new_session = token.regenerate!(
+          session: old_session,
+        )
+
+        new_session.reload
+
+        expect(new_session.orphaned?).to be false
+        expect(new_session.parent_id).to eq parent.id
+        expect(new_session.environment_id).to eq old_session.environment_id
+        expect(new_session.user_agent).to eq old_session.user_agent
+        expect(new_session.ip).to eq old_session.ip
+        expect(Session.exists?(old_session.id)).to be false
+        expect(Session.exists?(parent.id)).to be true
+
+        expect { parent.destroy }.to change { Session.exists?(new_session.id) }.from(true).to(false)
+      end
+    end
+
     it 'should not regenerate session' do
       other_session = create(:session, account:)
       new_session   = token.regenerate!(
