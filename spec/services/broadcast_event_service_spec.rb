@@ -152,6 +152,67 @@ describe BroadcastEventService do
     )
   end
 
+  it 'should pin event delivery to the validated address' do
+    create_webhook_event!(account, resource)
+
+    expect(WebhookWorker::Request).to have_received(:post).with(
+      endpoint.url,
+      hash_including(ipaddr: '1.1.1.1'),
+    )
+  end
+
+  it 'should not deliver the event when DNS is rebound to an invalid address' do
+    endpoint # create the endpoint before rebinding
+
+    # simulate the endpoint passing revalidation and then DNS being rebound
+    allow_any_instance_of(WebhookEndpoint).to receive(:invalid?).and_return false
+    allow(UrlValidator::DNS_RESOLVER).to receive(:getaddresses) { %w[127.0.0.1] }
+
+    expect { create_webhook_event!(account, resource) }.to raise_error WebhookWorker::FailedRequestError
+    event = WebhookEvent.last
+
+    expect(WebhookWorker::Request).to_not have_received(:post)
+    expect(event).to_not be_nil
+    expect(event.last_response_body).to eq 'RESOLV_ERROR'
+  end
+
+  it 'should not deliver the event when DNS is rebound to a mix of valid and invalid addresses' do
+    endpoint # create the endpoint before rebinding
+
+    allow_any_instance_of(WebhookEndpoint).to receive(:invalid?).and_return false
+    allow(UrlValidator::DNS_RESOLVER).to receive(:getaddresses) { %w[1.1.1.1 10.0.0.1] }
+
+    expect { create_webhook_event!(account, resource) }.to raise_error WebhookWorker::FailedRequestError
+    expect(WebhookWorker::Request).to_not have_received(:post)
+  end
+
+  it 'should pin event delivery to one of the validated addresses' do
+    endpoint # create the endpoint before changing DNS
+
+    allow(UrlValidator::DNS_RESOLVER).to receive(:getaddresses) { %w[1.1.1.1 1.0.0.1] }
+
+    create_webhook_event!(account, resource)
+
+    expect(WebhookWorker::Request).to have_received(:post).once.with(
+      endpoint.url,
+      hash_including(ipaddr: satisfy { it.in?(%w[1.1.1.1 1.0.0.1]) }),
+    )
+  end
+
+  it 'should connect to the pinned address instead of resolving the host' do
+    adapter = WebhookWorker::Request.default_options[:connection_adapter]
+    http    = adapter.call(URI.parse('https://webhooks.example'), ipaddr: '1.1.1.1')
+
+    expect(http.address).to eq 'webhooks.example'
+    expect(http.ipaddr).to eq '1.1.1.1'
+  end
+
+  it 'should not connect without a pinned address' do
+    adapter = WebhookWorker::Request.default_options[:connection_adapter]
+
+    expect { adapter.call(URI.parse('https://webhooks.example'), {}) }.to raise_error KeyError
+  end
+
   it 'should succeed when event delivery is ok' do
     allow(WebhookWorker::Request).to receive(:post) {
       OpenStruct.new(code: 204, body: nil)

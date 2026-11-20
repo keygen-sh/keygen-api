@@ -40,6 +40,14 @@ class WebhookEndpoint < ApplicationRecord
     end
   end
 
+  # ipaddrs resolves the endpoint's host to its validated IP addresses. it's empty
+  # when the host doesn't resolve or when it resolves to any unacceptable address.
+  #
+  # NB(ezekg) requests must connect to one of these rather than to the host, since
+  #           resolving the host again could return an address we never validated,
+  #           e.g. an internal one, i.e. DNS rebinding.
+  def ipaddrs = UrlValidator.resolve(URI.parse(url).host)
+
   def subscribed?(event)
     !(subscriptions & ['*', event]).empty?
   end

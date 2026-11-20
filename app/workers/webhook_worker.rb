@@ -49,6 +49,11 @@ class WebhookWorker < BaseWorker
     raise InvalidEndpointError if
       endpoint.invalid?
 
+    # pin the request to a validated IP address so that DNS can't be rebound to another
+    ipaddrs = endpoint.ipaddrs
+    raise InvalidEndpointError if
+      ipaddrs.empty?
+
     # migrate event payload in case anything has changed e.g. endpoint API version
     current_version = event.api_version || CURRENT_API_VERSION
     target_version  = endpoint.api_version || account.api_version
@@ -106,6 +111,7 @@ class WebhookWorker < BaseWorker
       write_timeout: 15.seconds.to_i,
       read_timeout: 15.seconds.to_i,
       open_timeout: 15.seconds.to_i,
+      ipaddr: ipaddrs.sample,
       headers:,
       body:,
     })
@@ -276,6 +282,11 @@ class WebhookWorker < BaseWorker
 
   class Request
     include HTTParty
+
+    # pins the connection to the given IP address instead of resolving the host
+    connection_adapter -> uri, options {
+      HTTParty::ConnectionAdapter.call(uri, options).tap { it.ipaddr = options.fetch(:ipaddr) }
+    }
 
     no_follow true
   end
