@@ -34,6 +34,62 @@ class UrlValidator < ActiveModel::EachValidator
     Resolv::DNS.new.tap { it.timeouts = DNS_ATTEMPT_TIMEOUTS },
   ])
 
+  class << self
+    # resolve returns the addresses a host resolves to, or an empty array when the
+    # host doesn't resolve or when it resolves to any unacceptable address.
+    def resolve(host)
+      addrs = Timeout.timeout(DNS_TIMEOUT) { DNS_RESOLVER.getaddresses(host) }
+
+      addrs.all? { valid_address?(IPAddr.new(it)) } ? addrs : []
+    rescue IPAddr::InvalidAddressError,
+           Resolv::ResolvError,
+           Timeout::Error
+      []
+    end
+
+    private
+
+    def valid_address?(ip)
+      # NB(ezekg) self-hosted deployments may legitimately point webhooks at private or
+      #           internal addresses, so allow explicitly permitted ranges.
+      return true if
+        allowed_private_address?(ip)
+
+      return false if
+        ip.loopback? || ip.private? || ip.link_local? ||
+        ip.ipv4_mapped? || ip.ipv4_compat?
+
+      case
+      when ip.ipv4?
+        !blacklisted_ipv4?(ip)
+      when embedded_ipv4?(ip)
+        !blacklisted_ipv4?(embedded_ipv4(ip))
+      else
+        !blacklisted_ipv6?(ip)
+      end
+    end
+
+    def allowed_private_address?(ip) = allowed_private_ranges.any? { it.include?(ip) }
+    def allowed_private_ranges
+      return [] unless
+        ENV.key?('KEYGEN_ALLOWED_PRIVATE_ADDRESSES')
+
+      # NB(ezekg) a comma-separated CIDR allowlist of otherwise-private ranges to permit,
+      #           e.g. an internal service subnet for webhooks.
+      ENV.fetch('KEYGEN_ALLOWED_PRIVATE_ADDRESSES') { '' }
+         .split(',')
+         .filter_map { IPAddr.new(it.strip) unless it.strip.empty? }
+    end
+
+    def blacklisted_ipv4?(ip) = BLACKLISTED_IPV4.any? { it.include?(ip) }
+    def blacklisted_ipv6?(ip) = BLACKLISTED_IPV6.any? { it.include?(ip) }
+    def embedded_ipv4?(ip)    = NAT64_PREFIXES.any? { it.include?(ip) }
+
+    def embedded_ipv4(ip)
+      IPAddr.new([ip.to_i & 0xffffffff].pack("N").unpack("C4").join("."))
+    end
+  end
+
   def validate_each(record, attribute, value)
     uri = URI.parse(value)
 
@@ -85,54 +141,6 @@ class UrlValidator < ActiveModel::EachValidator
     return false if
       uri.nil? || uri.host.nil?
 
-    addrs = Timeout.timeout(DNS_TIMEOUT) { DNS_RESOLVER.getaddresses(uri.host) }
-    return false if
-      addrs.empty?
-
-    addrs.all? do |addr|
-      ip = IPAddr.new(addr)
-
-      # NB(ezekg) self-hosted deployments may legitimately point webhooks at private or
-      #           internal addresses, so allow explicitly permitted ranges.
-      next true if
-        allowed_private_address?(ip)
-
-      next false if
-        ip.loopback? || ip.private? || ip.link_local? ||
-        ip.ipv4_mapped? || ip.ipv4_compat?
-
-      case
-      when ip.ipv4?
-        !blacklisted_ipv4?(ip)
-      when embedded_ipv4?(ip)
-        !blacklisted_ipv4?(embedded_ipv4(ip))
-      else
-        !blacklisted_ipv6?(ip)
-      end
-    end
-  rescue IPAddr::InvalidAddressError,
-         Resolv::ResolvError,
-         Timeout::Error
-    false
-  end
-
-  def allowed_private_address?(ip) = allowed_private_ranges.any? { it.include?(ip) }
-  def allowed_private_ranges
-    return [] unless
-      ENV.key?('KEYGEN_ALLOWED_PRIVATE_ADDRESSES')
-
-    # NB(ezekg) a comma-separated CIDR allowlist of otherwise-private ranges to permit,
-    #           e.g. an internal service subnet for webhooks.
-    ENV.fetch('KEYGEN_ALLOWED_PRIVATE_ADDRESSES') { '' }
-       .split(',')
-       .filter_map { IPAddr.new(it.strip) unless it.strip.empty? }
-  end
-
-  def blacklisted_ipv4?(ip) = BLACKLISTED_IPV4.any? { it.include?(ip) }
-  def blacklisted_ipv6?(ip) = BLACKLISTED_IPV6.any? { it.include?(ip) }
-  def embedded_ipv4?(ip)    = NAT64_PREFIXES.any? { it.include?(ip) }
-
-  def embedded_ipv4(ip)
-    IPAddr.new([ip.to_i & 0xffffffff].pack("N").unpack("C4").join("."))
+    self.class.resolve(uri.host).any?
   end
 end
