@@ -19,7 +19,7 @@ describe UrlValidator do
   subject { model.new(url:) }
 
   def stub_resolv!(host, *addrs)
-    allow(Hostname::DNS_RESOLVER).to receive(:getaddresses).with(host).and_return(addrs)
+    allow(HostResolver::DNS_RESOLVER).to receive(:getaddresses).with(host).and_return(addrs)
   end
 
   context 'with an invalid URL' do
@@ -203,9 +203,9 @@ describe UrlValidator do
 
     context 'when resolution exceeds the deadline' do
       before do
-        stub_const('Hostname::DNS_TIMEOUT', 0.1)
+        stub_const('HostResolver::DNS_TIMEOUT', 0.1)
 
-        allow(Hostname::DNS_RESOLVER).to receive(:getaddresses).with('webhooks.example') { sleep 5 }
+        allow(HostResolver::DNS_RESOLVER).to receive(:getaddresses).with('webhooks.example') { sleep 5 }
       end
 
       it 'should be invalid' do
@@ -226,18 +226,18 @@ describe UrlValidator do
 
     context 'when resolution times out' do
       before do
-        allow(Hostname::DNS_RESOLVER).to receive(:getaddresses).with('webhooks.example').and_raise(Resolv::ResolvTimeout)
+        allow(HostResolver::DNS_RESOLVER).to receive(:getaddresses).with('webhooks.example').and_raise(Resolv::ResolvTimeout)
       end
 
       it { is_expected.to_not be_valid }
     end
 
     it 'should use a resolver with bounded timeouts' do
-      dns = Hostname::DNS_RESOLVER.instance_variable_get(:@resolvers).grep(Resolv::DNS).sole
+      dns = HostResolver::DNS_RESOLVER.instance_variable_get(:@resolvers).grep(Resolv::DNS).sole
       cfg = dns.instance_variable_get(:@config)
 
-      expect(cfg.instance_variable_get(:@timeouts)).to eq Hostname::DNS_ATTEMPT_TIMEOUTS
-      expect(Hostname::DNS_ATTEMPT_TIMEOUTS.sum).to be <= Hostname::DNS_TIMEOUT
+      expect(cfg.instance_variable_get(:@timeouts)).to eq HostResolver::DNS_ATTEMPT_TIMEOUTS
+      expect(HostResolver::DNS_ATTEMPT_TIMEOUTS.sum).to be <= HostResolver::DNS_TIMEOUT
     end
   end
 
@@ -255,7 +255,7 @@ describe UrlValidator do
     end
 
     before do
-      allow(Hostname::DNS_RESOLVER).to receive(:getaddresses).and_raise('unexpected DNS query')
+      allow(HostResolver::DNS_RESOLVER).to receive(:getaddresses).and_raise('unexpected DNS query')
     end
 
     context 'with a valid URL' do

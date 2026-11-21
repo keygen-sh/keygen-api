@@ -57,6 +57,6 @@ class UrlValidator < ActiveModel::EachValidator
     return false if
       uri.nil? || uri.host.nil?
 
-    Hostname.new(uri.host).ipaddrs.any?
+    HostResolver.new(uri.host).ipaddrs.any?
   end
 end
