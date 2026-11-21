@@ -166,7 +166,7 @@ describe BroadcastEventService do
 
     # simulate the endpoint passing revalidation and then DNS being rebound
     allow_any_instance_of(WebhookEndpoint).to receive(:invalid?).and_return false
-    allow(Hostname::DNS_RESOLVER).to receive(:getaddresses) { %w[127.0.0.1] }
+    allow(HostResolver::DNS_RESOLVER).to receive(:getaddresses) { %w[127.0.0.1] }
 
     expect { create_webhook_event!(account, resource) }.to raise_error WebhookWorker::FailedRequestError
     event = WebhookEvent.last
@@ -180,7 +180,7 @@ describe BroadcastEventService do
     endpoint # create the endpoint before rebinding
 
     allow_any_instance_of(WebhookEndpoint).to receive(:invalid?).and_return false
-    allow(Hostname::DNS_RESOLVER).to receive(:getaddresses) { %w[1.1.1.1 10.0.0.1] }
+    allow(HostResolver::DNS_RESOLVER).to receive(:getaddresses) { %w[1.1.1.1 10.0.0.1] }
 
     expect { create_webhook_event!(account, resource) }.to raise_error WebhookWorker::FailedRequestError
     expect(WebhookWorker::Request).to_not have_received(:post)
@@ -189,7 +189,7 @@ describe BroadcastEventService do
   it 'should pin event delivery to one of the validated addresses' do
     endpoint # create the endpoint before changing DNS
 
-    allow(Hostname::DNS_RESOLVER).to receive(:getaddresses) { %w[1.1.1.1 1.0.0.1] }
+    allow(HostResolver::DNS_RESOLVER).to receive(:getaddresses) { %w[1.1.1.1 1.0.0.1] }
 
     create_webhook_event!(account, resource)
 

@@ -40,8 +40,8 @@ class WebhookEndpoint < ApplicationRecord
     end
   end
 
-  # ipaddrs resolves the endpoint's host to its validated IP addresses (see Hostname)
-  def ipaddrs = Hostname.new(host).ipaddrs
+  # ipaddrs resolves the endpoint's host to its validated IP addresses (see HostResolver)
+  def ipaddrs = HostResolver.new(host).ipaddrs
   def host    = URI.parse(url).host
 
   def subscribed?(event)

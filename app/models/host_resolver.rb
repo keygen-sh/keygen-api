@@ -2,7 +2,7 @@
 
 require 'resolv'
 
-class Hostname
+class HostResolver
   BLACKLISTED_IPV4 = %w[
     0.0.0.0/8 100.64.0.0/10 192.0.0.0/24 192.0.2.0/24 192.88.99.0/24
     198.18.0.0/15 198.51.100.0/24 203.0.113.0/24 224.0.0.0/4
@@ -29,20 +29,20 @@ class Hostname
     Resolv::DNS.new.tap { it.timeouts = DNS_ATTEMPT_TIMEOUTS },
   ])
 
-  attr_reader :name
+  attr_reader :host
 
-  def initialize(name)
-    @name = name
+  def initialize(host)
+    @host = host
   end
 
-  # ipaddrs resolves the hostname to its IP addresses. it's empty when the hostname
-  # doesn't resolve or when it resolves to any unacceptable address.
+  # ipaddrs resolves the host to its IP addresses. it's empty when the host doesn't
+  # resolve or when it resolves to any unacceptable address.
   #
-  # NB(ezekg) requests must connect to one of these rather than to the hostname, since
-  #           resolving the hostname again could return an address we never validated,
+  # NB(ezekg) requests must connect to one of these rather than to the host, since
+  #           resolving the host again could return an address we never validated,
   #           e.g. an internal one, i.e. DNS rebinding.
   def ipaddrs
-    addrs = Timeout.timeout(DNS_TIMEOUT) { DNS_RESOLVER.getaddresses(name) }
+    addrs = Timeout.timeout(DNS_TIMEOUT) { DNS_RESOLVER.getaddresses(host) }
 
     addrs.all? { acceptable?(IPAddr.new(it)) } ? addrs : []
   rescue IPAddr::InvalidAddressError,
