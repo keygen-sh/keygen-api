@@ -75,4 +75,25 @@ describe CullDeadProcessesWorker do
       end
     end
   end
+
+  context 'with a legacy NULL heartbeat cull strategy' do
+    let(:policy)  { create(:policy, account:) }
+    let(:license) { create(:license, policy:, account:) }
+    let(:machine) { create(:machine, license:, account:) }
+
+    before do
+      policy.update_columns(
+        heartbeat_cull_strategy: nil,
+        heartbeat_resurrection_strategy: nil,
+      )
+    end
+
+    it 'should cull a process that is dead' do
+      create(:process, :dead, machine:, account:)
+
+      expect { worker.perform_async }.to(
+        change { account.machine_processes.count },
+      )
+    end
+  end
 end
