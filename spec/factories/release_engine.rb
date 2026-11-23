@@ -34,8 +34,13 @@ FactoryBot.define do
     end
 
     trait :oci do
-      name { 'oci' }
+      name { 'OCI' }
       key  { 'oci' }
+    end
+
+    trait :electron do
+      name { 'Electron' }
+      key  { 'electron' }
     end
   end
 end
