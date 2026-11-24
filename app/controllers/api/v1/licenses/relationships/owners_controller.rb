@@ -26,10 +26,11 @@ module Api::V1::Licenses::Relationships
       end
     }
     def update
-      owner = license.owner
+      owner = current_account.users.find_by(id: owner_params[:id])
       authorize! owner,
         with: Licenses::OwnerPolicy
 
+      # use owner ID again so that model validations are run for invalid owners
       license.update!(user_id: owner_params[:id])
 
       BroadcastEventService.call(

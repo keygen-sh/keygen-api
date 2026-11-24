@@ -118,7 +118,11 @@ class ApplicationPolicy
   # the current environment-scoped records, given the current environment is a
   # shared environment. Generally, this is only used for reads (plus e.g.
   # validations and downloads).
-  def verify_environment!(strict: true)
+  #
+  # When :allow_nil is true, a nil record is allowed regardless of the current
+  # environment, e.g. when detaching an optional relationship. The remaining
+  # authz contexts are still asserted.
+  def verify_environment!(strict: true, allow_nil: false)
     # For isolated environments, the bearer can only be from the current isolated
     # environment. For shared environments, the bearer can be from the current
     # environment or from the global environment. For the global environment,
@@ -203,6 +207,8 @@ class ApplicationPolicy
     in [*] => records
       deny! 'records are not compatible with the current environment' unless
         !strict || environment.nil?
+    in nil if allow_nil
+      # nothing to assert
     else
       deny! 'record is not compatible with the current environment' unless
         !strict || environment.nil?

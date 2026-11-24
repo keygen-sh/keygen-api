@@ -7,6 +7,51 @@ describe Licenses::OwnerPolicy, type: :policy do
   subject { described_class.new(record, account:, environment:, bearer:, token:, license:) }
 
   with_role_authorization :admin do
+    # NB(ezekg) a nil owner i.e. detaching the owner
+    with_scenarios %i[accessing_a_license] do
+      let(:record) { nil }
+
+      with_token_authentication do
+        with_permissions %w[license.owner.update] do
+          without_token_permissions { denies :update }
+
+          allows :update
+        end
+
+        without_permissions do
+          denies :update
+        end
+
+        within_environment :isolated do
+          with_bearer_and_token_trait :in_shared_environment do
+            denies :update
+          end
+
+          with_bearer_and_token_trait :in_nil_environment do
+            denies :update
+          end
+
+          allows :update
+        end
+
+        within_environment :shared do
+          with_bearer_and_token_trait :in_isolated_environment do
+            denies :update
+          end
+
+          allows :update
+        end
+
+        within_environment nil do
+          with_bearer_and_token_trait :in_isolated_environment do
+            denies :update
+          end
+
+          allows :update
+        end
+      end
+    end
+
     with_license_trait :with_owner do
       with_scenarios %i[accessing_a_license accessing_its_owner] do
         with_token_authentication do
