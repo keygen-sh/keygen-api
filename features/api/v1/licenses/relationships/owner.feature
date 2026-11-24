@@ -664,6 +664,163 @@ Feature: License owner relationship
     And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Isolated environment attaches an isolated owner to an isolated license (no owner)
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 isolated "user"
+    And the current account has 1 isolated "license"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a PUT request to "/accounts/test1/licenses/$0/owner" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "id": "$users[1]"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "event-log" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Isolated environment changes an isolated license's owner to another isolated user
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 2 isolated "users"
+    And the current account has 1 isolated "license" for the first "user" as "owner"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a PUT request to "/accounts/test1/licenses/$0/owner" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "id": "$users[2]"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": { "type": "users", "id": "$users[2]" }
+        }
+      }
+      """
+
+  @ee
+  Scenario: Isolated environment removes an isolated license's owner
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "user"
+    And the current account has 1 isolated "license" for the last "user" as "owner"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a PUT request to "/accounts/test1/licenses/$0/owner" with the following:
+      """
+      { "data": null }
+      """
+    Then the response status should be "200"
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": null
+        }
+      }
+      """
+
+  @ee
+  Scenario: Isolated environment attaches a global owner to an isolated license
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 global "user"
+    And the current account has 1 isolated "license"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a PUT request to "/accounts/test1/licenses/$0/owner" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "id": "$users[1]"
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (record environment is not compatible with the current environment)"
+      }
+      """
+
+  @ee
+  Scenario: Shared environment attaches a shared owner to a shared license (no owner)
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "user"
+    And the current account has 1 shared "license"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a PUT request to "/accounts/test1/licenses/$0/owner" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "id": "$users[1]"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
+
   Scenario: Admin changes a license's owner relationship to a non-existent user (default)
     Given I am an admin of account "test1"
     And the current account is "test1"

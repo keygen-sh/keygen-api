@@ -359,6 +359,87 @@ Feature: Machine group relationship
     And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Isolated environment adds an isolated machine to an isolated group
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "group"
+    And the current account has 1 isolated "machine"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a PUT request to "/accounts/test1/machines/$0/group" with the following:
+      """
+      { "data": { "type": "groups", "id": "$groups[0]" } }
+      """
+    Then the response status should be "200"
+    And the response body should be a "machine" with the following relationships:
+      """
+      {
+        "group": {
+          "links": { "related": "/v1/accounts/$account/machines/$machines[0]/group" },
+          "data": { "type": "groups", "id": "$groups[0]" }
+        }
+      }
+      """
+
+  @ee
+  Scenario: Isolated environment removes an isolated machine's group
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "group"
+    And the current account has 1 isolated "machine" for the last "group"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a PUT request to "/accounts/test1/machines/$0/group" with the following:
+      """
+      { "data": null }
+      """
+    Then the response status should be "200"
+    And the response body should be a "machine" with the following relationships:
+      """
+      {
+        "group": {
+          "links": { "related": "/v1/accounts/$account/machines/$machines[0]/group" },
+          "data": null
+        }
+      }
+      """
+
+  @ee
+  Scenario: Shared environment removes a shared machine's group
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "group"
+    And the current account has 1 shared "machine" for the last "group"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a PUT request to "/accounts/test1/machines/$0/group" with the following:
+      """
+      { "data": null }
+      """
+    Then the response status should be "200"
+    And the response body should be a "machine" with the following relationships:
+      """
+      {
+        "group": {
+          "links": { "related": "/v1/accounts/$account/machines/$machines[0]/group" },
+          "data": null
+        }
+      }
+      """
+
   Scenario: Admin changes a machine's policy relationship to a non-existent group
     Given I am an admin of account "test1"
     And the current account is "test1"

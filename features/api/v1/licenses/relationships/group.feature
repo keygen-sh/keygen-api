@@ -313,6 +313,87 @@ Feature: License group relationship
     And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Isolated environment adds an isolated license to an isolated group
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "group"
+    And the current account has 1 isolated "license"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a PUT request to "/accounts/test1/licenses/$0/group" with the following:
+      """
+      { "data": { "type": "groups", "id": "$groups[0]" } }
+      """
+    Then the response status should be "200"
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "group": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/group" },
+          "data": { "type": "groups", "id": "$groups[0]" }
+        }
+      }
+      """
+
+  @ee
+  Scenario: Isolated environment removes an isolated license's group
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "group"
+    And the current account has 1 isolated "license" for the last "group"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a PUT request to "/accounts/test1/licenses/$0/group" with the following:
+      """
+      { "data": null }
+      """
+    Then the response status should be "200"
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "group": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/group" },
+          "data": null
+        }
+      }
+      """
+
+  @ee
+  Scenario: Shared environment removes a shared license's group
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "group"
+    And the current account has 1 shared "license" for the last "group"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a PUT request to "/accounts/test1/licenses/$0/group" with the following:
+      """
+      { "data": null }
+      """
+    Then the response status should be "200"
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "group": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/group" },
+          "data": null
+        }
+      }
+      """
+
   Scenario: Admin changes a license's group relationship to a non-existent group
     Given I am an admin of account "test1"
     And the current account is "test1"

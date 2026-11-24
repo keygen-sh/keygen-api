@@ -26,7 +26,9 @@ module Machines
 
     def update?
       verify_permissions!('machine.owner.update')
-      verify_environment!
+      verify_environment!(
+        allow_nil: true, # nil owner i.e. detaching
+      )
 
       case bearer
       in role: Role(:admin | :developer | :sales_agent | :environment)
