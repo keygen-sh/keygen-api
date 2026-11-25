@@ -5,8 +5,10 @@ class CullDeadMachinesWorker < BaseWorker
                   cronitor_enabled: true
 
   def perform
+    # != drops NULL, so legacy policies never entered the sweep. IS DISTINCT FROM
+    # keeps them. ALWAYS_REVIVE is not a stored cull strategy, so other rows are unchanged.
     machines = Machine.joins(:policy)
-                      .where.not(policies: { heartbeat_cull_strategy: 'ALWAYS_REVIVE' })
+                      .where("policies.heartbeat_cull_strategy IS DISTINCT FROM 'ALWAYS_REVIVE'")
                       .where(heartbeat_jid: nil)
                       .dead
 
