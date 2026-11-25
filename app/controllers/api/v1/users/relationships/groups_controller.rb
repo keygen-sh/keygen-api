@@ -26,10 +26,13 @@ module Api::V1::Users::Relationships
       end
     }
     def update
-      authorize! user,
+      group_id = group_params[:id]
+      group    = current_account.groups.find_by(id: group_id) unless group_id.nil?
+      authorize! group,
         with: Users::GroupPolicy
 
-      user.update!(group_id: group_params[:id])
+      # reuse id so that model validations are run for invalid groups
+      user.update!(group_id:)
 
       BroadcastEventService.call(
         event: 'user.group.updated',
@@ -37,6 +40,7 @@ module Api::V1::Users::Relationships
         resource: user,
       )
 
+      # FIXME(ezekg) this should be the group linkage
       render jsonapi: user
     end
 

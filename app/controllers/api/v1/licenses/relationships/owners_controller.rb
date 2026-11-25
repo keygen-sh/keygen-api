@@ -26,12 +26,13 @@ module Api::V1::Licenses::Relationships
       end
     }
     def update
-      owner = current_account.users.find_by(id: owner_params[:id])
+      owner_id = owner_params[:id]
+      owner    = current_account.users.find_by(id: owner_id) unless owner_id.nil?
       authorize! owner,
         with: Licenses::OwnerPolicy
 
-      # use owner ID again so that model validations are run for invalid owners
-      license.update!(user_id: owner_params[:id])
+      # reuse id so that model validations are run for invalid owners
+      license.update!(owner_id:)
 
       BroadcastEventService.call(
         event: 'license.owner.updated',
@@ -39,7 +40,7 @@ module Api::V1::Licenses::Relationships
         resource: license,
       )
 
-      # FIXME(ezekg) This should be the user
+      # FIXME(ezekg) this should be the user linkage
       render jsonapi: license
     end
 
