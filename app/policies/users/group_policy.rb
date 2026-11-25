@@ -24,7 +24,9 @@ module Users
 
     def update?
       verify_permissions!('user.group.update')
-      verify_environment!
+      verify_environment!(
+        allow_nil: true, # nil group i.e. detaching
+      )
 
       case bearer
       in role: Role(:admin | :developer | :sales_agent | :environment)

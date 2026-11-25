@@ -26,12 +26,13 @@ module Api::V1::Licenses::Relationships
       end
     }
     def update
-      group = current_account.groups.find_by(id: group_params[:id])
+      group_id = group_params[:id]
+      group    = current_account.groups.find_by(id: group_id) unless group_id.nil?
       authorize! group,
         with: Licenses::GroupPolicy
 
-      # Use group ID again so that model validations are run for invalid groups
-      license.update!(group_id: group_params[:id])
+      # reuse id so that model validations are run for invalid groups
+      license.update!(group_id:)
 
       BroadcastEventService.call(
         event: 'license.group.updated',
@@ -39,7 +40,7 @@ module Api::V1::Licenses::Relationships
         resource: license,
       )
 
-      # FIXME(ezekg) This should be the group linkage
+      # FIXME(ezekg) this should be the group linkage
       render jsonapi: license
     end
 

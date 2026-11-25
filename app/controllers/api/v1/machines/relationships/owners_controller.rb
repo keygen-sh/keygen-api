@@ -26,12 +26,13 @@ module Api::V1::Machines::Relationships
       end
     }
     def update
-      owner = current_account.users.find_by(id: owner_params[:id])
+      owner_id = owner_params[:id]
+      owner    = current_account.users.find_by(id: owner_id) unless owner_id.nil?
       authorize! owner,
         with: Machines::OwnerPolicy
 
-      # use owner ID again so that model validations are run for invalid owners
-      machine.update!(owner_id: owner_params[:id])
+      # reuse id so that model validations are run for invalid owners
+      machine.update!(owner_id:)
 
       BroadcastEventService.call(
         event: 'machine.owner.updated',
@@ -39,6 +40,7 @@ module Api::V1::Machines::Relationships
         resource: machine,
       )
 
+      # FIXME(ezekg) this should be the owner linkage
       render jsonapi: machine
     end
 

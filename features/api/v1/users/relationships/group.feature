@@ -262,6 +262,108 @@ Feature: User group relationship
     And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Isolated environment adds an isolated user to an isolated group
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "group"
+    And the current account has 1 isolated "user"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a PUT request to "/accounts/test1/users/$1/group" with the following:
+      """
+      { "data": { "type": "groups", "id": "$groups[0]" } }
+      """
+    Then the response status should be "200"
+    And the response body should be a "user" with the following relationships:
+      """
+      {
+        "group": {
+          "links": { "related": "/v1/accounts/$account/users/$users[1]/group" },
+          "data": { "type": "groups", "id": "$groups[0]" }
+        }
+      }
+      """
+  @ee
+  Scenario: Isolated environment removes an isolated user's group
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "group"
+    And the current account has 1 isolated "user" for the last "group"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a PUT request to "/accounts/test1/users/$1/group" with the following:
+      """
+      { "data": null }
+      """
+    Then the response status should be "200"
+    And the response body should be a "user" with the following relationships:
+      """
+      {
+        "group": {
+          "links": { "related": "/v1/accounts/$account/users/$users[1]/group" },
+          "data": null
+        }
+      }
+      """
+  @ee
+  Scenario: Isolated environment adds an isolated user to a global group
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 global "group"
+    And the current account has 1 isolated "user"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a PUT request to "/accounts/test1/users/$1/group" with the following:
+      """
+      { "data": { "type": "groups", "id": "$groups[0]" } }
+      """
+    Then the response status should be "403"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (record environment is not compatible with the current environment)"
+      }
+      """
+  @ee
+  Scenario: Shared environment removes a shared user's group
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "group"
+    And the current account has 1 shared "user" for the last "group"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a PUT request to "/accounts/test1/users/$1/group" with the following:
+      """
+      { "data": null }
+      """
+    Then the response status should be "200"
+    And the response body should be a "user" with the following relationships:
+      """
+      {
+        "group": {
+          "links": { "related": "/v1/accounts/$account/users/$users[1]/group" },
+          "data": null
+        }
+      }
+      """
   Scenario: Admin changes a user's policy relationship to a non-existent group
     Given I am an admin of account "test1"
     And the current account is "test1"

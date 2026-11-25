@@ -26,12 +26,13 @@ module Api::V1::Machines::Relationships
       end
     }
     def update
-      group = current_account.groups.find_by(id: group_params[:id])
+      group_id = group_params[:id]
+      group    = current_account.groups.find_by(id: group_id) unless group_id.nil?
       authorize! group,
         with: Machines::GroupPolicy
 
-      # Use group ID again so that model validations are run for invalid groups
-      machine.update!(group_id: group_params[:id])
+      # reuse id so that model validations are run for invalid groups
+      machine.update!(group_id:)
 
       BroadcastEventService.call(
         event: 'machine.group.updated',
@@ -39,7 +40,7 @@ module Api::V1::Machines::Relationships
         resource: machine,
       )
 
-      # FIXME(ezekg) This should be the group linkage
+      # FIXME(ezekg) this should be the group linkage
       render jsonapi: machine
     end
 
