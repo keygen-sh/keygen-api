@@ -1,0 +1,1036 @@
+openapi: 3.1.0
+info:
+  title: Keygen API
+  version: "1.8"
+  summary: Software licensing and distribution API (licenses, machines and license validation).
+  description: |
+    A first, scoped description of the Keygen v1 API covering licenses, machines and license
+    validation. It is written against the routes, typed params and serializers in this repository
+    and checked against a running Keygen CE instance (see `openapi/README.md`).
+
+    Requests and responses use [JSON:API](https://jsonapi.org). Send
+    `Content-Type: application/vnd.api+json` on requests with a body and
+    `Accept: application/vnd.api+json`. Resource attributes are camelCase.
+
+    Fields and relationships that only exist in Keygen EE (for example `permissions` and
+    `environment`) are intentionally not listed; response schemas allow additional properties, so
+    EE responses still validate.
+
+    This is a subset. Other resources (products, policies, users, entitlements, releases and so on)
+    are not described yet.
+  license:
+    name: FCL-1.0-ALv2
+    url: https://github.com/keygen-sh/keygen-api/blob/master/LICENSE.md
+servers:
+  - url: https://api.keygen.sh/v1
+    description: Keygen Cloud
+  - url: https://{host}/v1
+    description: Self-hosted Keygen
+    variables:
+      host:
+        default: keygen.example.com
+tags:
+  - name: Licenses
+    description: Create, read, update and delete licenses.
+  - name: License validation
+    description: Check whether a license is valid, optionally for a given machine, product, policy or user.
+  - name: Machines
+    description: Activate and deactivate the machines a license is used on.
+security:
+  - bearerAuth: []
+paths:
+  /accounts/{account}/licenses:
+    parameters:
+      - $ref: "#/components/parameters/Account"
+      - $ref: "#/components/parameters/KeygenVersion"
+    get:
+      operationId: listLicenses
+      tags: [Licenses]
+      summary: List licenses
+      description: |
+        Returns the licenses visible to the bearer. Without pagination parameters the response is
+        limited to `limit` records (default 10) and has no `links`. With `page[number]` the response
+        includes offset pagination `links` (including `links.meta.pages` and `links.meta.count`);
+        with `page[cursor]` it includes keyset pagination links.
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/PageNumber"
+        - $ref: "#/components/parameters/PageSize"
+        - $ref: "#/components/parameters/PageCursor"
+        - $ref: "#/components/parameters/Order"
+        - name: status
+          in: query
+          description: Only return licenses with this status.
+          schema:
+            $ref: "#/components/schemas/LicenseStatus"
+        - name: product
+          in: query
+          description: Only return licenses of this product (ID).
+          schema: { type: string }
+        - name: policy
+          in: query
+          description: Only return licenses of this policy (ID).
+          schema: { type: string }
+        - name: owner
+          in: query
+          description: Only return licenses owned by this user (ID).
+          schema: { type: string }
+        - name: user
+          in: query
+          description: Only return licenses attached to this user (ID).
+          schema: { type: string }
+        - name: machine
+          in: query
+          description: Only return licenses with this machine (ID).
+          schema: { type: string }
+        - name: group
+          in: query
+          description: Only return licenses in this group (ID).
+          schema: { type: string }
+        - name: metadata
+          in: query
+          description: Filter by metadata, e.g. `metadata[tier]=pro`.
+          style: deepObject
+          explode: true
+          schema:
+            type: object
+            additionalProperties: true
+      responses:
+        "200":
+          description: A page of licenses.
+          headers:
+            Keygen-Version: { $ref: "#/components/headers/KeygenVersion" }
+            Keygen-Signature: { $ref: "#/components/headers/KeygenSignature" }
+            Digest: { $ref: "#/components/headers/Digest" }
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: "#/components/schemas/LicenseList"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+    post:
+      operationId: createLicense
+      tags: [Licenses]
+      summary: Create a license
+      description: |
+        Creates a license for a policy. The key is generated from the policy unless one is given
+        and the policy allows it. The product is derived from the policy.
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: "#/components/schemas/LicenseCreateRequest"
+      responses:
+        "201":
+          description: The created license.
+          headers:
+            Keygen-Version: { $ref: "#/components/headers/KeygenVersion" }
+            Keygen-Signature: { $ref: "#/components/headers/KeygenSignature" }
+            Digest: { $ref: "#/components/headers/Digest" }
+            Location:
+              description: URL of the new license.
+              schema: { type: string, format: uri }
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: "#/components/schemas/LicenseResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+  /accounts/{account}/licenses/{license}:
+    parameters:
+      - $ref: "#/components/parameters/Account"
+      - $ref: "#/components/parameters/License"
+      - $ref: "#/components/parameters/KeygenVersion"
+    get:
+      operationId: getLicense
+      tags: [Licenses]
+      summary: Retrieve a license
+      responses:
+        "200":
+          description: The license.
+          headers:
+            Keygen-Version: { $ref: "#/components/headers/KeygenVersion" }
+            Keygen-Signature: { $ref: "#/components/headers/KeygenSignature" }
+            Digest: { $ref: "#/components/headers/Digest" }
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: "#/components/schemas/LicenseResponse"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    patch:
+      operationId: updateLicense
+      tags: [Licenses]
+      summary: Update a license
+      description: Only the attributes sent are changed. `metadata` is replaced as a whole.
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: "#/components/schemas/LicenseUpdateRequest"
+      responses:
+        "200":
+          description: The updated license.
+          headers:
+            Keygen-Version: { $ref: "#/components/headers/KeygenVersion" }
+            Keygen-Signature: { $ref: "#/components/headers/KeygenSignature" }
+            Digest: { $ref: "#/components/headers/Digest" }
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: "#/components/schemas/LicenseResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+    delete:
+      operationId: deleteLicense
+      tags: [Licenses]
+      summary: Delete a license
+      description: Permanently deletes the license, along with its machines.
+      responses:
+        "204":
+          description: The license was deleted.
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /accounts/{account}/licenses/{license}/actions/validate:
+    parameters:
+      - $ref: "#/components/parameters/Account"
+      - $ref: "#/components/parameters/License"
+      - $ref: "#/components/parameters/KeygenVersion"
+    get:
+      operationId: quickValidateLicense
+      tags: [License validation]
+      summary: Quick-validate a license by ID or key
+      description: |
+        Validates the license without a scope. Use the POST variant to validate against a machine
+        fingerprint, product, policy, user, entitlements, and so on. The outcome is in
+        `meta.valid` and `meta.code`; an invalid license is still a `200` response.
+      responses:
+        "200":
+          description: The license and the validation result.
+          headers:
+            Keygen-Version: { $ref: "#/components/headers/KeygenVersion" }
+            Keygen-Signature: { $ref: "#/components/headers/KeygenSignature" }
+            Digest: { $ref: "#/components/headers/Digest" }
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: "#/components/schemas/ValidationResponse"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    post:
+      operationId: validateLicense
+      tags: [License validation]
+      summary: Validate a license by ID or key
+      description: |
+        Validates the license, optionally with a scope. Validation results are always returned with
+        a `200` status; check `meta.valid` and `meta.code`. The body is optional.
+      requestBody:
+        required: false
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: "#/components/schemas/ValidateRequest"
+      responses:
+        "200":
+          description: The license and the validation result.
+          headers:
+            Keygen-Version: { $ref: "#/components/headers/KeygenVersion" }
+            Keygen-Signature: { $ref: "#/components/headers/KeygenSignature" }
+            Digest: { $ref: "#/components/headers/Digest" }
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: "#/components/schemas/ValidationResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /accounts/{account}/licenses/actions/validate-key:
+    parameters:
+      - $ref: "#/components/parameters/Account"
+      - $ref: "#/components/parameters/KeygenVersion"
+    post:
+      operationId: validateLicenseKey
+      tags: [License validation]
+      summary: Validate a license by key
+      description: |
+        Validates a license key. Authentication is optional, so this can be called from the
+        licensed software itself. When no license matches the key, the response has `data: null`
+        and `meta.code` is `NOT_FOUND`.
+      security:
+        - {}
+        - bearerAuth: []
+        - licenseAuth: []
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: "#/components/schemas/ValidateKeyRequest"
+      responses:
+        "200":
+          description: The license (or `null`) and the validation result.
+          headers:
+            Keygen-Version: { $ref: "#/components/headers/KeygenVersion" }
+            Keygen-Signature: { $ref: "#/components/headers/KeygenSignature" }
+            Digest: { $ref: "#/components/headers/Digest" }
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: "#/components/schemas/ValidationResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /accounts/{account}/machines:
+    parameters:
+      - $ref: "#/components/parameters/Account"
+      - $ref: "#/components/parameters/KeygenVersion"
+    get:
+      operationId: listMachines
+      tags: [Machines]
+      summary: List machines
+      description: Pagination works as described for `listLicenses`.
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/PageNumber"
+        - $ref: "#/components/parameters/PageSize"
+        - $ref: "#/components/parameters/PageCursor"
+        - $ref: "#/components/parameters/Order"
+        - name: fingerprint
+          in: query
+          description: Only return machines with this fingerprint.
+          schema: { type: string }
+        - name: ip
+          in: query
+          schema: { type: string }
+        - name: hostname
+          in: query
+          schema: { type: string }
+        - name: license
+          in: query
+          description: Only return machines of this license (ID).
+          schema: { type: string }
+        - name: key
+          in: query
+          description: Only return machines of the license with this key.
+          schema: { type: string }
+        - name: product
+          in: query
+          description: Only return machines of this product (ID).
+          schema: { type: string }
+        - name: policy
+          in: query
+          description: Only return machines of this policy (ID).
+          schema: { type: string }
+        - name: owner
+          in: query
+          schema: { type: string }
+        - name: user
+          in: query
+          schema: { type: string }
+        - name: group
+          in: query
+          schema: { type: string }
+        - name: metadata
+          in: query
+          description: Filter by metadata, e.g. `metadata[env]=prod`.
+          style: deepObject
+          explode: true
+          schema:
+            type: object
+            additionalProperties: true
+      responses:
+        "200":
+          description: A page of machines.
+          headers:
+            Keygen-Version: { $ref: "#/components/headers/KeygenVersion" }
+            Keygen-Signature: { $ref: "#/components/headers/KeygenSignature" }
+            Digest: { $ref: "#/components/headers/Digest" }
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: "#/components/schemas/MachineList"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+    post:
+      operationId: activateMachine
+      tags: [Machines]
+      summary: Activate a machine
+      description: |
+        Creates a machine for a license. This is the "activation" step: the license's policy limits
+        (such as `maxMachines`) are enforced here.
+      security:
+        - bearerAuth: []
+        - licenseAuth: []
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: "#/components/schemas/MachineCreateRequest"
+      responses:
+        "201":
+          description: The created machine.
+          headers:
+            Keygen-Version: { $ref: "#/components/headers/KeygenVersion" }
+            Keygen-Signature: { $ref: "#/components/headers/KeygenSignature" }
+            Digest: { $ref: "#/components/headers/Digest" }
+            Location:
+              description: URL of the new machine.
+              schema: { type: string, format: uri }
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: "#/components/schemas/MachineResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+  /accounts/{account}/machines/{machine}:
+    parameters:
+      - $ref: "#/components/parameters/Account"
+      - $ref: "#/components/parameters/Machine"
+      - $ref: "#/components/parameters/KeygenVersion"
+    get:
+      operationId: getMachine
+      tags: [Machines]
+      summary: Retrieve a machine
+      security:
+        - bearerAuth: []
+        - licenseAuth: []
+      responses:
+        "200":
+          description: The machine.
+          headers:
+            Keygen-Version: { $ref: "#/components/headers/KeygenVersion" }
+            Keygen-Signature: { $ref: "#/components/headers/KeygenSignature" }
+            Digest: { $ref: "#/components/headers/Digest" }
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: "#/components/schemas/MachineResponse"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    patch:
+      operationId: updateMachine
+      tags: [Machines]
+      summary: Update a machine
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: "#/components/schemas/MachineUpdateRequest"
+      responses:
+        "200":
+          description: The updated machine.
+          headers:
+            Keygen-Version: { $ref: "#/components/headers/KeygenVersion" }
+            Keygen-Signature: { $ref: "#/components/headers/KeygenSignature" }
+            Digest: { $ref: "#/components/headers/Digest" }
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: "#/components/schemas/MachineResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+    delete:
+      operationId: deactivateMachine
+      tags: [Machines]
+      summary: Deactivate a machine
+      description: Deletes the machine, which frees up an activation on its license.
+      security:
+        - bearerAuth: []
+        - licenseAuth: []
+      responses:
+        "204":
+          description: The machine was deleted.
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: |
+        A Keygen API token, sent as `Authorization: Bearer <token>`. Tokens are created with
+        `POST /accounts/{account}/tokens` (HTTP Basic with an email and password) or in the dashboard.
+    licenseAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: |
+        A license key, sent as `Authorization: License <key>`. Only accepted by endpoints that list
+        it, and only for licenses whose policy allows license-key authentication.
+  parameters:
+    Account:
+      name: account
+      in: path
+      required: true
+      description: Account ID, or slug on Keygen Cloud.
+      schema: { type: string }
+    License:
+      name: license
+      in: path
+      required: true
+      description: License ID (UUID) or license key.
+      schema: { type: string }
+    Machine:
+      name: machine
+      in: path
+      required: true
+      description: Machine ID (UUID) or machine fingerprint.
+      schema: { type: string }
+    KeygenVersion:
+      name: Keygen-Version
+      in: header
+      required: false
+      description: Pin the API version, e.g. `1.8`. Defaults to the account's version.
+      schema: { type: string, examples: ["1.8"] }
+    Limit:
+      name: limit
+      in: query
+      description: Number of records to return when not using `page[...]` parameters.
+      schema: { type: integer, minimum: 1, default: 10 }
+    PageNumber:
+      name: page[number]
+      in: query
+      description: Offset pagination. Page number.
+      schema: { type: integer, minimum: 1 }
+    PageSize:
+      name: page[size]
+      in: query
+      description: Page size for offset or keyset pagination.
+      schema: { type: integer, minimum: 1, default: 10 }
+    PageCursor:
+      name: page[cursor]
+      in: query
+      description: Keyset pagination. Use `links.next` from the previous page.
+      schema: { type: string }
+    Order:
+      name: order
+      in: query
+      description: Sort order by creation time.
+      schema:
+        type: string
+        enum: [asc, desc]
+        default: desc
+  headers:
+    KeygenVersion:
+      description: The API version that served the request.
+      schema: { type: string }
+    KeygenSignature:
+      description: |
+        Signature of the response over `(request-target) host date digest`, signed with the
+        account's key (Ed25519 by default).
+      schema: { type: string }
+    Digest:
+      description: SHA-256 digest of the response body, used by `Keygen-Signature`.
+      schema: { type: string }
+  responses:
+    BadRequest:
+      description: The request body or parameters are malformed.
+      content:
+        application/vnd.api+json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    Unauthorized:
+      description: Authentication is missing or invalid.
+      headers:
+        WWW-Authenticate:
+          schema: { type: string }
+      content:
+        application/vnd.api+json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    Forbidden:
+      description: The bearer is not allowed to perform the action.
+      content:
+        application/vnd.api+json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    NotFound:
+      description: The resource does not exist, or is not visible to the bearer.
+      content:
+        application/vnd.api+json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    UnprocessableEntity:
+      description: The resource failed validation. See `errors[].source.pointer`.
+      content:
+        application/vnd.api+json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+  schemas:
+    Uuid:
+      type: string
+      format: uuid
+    Timestamp:
+      type: string
+      format: date-time
+    Metadata:
+      type: object
+      description: Free-form key/values, nested at most 2 levels deep.
+      additionalProperties: true
+    ResourceIdentifier:
+      type: object
+      required: [type, id]
+      properties:
+        type: { type: string }
+        id: { $ref: "#/components/schemas/Uuid" }
+    Relationship:
+      type: object
+      description: A JSON:API relationship. `data` is `null` when nothing is related.
+      properties:
+        links:
+          type: object
+          properties:
+            related: { type: string }
+        data:
+          oneOf:
+            - $ref: "#/components/schemas/ResourceIdentifier"
+            - type: "null"
+        meta:
+          type: object
+          additionalProperties: true
+    ResourceLinks:
+      type: object
+      properties:
+        self: { type: string }
+    LicenseStatus:
+      type: string
+      enum: [ACTIVE, INACTIVE, EXPIRING, EXPIRED, SUSPENDED, BANNED]
+    LicenseAttributes:
+      type: object
+      required:
+        - key
+        - status
+        - expiry
+        - uses
+        - suspended
+        - metadata
+        - created
+        - updated
+      properties:
+        name: { type: [string, "null"] }
+        key:
+          type: string
+          description: The license key. Absent for legacy encrypted licenses whose raw key is unknown.
+        expiry: { type: [string, "null"], format: date-time }
+        status: { $ref: "#/components/schemas/LicenseStatus" }
+        uses: { type: integer }
+        suspended: { type: boolean }
+        scheme:
+          type: [string, "null"]
+          description: Cryptographic key scheme of the policy, e.g. `ED25519_SIGN`.
+        encrypted: { type: boolean }
+        strict: { type: boolean }
+        floating: { type: boolean }
+        protected: { type: boolean }
+        version:
+          type: [string, "null"]
+          description: The last version this license was validated with.
+        maxMachines: { type: [integer, "null"] }
+        maxProcesses: { type: [integer, "null"] }
+        maxUsers: { type: [integer, "null"] }
+        maxCores: { type: [integer, "null"] }
+        maxMemory: { type: [integer, "null"] }
+        maxDisk: { type: [integer, "null"] }
+        maxUses: { type: [integer, "null"] }
+        requireHeartbeat: { type: boolean }
+        requireCheckIn: { type: boolean }
+        lastValidated: { type: [string, "null"], format: date-time }
+        lastCheckIn: { type: [string, "null"], format: date-time }
+        nextCheckIn: { type: [string, "null"], format: date-time }
+        lastCheckOut: { type: [string, "null"], format: date-time }
+        metadata: { $ref: "#/components/schemas/Metadata" }
+        created: { $ref: "#/components/schemas/Timestamp" }
+        updated: { $ref: "#/components/schemas/Timestamp" }
+    License:
+      type: object
+      required: [id, type, attributes, relationships, links]
+      properties:
+        id: { $ref: "#/components/schemas/Uuid" }
+        type: { const: licenses }
+        attributes: { $ref: "#/components/schemas/LicenseAttributes" }
+        relationships:
+          type: object
+          required: [account, product, policy, group, owner, users, machines, tokens, entitlements]
+          properties:
+            account: { $ref: "#/components/schemas/Relationship" }
+            product: { $ref: "#/components/schemas/Relationship" }
+            policy: { $ref: "#/components/schemas/Relationship" }
+            group: { $ref: "#/components/schemas/Relationship" }
+            owner: { $ref: "#/components/schemas/Relationship" }
+            users: { $ref: "#/components/schemas/Relationship" }
+            machines: { $ref: "#/components/schemas/Relationship" }
+            tokens: { $ref: "#/components/schemas/Relationship" }
+            entitlements: { $ref: "#/components/schemas/Relationship" }
+        links: { $ref: "#/components/schemas/ResourceLinks" }
+    LicenseResponse:
+      type: object
+      required: [data]
+      properties:
+        data: { $ref: "#/components/schemas/License" }
+    PaginationLinks:
+      type: object
+      description: |
+        Present when `page[...]` parameters are used. Offset pagination also returns `first`,
+        `last`, `prev` and `meta`; keyset pagination returns `self` and `next` only.
+      properties:
+        self: { type: [string, "null"] }
+        next: { type: [string, "null"] }
+        prev: { type: [string, "null"] }
+        first: { type: [string, "null"] }
+        last: { type: [string, "null"] }
+        meta:
+          type: object
+          properties:
+            pages: { type: integer }
+            count: { type: integer }
+    LicenseList:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items: { $ref: "#/components/schemas/License" }
+        links: { $ref: "#/components/schemas/PaginationLinks" }
+    LicenseCreateRequest:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: object
+          required: [type, relationships]
+          properties:
+            type: { enum: [license, licenses] }
+            attributes:
+              type: object
+              properties:
+                name: { type: [string, "null"] }
+                key:
+                  type: string
+                  description: A custom key, when the policy allows it.
+                protected: { type: boolean }
+                expiry: { type: [string, "null"], format: date-time }
+                suspended: { type: boolean }
+                maxMachines: { type: [integer, "null"] }
+                maxProcesses: { type: [integer, "null"] }
+                maxUsers: { type: [integer, "null"] }
+                maxCores: { type: [integer, "null"] }
+                maxMemory: { type: [integer, "null"] }
+                maxDisk: { type: [integer, "null"] }
+                maxUses: { type: [integer, "null"] }
+                metadata: { $ref: "#/components/schemas/Metadata" }
+            relationships:
+              type: object
+              required: [policy]
+              properties:
+                policy:
+                  type: object
+                  required: [data]
+                  properties:
+                    data:
+                      type: object
+                      required: [type, id]
+                      properties:
+                        type: { enum: [policy, policies] }
+                        id: { $ref: "#/components/schemas/Uuid" }
+                owner:
+                  type: object
+                  required: [data]
+                  properties:
+                    data:
+                      oneOf:
+                        - type: object
+                          required: [type, id]
+                          properties:
+                            type: { enum: [user, users] }
+                            id: { $ref: "#/components/schemas/Uuid" }
+                        - type: "null"
+                group:
+                  type: object
+                  required: [data]
+                  properties:
+                    data:
+                      oneOf:
+                        - type: object
+                          required: [type, id]
+                          properties:
+                            type: { enum: [group, groups] }
+                            id: { $ref: "#/components/schemas/Uuid" }
+                        - type: "null"
+    LicenseUpdateRequest:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: object
+          required: [type, attributes]
+          properties:
+            type: { enum: [license, licenses] }
+            attributes:
+              type: object
+              properties:
+                name: { type: [string, "null"] }
+                protected: { type: boolean }
+                expiry: { type: [string, "null"], format: date-time }
+                suspended: { type: boolean }
+                maxMachines: { type: [integer, "null"] }
+                maxProcesses: { type: [integer, "null"] }
+                maxUsers: { type: [integer, "null"] }
+                maxCores: { type: [integer, "null"] }
+                maxMemory: { type: [integer, "null"] }
+                maxDisk: { type: [integer, "null"] }
+                maxUses: { type: [integer, "null"] }
+                metadata: { $ref: "#/components/schemas/Metadata" }
+    ValidationScope:
+      type: object
+      description: Constraints the license must satisfy for the validation to pass.
+      properties:
+        product: { type: string, description: "Product ID." }
+        policy: { type: string, description: "Policy ID." }
+        user:
+          type: [string, "null"]
+          description: User ID or email.
+        machine: { type: string, description: "Machine ID." }
+        fingerprint: { type: string, description: "A machine fingerprint that must be activated." }
+        fingerprints:
+          type: array
+          items: { type: string }
+          description: Machine fingerprints that must all be activated.
+        components:
+          type: array
+          items: { type: string }
+          description: Hardware component fingerprints that must be present.
+        entitlements:
+          type: array
+          items: { type: string }
+          description: Entitlement codes the license must have.
+        checksum: { type: string }
+        version: { type: string }
+    ValidateRequest:
+      type: object
+      properties:
+        meta:
+          type: object
+          properties:
+            nonce:
+              type: integer
+              description: Echoed back in `meta.nonce` to protect against replay.
+            scope: { $ref: "#/components/schemas/ValidationScope" }
+    ValidateKeyRequest:
+      type: object
+      required: [meta]
+      properties:
+        meta:
+          type: object
+          required: [key]
+          properties:
+            key:
+              type: string
+              minLength: 1
+            legacyEncrypted: { type: boolean }
+            encrypted: { type: boolean }
+            nonce: { type: integer }
+            scope: { $ref: "#/components/schemas/ValidationScope" }
+    ValidationCode:
+      type: string
+      description: |
+        Machine-readable validation result. `VALID` means the license is valid. Other values
+        include `NOT_FOUND`, `SUSPENDED`, `EXPIRED`, `BANNED`, `OVERDUE`, `NO_MACHINE`,
+        `NO_MACHINES`, `TOO_MANY_MACHINES`, `TOO_MANY_CORES`, `TOO_MANY_PROCESSES`,
+        `TOO_MANY_USERS`, `TOO_MUCH_MEMORY`, `TOO_MUCH_DISK`, `HEARTBEAT_NOT_STARTED`,
+        `HEARTBEAT_DEAD`, `ENTITLEMENTS_MISSING` and `*_SCOPE_REQUIRED`, `*_SCOPE_MISMATCH`,
+        `*_SCOPE_EMPTY` codes for each scope key. The set can grow, so this is not an enum.
+      examples: [VALID, NO_MACHINES, FINGERPRINT_SCOPE_MISMATCH]
+    ValidationMeta:
+      type: object
+      required: [ts, valid, detail, code]
+      properties:
+        ts: { $ref: "#/components/schemas/Timestamp" }
+        valid: { type: boolean }
+        detail: { type: string }
+        code: { $ref: "#/components/schemas/ValidationCode" }
+        nonce: { type: integer }
+        scope: { $ref: "#/components/schemas/ValidationScope" }
+    ValidationResponse:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          oneOf:
+            - $ref: "#/components/schemas/License"
+            - type: "null"
+        meta: { $ref: "#/components/schemas/ValidationMeta" }
+    MachineAttributes:
+      type: object
+      required: [fingerprint, heartbeatStatus, metadata, created, updated]
+      properties:
+        fingerprint: { type: string }
+        cores: { type: [integer, "null"] }
+        memory: { type: [integer, "null"] }
+        disk: { type: [integer, "null"] }
+        ip: { type: [string, "null"] }
+        hostname: { type: [string, "null"] }
+        platform: { type: [string, "null"] }
+        name: { type: [string, "null"] }
+        requireHeartbeat: { type: boolean }
+        heartbeatStatus:
+          type: string
+          enum: [NOT_STARTED, ALIVE, DEAD, RESURRECTED]
+        heartbeatDuration: { type: [integer, "null"], description: "Seconds." }
+        maxProcesses: { type: [integer, "null"] }
+        lastCheckOut: { type: [string, "null"], format: date-time }
+        lastHeartbeat: { type: [string, "null"], format: date-time }
+        nextHeartbeat: { type: [string, "null"], format: date-time }
+        metadata: { $ref: "#/components/schemas/Metadata" }
+        created: { $ref: "#/components/schemas/Timestamp" }
+        updated: { $ref: "#/components/schemas/Timestamp" }
+    Machine:
+      type: object
+      required: [id, type, attributes, relationships, links]
+      properties:
+        id: { $ref: "#/components/schemas/Uuid" }
+        type: { const: machines }
+        attributes: { $ref: "#/components/schemas/MachineAttributes" }
+        relationships:
+          type: object
+          required: [account, product, group, license, owner, components, processes]
+          properties:
+            account: { $ref: "#/components/schemas/Relationship" }
+            product: { $ref: "#/components/schemas/Relationship" }
+            group: { $ref: "#/components/schemas/Relationship" }
+            license: { $ref: "#/components/schemas/Relationship" }
+            owner: { $ref: "#/components/schemas/Relationship" }
+            components: { $ref: "#/components/schemas/Relationship" }
+            processes: { $ref: "#/components/schemas/Relationship" }
+        links: { $ref: "#/components/schemas/ResourceLinks" }
+    MachineResponse:
+      type: object
+      required: [data]
+      properties:
+        data: { $ref: "#/components/schemas/Machine" }
+    MachineList:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items: { $ref: "#/components/schemas/Machine" }
+        links: { $ref: "#/components/schemas/PaginationLinks" }
+    MachineCreateRequest:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: object
+          required: [type, attributes, relationships]
+          properties:
+            type: { enum: [machine, machines] }
+            attributes:
+              type: object
+              required: [fingerprint]
+              properties:
+                fingerprint:
+                  type: string
+                  description: Unique per license (or per policy, depending on its uniqueness strategy).
+                name: { type: [string, "null"] }
+                ip: { type: [string, "null"] }
+                hostname: { type: [string, "null"] }
+                platform: { type: [string, "null"] }
+                cores: { type: [integer, "null"] }
+                memory: { type: [integer, "null"] }
+                disk: { type: [integer, "null"] }
+                metadata: { $ref: "#/components/schemas/Metadata" }
+            relationships:
+              type: object
+              required: [license]
+              properties:
+                license:
+                  type: object
+                  required: [data]
+                  properties:
+                    data:
+                      type: object
+                      required: [type, id]
+                      properties:
+                        type: { enum: [license, licenses] }
+                        id: { $ref: "#/components/schemas/Uuid" }
+                owner:
+                  type: object
+                  required: [data]
+                  properties:
+                    data:
+                      oneOf:
+                        - type: object
+                          required: [type, id]
+                          properties:
+                            type: { enum: [user, users] }
+                            id: { $ref: "#/components/schemas/Uuid" }
+                        - type: "null"
+    MachineUpdateRequest:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: object
+          required: [type, attributes]
+          properties:
+            type: { enum: [machine, machines] }
+            attributes:
+              type: object
+              description: |
+                `name`, `ip`, `hostname` and `platform` can be changed by any bearer that can update
+                the machine. `cores`, `memory`, `disk` and `metadata` need an admin, developer,
+                sales agent, product or environment role.
+              properties:
+                name: { type: [string, "null"] }
+                ip: { type: [string, "null"] }
+                hostname: { type: [string, "null"] }
+                platform: { type: [string, "null"] }
+                cores: { type: [integer, "null"] }
+                memory: { type: [integer, "null"] }
+                disk: { type: [integer, "null"] }
+                metadata: { $ref: "#/components/schemas/Metadata" }
+    Error:
+      type: object
+      required: [title, detail]
+      properties:
+        title: { type: string }
+        detail: { type: string }
+        code:
+          type: string
+          description: Machine-readable error code, e.g. `TOKEN_MISSING`, `NOT_FOUND`, `FINGERPRINT_TAKEN`.
+        source:
+          type: object
+          properties:
+            pointer: { type: string, description: "JSON pointer into the request body." }
+            parameter: { type: string }
+        links:
+          type: object
+          properties:
+            about: { type: string }
+    ErrorResponse:
+      type: object
+      required: [errors]
+      properties:
+        meta:
+          type: object
+          properties:
+            id: { type: string, description: "Request ID, useful when contacting support." }
+        errors:
+          type: array
+          minItems: 1
+          items: { $ref: "#/components/schemas/Error" }
