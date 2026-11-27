@@ -38,67 +38,8 @@ class ProcessOciImageWorker < BaseWorker
 
     # unpack the image tarball
     unpack tar do |archive|
-      layout = OciImageLayout.parse(archive)
-
-      layout.each do |item|
-        next unless
-          item.exists?
-
-        # store indexes and manifests as a manifest for reference without hitting storage provider
-        if item in OciImageLayout::Index | OciImageLayout::Manifest => descriptor
-          raise ImageNotAcceptableError, 'manifest is too big' if
-            descriptor.size > MAX_MANIFEST_SIZE
-
-          ReleaseManifest.create!(
-            account_id: artifact.account_id,
-            environment_id: artifact.environment_id,
-            release_id: artifact.release_id,
-            release_artifact_id: artifact.id,
-            content_type: descriptor.media_type,
-            content_digest: descriptor.digest,
-            content_length: descriptor.size,
-            content_path: descriptor.path,
-            content: descriptor.read,
-          )
-
-          # still need to read/store it as a blob
-          descriptor.rewind
-        end
-
-        # store blobs as a descriptor pointing to the storage provider
-        if item in OciImageLayout::Blob => blob
-          raise ImageNotAcceptableError, 'blob is too big' if
-            blob.size > MAX_BLOB_SIZE
-
-          descriptor = ReleaseDescriptor.create!(
-            account_id: artifact.account_id,
-            environment_id: artifact.environment_id,
-            release_id: artifact.release_id,
-            release_artifact_id: artifact.id,
-            content_type: blob.media_type,
-            content_digest: blob.digest,
-            content_length: blob.size,
-            content_path: blob.path,
-          )
-
-          # don't reupload if blob already exists
-          next if
-            client.head_object(bucket: descriptor.bucket, key: descriptor.key).successful? rescue false
-
-          # TODO(ezekg) this should accept a block like get_object to support chunked writes
-          #             see: https://github.com/aws/aws-sdk-ruby/issues/3142
-          client.put_object(
-            bucket: descriptor.bucket,
-            key: descriptor.key,
-            content_length: descriptor.content_length,
-            content_type: descriptor.content_type,
-            body: blob.to_io,
-          )
-        end
-      rescue ActiveRecord::RecordNotUnique => e
-        # FIXME(ezekg) sometimes we get the same item more than once when
-        #              live-streaming an in-progress upload
-        Keygen.logger.warn { "[workers.process-oci-image-worker] Error: #{e.class.name} - #{e.message}" }
+      OciImageLayout.parse(archive) do |layout|
+        process layout, artifact:, client:
       end
     end
 
@@ -128,6 +69,72 @@ class ProcessOciImageWorker < BaseWorker
   end
 
   private
+
+  def process(layout, artifact:, client:)
+    layout.each do |item|
+      next unless
+        item.exists?
+
+      # store indexes and manifests as a manifest for reference without hitting storage provider
+      if item in OciImageLayout::Index | OciImageLayout::Manifest => descriptor
+        raise ImageNotAcceptableError, 'manifest is too big' if
+          descriptor.size > MAX_MANIFEST_SIZE
+
+        ReleaseManifest.create!(
+          account_id: artifact.account_id,
+          environment_id: artifact.environment_id,
+          release_id: artifact.release_id,
+          release_artifact_id: artifact.id,
+          content_type: descriptor.media_type,
+          content_digest: descriptor.digest,
+          content_length: descriptor.size,
+          content_path: descriptor.path,
+          content: descriptor.read,
+        )
+
+        # still need to read/store it as a blob
+        descriptor.rewind
+      end
+
+      # store blobs as a descriptor pointing to the storage provider
+      if item in OciImageLayout::Blob => blob
+        raise ImageNotAcceptableError, 'blob is too big' if
+          blob.size > MAX_BLOB_SIZE
+
+        descriptor = ReleaseDescriptor.create!(
+          account_id: artifact.account_id,
+          environment_id: artifact.environment_id,
+          release_id: artifact.release_id,
+          release_artifact_id: artifact.id,
+          content_type: blob.media_type,
+          content_digest: blob.digest,
+          content_length: blob.size,
+          content_path: blob.path,
+        )
+
+        # don't reupload if blob already exists
+        next if
+          client.head_object(bucket: descriptor.bucket, key: descriptor.key).successful? rescue false
+
+        # TODO(ezekg) this should accept a block like get_object to support chunked writes
+        #             see: https://github.com/aws/aws-sdk-ruby/issues/3142
+        client.put_object(
+          bucket: descriptor.bucket,
+          key: descriptor.key,
+          content_length: descriptor.content_length,
+          content_type: descriptor.content_type,
+          body: blob.to_io,
+        )
+      end
+    rescue ActiveRecord::RecordNotUnique => e
+      # FIXME(ezekg) sometimes we get the same item more than once when
+      #              live-streaming an in-progress upload
+      Keygen.logger.warn { "[workers.process-oci-image-worker] Error: #{e.class.name} - #{e.message}" }
+    ensure
+      # release the item's file descriptor as soon as we're done with it
+      item.close
+    end
+  end
 
   def unpack(io, &)
     Minitar::Reader.open(io, &)
